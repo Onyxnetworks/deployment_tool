@@ -44,7 +44,7 @@ def external_epg_deployment(request):
         request.session['RULE_LIST'] = rule_list
         # Validate Request names and format
         task = EXTERNAL_EPG_VALIDATION.delay(rule_list, location, apic_username, apic_password)
-
+        print(request.session.get('RULE_LIST'))
         # Return file url.
         return HttpResponse(json.dumps({'task_id': task.id}), content_type='application/json')
     content = {}
