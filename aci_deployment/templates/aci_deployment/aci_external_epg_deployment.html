@@ -31,7 +31,7 @@
                <p id="externnal_epg_result"></p>
             <div class="row">
 		<div class="col-lg-12">
-                    <div class="panel panel-default" style="visibility: hidden;" id="tablediv">
+                    <div class="panel panel-default" style="visibility: hidden;" id="resultdiv">
                         <!-- /.panel-heading -->
                         <div class="panel-body">
                             <div id="epg_deployment_results">
@@ -74,7 +74,7 @@
                 }
             },
             error: function (data) {
-                document.getElementById("tablediv").style.visibility = "hidden";
+                document.getElementById("resultdiv").style.visibility = "hidden";
                 console.log("Something went wrong!");
             }
         });
@@ -94,7 +94,7 @@
                 else if (data.state == 'SUCCESS') {
                     <!-- Clear Old  Data -->
                     document.getElementById("epg_deployment_results").innerHTML = "";
-                    document.getElementById("tablediv").style.visibility = "visible";
+                    document.getElementById("resultdiv").style.visibility = "visible";
                     var results = data.result;
                     var result_location = document.getElementById("epg_deployment_results")
                     for (i = 0, len = results.length, text = ""; i < len; i++) {
@@ -117,7 +117,7 @@
                 }
             },
             error: function (data) {
-                document.getElementById("tablediv").style.visibility = "hidden";
+                document.getElementById("resultdiv").style.visibility = "hidden";
                 rslt.html("Something went wrong!");
 
             success()

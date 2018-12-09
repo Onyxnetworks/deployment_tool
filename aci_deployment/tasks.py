@@ -192,7 +192,7 @@ def EXTERNAL_EPG_VALIDATION(RULE_LIST, LOCATION, APIC_USERNAME, APIC_PASSWORD):
                     network = ipaddress.IPv4Network(subnets)
                 except ValueError:
                     ERROR = True
-                    OUTPUT_LOG.append({'Errors': subnets + 'Is not a valid IPv4 address.'})
+                    OUTPUT_LOG.append({'Errors': subnets + ' Is not a valid IPv4 address.'})
 
         if len(addresses['PROVIDER_IP']) >= 1:
             for subnets in addresses['PROVIDER_IP']:
@@ -200,7 +200,7 @@ def EXTERNAL_EPG_VALIDATION(RULE_LIST, LOCATION, APIC_USERNAME, APIC_PASSWORD):
                     network = ipaddress.IPv4Network(subnets)
                 except ValueError:
                     ERROR = True
-                    OUTPUT_LOG.append({'Errors': subnets + 'Is not a valid IPv4 address.'})
+                    OUTPUT_LOG.append({'Errors': subnets + ' Is not a valid IPv4 address.'})
 
 
 
