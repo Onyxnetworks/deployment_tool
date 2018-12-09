@@ -121,13 +121,15 @@
                     if (validation_error){
                         var p_error = document.createElement("p");
                         result_location.appendChild(p_error);
-                        p_error.innerHTML = "Errors found. Please fix and try again."
+                        p_error.innerHTML = "Errors found. Please fix and try again.";
                     }
 
                     if (!validation_error){
                         document.getElementById("deploy_btn").style.visibility = "visible";
                         document.getElementById("new_file_btn").style.visibility = "visible";
-                        document.getElementById("upload_btn").style.visibility = "hidden"
+                        document.getElementById("upload_btn").style.visibility = "hidden";
+                        document.getElementById("location").disabled = true;
+                        document.getElementById("file").disabled = true;
 
                     }
                 }
