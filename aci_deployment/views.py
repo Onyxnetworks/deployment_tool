@@ -4,7 +4,6 @@ from django.core.files.storage import FileSystemStorage
 
 import json
 from .tasks import *
-from .test_data import *
 
 
 def endpoint_search(request):
