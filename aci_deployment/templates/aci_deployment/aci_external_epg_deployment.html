@@ -141,7 +141,7 @@
                 }
                 if (data.state != 'SUCCESS') {
                     setTimeout(function () {
-                        get_task_info(task_id)
+                        get_task_info(task_id, location, rule_list)
                     }, 1000);
                 }
             },
