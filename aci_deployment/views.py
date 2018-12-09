@@ -50,7 +50,7 @@ def external_epg_deployment(request):
 def external_epg_deployment_push(request):
 
     # Deploy External EPG configuration
-    if request.method == 'POST' and 'rule_list' in request.POST:
+    if request.method == 'POST' and 'location' in request.POST:
         print('test')
 
         # Return task id back to client for ajax use.
