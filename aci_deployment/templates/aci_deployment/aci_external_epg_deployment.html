@@ -113,7 +113,10 @@
 
 
                 }
-                alert('Test')}
+                    if ('Errors' in results) {
+                        alert('Test')}
+                    }
+
                 if (data.state != 'SUCCESS') {
                     setTimeout(function () {
                         get_task_info(task_id)
