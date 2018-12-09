@@ -73,7 +73,7 @@
 
             success: function (data) {
                 if (data.task_id != null) {
-                    get_task_info(data.task_id);
+                    get_task_info(data.task_id, data.location, data.rule_list);
                 }
             },
             error: function (data) {
@@ -84,7 +84,11 @@
         return false;
     });
 
-    function get_task_info(task_id) {
+    function deploy_configuration(location, rule_list) {
+        alert(location)
+    }
+
+    function get_task_info(task_id, location, rule_list) {
         $.ajax({
             type: 'get',
             url: '/get_task_info/',
@@ -130,6 +134,8 @@
                         document.getElementById("upload_btn").style.visibility = "hidden";
                         document.getElementById("location").disabled = true;
                         document.getElementById("file").disabled = true;
+                        deploy_configuration(location, rule_list);
+
 
                     }
                 }
