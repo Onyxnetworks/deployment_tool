@@ -85,6 +85,7 @@
     });
 
     function deploy_configuration(location, rule_list) {
+    alert(location)
     }
 
     function get_task_info(task_id, location, rule_list) {
@@ -93,7 +94,6 @@
             url: '/get_task_info/',
             data: {'task_id': task_id},
             success: function (data) {
-                alert(location)
                 rslt.html('');
                 if (data.state == 'PENDING') {
                     rslt.html('Please wait...');
