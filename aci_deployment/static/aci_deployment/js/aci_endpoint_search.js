@@ -67,7 +67,17 @@ function get_task_info(task_id) {
                         td.innerHTML = items;
                         document.body.appendChild(td);
                         document.getElementById(TABLE_TR).appendChild(td);
-                    });}}if (data.state != 'SUCCESS') {
+                    });}
+
+                $('#endpoint_table').DataTable({
+                    responsive: true,
+                    "language": {
+                        "search": "Filter records:"
+                    },
+                } );
+            }
+
+            if (data.state != 'SUCCESS') {
                 setTimeout(function () {
                     get_task_info(task_id)
                 }, 1000);
