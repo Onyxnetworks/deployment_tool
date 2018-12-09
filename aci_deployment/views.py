@@ -33,22 +33,20 @@ def external_epg_deployment(request):
     if request.method == 'POST' and 'file' in request.FILES:
         file = request.FILES['file']
         location = request.POST['location']
-        #fs = FileSystemStorage()
-        #filename = fs.save(file.name, file)
-        #uploaded_file_url = fs.url(filename)
-        #fs.delete(filename)
 
         # Open workbook and build jason data structure.
         rule_list = EXTERNAL_EPG_EXCEL_OPEN_WORKBOOK(file, location)
+
+        # Set session cookies for json and location
         request.session['LOCATION'] = location
         request.session['RULE_LIST'] = rule_list
-        print(rule_list)
+
         # Validate Request names and format
         task = EXTERNAL_EPG_VALIDATION.delay(rule_list, location, apic_username, apic_password)
-        print(request.session.get('LOCATION'))
-        print(str(request.session.get('RULE_LIST')))
-        # Return file url.
-        return HttpResponse(json.dumps({'task_id': task.id}), content_type='application/json')
+
+        # Return task id.
+        return HttpResponse(json.dumps({'task_id': task.id, 'rule_list': rule_list}), content_type='application/json')
+
     content = {}
     return render(request, 'aci_deployment/aci_external_epg_deployment.html', content)
 
