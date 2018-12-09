@@ -103,24 +103,26 @@ def EXTERNAL_EPG_EXCEL_FORMAT_VALIDATION(RULE_LIST):
                     DISPLAY_LIST.append(rules['CONSUMER_EPG'])
                     ERROR = True
 
-                if rules['CONSUMER_EPG'].split('_')[1].upper() != 'EPG':
+                elif rules['CONSUMER_EPG'].split('_')[1].upper() != 'EPG':
                     DISPLAY_LIST.append(rules['CONSUMER_EPG'])
                     ERROR = True
 
-                if rules['CONSUMER_EPG'].split('-')[0].upper() not in TENANT_LIST:
+                elif rules['CONSUMER_EPG'].split('-')[0].upper() not in TENANT_LIST:
                     DISPLAY_LIST.append(rules['CONSUMER_EPG'])
                     ERROR = True
 
-                if rules['CONSUMER_L3OUT'].split('_')[0].endswith('CLOUD'):
+                elif rules['CONSUMER_L3OUT'].split('_')[0].endswith('CLOUD'):
                     continue
 
                 # TEMP FIX FOR BLUE INET UNTIL RENAME
-                if rules['CONSUMER_L3OUT'] == 'BLUE-DC1-INET_L3O' or 'BLUE-DC2-INET_L3O':
+                elif rules['CONSUMER_L3OUT'] == 'BLUE-DC1-INET_L3O' or 'BLUE-DC2-INET_L3O':
                     continue
-                if not rules['CONSUMER_EPG'].split('_')[0].startswith(rules['CONSUMER_EPG'].split('_')[0]):
+                elif not rules['CONSUMER_EPG'].split('_')[0].startswith(rules['CONSUMER_EPG'].split('_')[0]):
                     DISPLAY_LIST.append(rules['CONSUMER_EPG'])
                     ERROR = True
 
+                else:
+                    pass
 
             except:
                 ERROR = True
@@ -132,24 +134,26 @@ def EXTERNAL_EPG_EXCEL_FORMAT_VALIDATION(RULE_LIST):
                     DISPLAY_LIST.append(rules['PROVIDER_EPG'])
                     ERROR = True
 
-                if rules['PROVIDER_EPG'].split('_')[1].upper() != 'EPG':
+                elif rules['PROVIDER_EPG'].split('_')[1].upper() != 'EPG':
                     DISPLAY_LIST.append(rules['PROVIDER_EPG'])
                     ERROR = True
 
-                if rules['PROVIDER_EPG'].split('-')[0].upper() not in TENANT_LIST:
+                elif rules['PROVIDER_EPG'].split('-')[0].upper() not in TENANT_LIST:
                     DISPLAY_LIST.append(rules['PROVIDER_EPG'])
                     ERROR = True
 
-                if rules['PROVIDER_L3OUT'].split('_')[0].endswith('CLOUD'):
+                elif rules['PROVIDER_L3OUT'].split('_')[0].endswith('CLOUD'):
                     continue
 
                 # TEMP FIX FOR BLUE INET UNTIL RENAME
-                if rules['PROVIDER_L3OUT'] == 'BLUE-DC1-INET_L3O' or 'BLUE-DC2-INET_L3O':
+                elif rules['PROVIDER_L3OUT'] == 'BLUE-DC1-INET_L3O' or 'BLUE-DC2-INET_L3O':
                     continue
-                if not rules['PROVIDER_EPG'].split('_')[0].startswith(rules['PROVIDER_L3OUT'].split('_')[0]):
+                elif not rules['PROVIDER_EPG'].split('_')[0].startswith(rules['PROVIDER_L3OUT'].split('_')[0]):
                     DISPLAY_LIST.append(rules['PROVIDER_EPG'])
                     ERROR = True
 
+                else:
+                    pass
 
             except:
                 ERROR = True
