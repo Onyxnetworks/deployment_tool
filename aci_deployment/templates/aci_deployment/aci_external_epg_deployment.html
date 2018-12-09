@@ -109,13 +109,14 @@
                             p_err.innerHTML = results[i].Errors;
                         }
 
+                        if ("Errors" in results[i]) {
+                            alert('Test')
+                        }
+
 
 
 
                 }
-                    if ('Errors' in results) {
-                        alert('Test')}
-                    }
 
                 if (data.state != 'SUCCESS') {
                     setTimeout(function () {
