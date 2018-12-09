@@ -92,8 +92,8 @@
         $.ajax({
             type: 'get',
             url: '/get_task_info/',
-            data: {'task_id': task_id},
-            success: function (data, location, rule_list) {
+            data: {'task_id': task_id, 'location': location},
+            success: function (data) {
                 rslt.html('');
                 if (data.state == 'PENDING') {
                     rslt.html('Please wait...');
@@ -134,7 +134,7 @@
                         document.getElementById("upload_btn").style.visibility = "hidden";
                         document.getElementById("location").disabled = true;
                         document.getElementById("file").disabled = true;
-                        alert(location)
+                        alert(data.location)
                         deploy_configuration(location, rule_list);
 
 
