@@ -53,6 +53,9 @@ def external_epg_deployment_push(request):
     if request.method == 'POST' and 'rule_list' in request.POST:
         print('test')
 
+        # Return task id back to client for ajax use.
+        return HttpResponse(json.dumps({'task_id': task.id}), content_type='application/json')
+
 
 def contract_deployment(request):
     APIC_USERNAME = 'admin'
