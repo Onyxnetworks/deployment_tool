@@ -54,8 +54,9 @@ def external_epg_deployment_push(request):
         print('test')
 
         # Return task id back to client for ajax use.
-        return HttpResponse(json.dumps({'task_id': task.id}), content_type='application/json')
-
+        return HttpResponse(json.dumps({'task_id': 'test'}), content_type='application/json')
+    content = {}
+    return render(request, 'aci_deployment/aci_external_epg_deployment.html', content)
 
 def contract_deployment(request):
     APIC_USERNAME = 'admin'
