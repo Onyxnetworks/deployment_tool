@@ -59,6 +59,7 @@
     frm.submit(function(e) {
     e.preventDefault();
     var formData = new FormData(this);
+    document.getElementById("resultdiv").style.visibility = "hidden";
 
         $.ajax({
             type: 'post',
