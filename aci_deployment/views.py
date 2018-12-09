@@ -41,7 +41,7 @@ def external_epg_deployment(request):
         task = EXTERNAL_EPG_VALIDATION.delay(rule_list, location, apic_username, apic_password)
 
         # Return task id.
-        return HttpResponse(json.dumps({'task_id': task.id, 'rule_list': rule_list, 'location': location}), content_type='application/json')
+        return HttpResponse(json.dumps({'task_id': task.id, 'rule_list': '123', 'location': location}), content_type='application/json')
 
     content = {}
     return render(request, 'aci_deployment/aci_external_epg_deployment.html', content)
@@ -50,7 +50,7 @@ def external_epg_deployment(request):
 def external_epg_deployment_push(request):
 
     # Deploy External EPG configuration
-    if request.method == 'POST' and 'location' in request.POST:
+    if request.method == 'POST' and 'location' and 'rule_list' in request.POST:
         print('test')
 
         # Return task id back to client for ajax use.
