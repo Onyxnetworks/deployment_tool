@@ -87,7 +87,7 @@
     function get_validation_task_info(task_id, location, rule_list) {
         $.ajax({
             type: 'get',
-            url: '/get_validation_task_info/',
+            url: '/get_task_info/',
             data: {'task_id': task_id},
             success: function (data) {
                 rslt.html('');
