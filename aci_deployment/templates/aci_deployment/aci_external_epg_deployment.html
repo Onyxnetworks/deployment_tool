@@ -116,8 +116,9 @@
                     }
 
                     if (validation_error){
-                        alert('Test')
-                    }
+                        var p_error = document.createElement("p");
+                        result_location.appendChild(p_error);
+                        p_error.innerHTML = "Errors found. Please fix and try again."                    }
                 }
                 if (data.state != 'SUCCESS') {
                     setTimeout(function () {
