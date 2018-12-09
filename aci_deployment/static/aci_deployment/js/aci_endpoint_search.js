@@ -69,6 +69,12 @@ function get_task_info(task_id) {
                         document.getElementById(TABLE_TR).appendChild(td);
                     });}
 
+                $('#endpoint_table').DataTable({
+                    responsive: true,
+                    "language": {
+                        "search": "Filter records:"
+                    },
+                } );
             }
 
             if (data.state != 'SUCCESS') {
