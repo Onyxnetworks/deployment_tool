@@ -26,12 +26,11 @@ def endpoint_search(request):
 
 
 def external_epg_deployment(request):
-    BASE_URL = 'https://sandboxapicdc.cisco.com/api/'
-    APIC_USERNAME = 'admin'
-    APIC_PASSWORD = 'ciscopsdt'
+    base_url = 'https://sandboxapicdc.cisco.com/api/'
+    apic_username = 'admin'
+    apic_password = 'ciscopsdt'
     # Present file upload to screen and give options to user
     if request.method == 'POST' and 'file' in request.FILES:
-        print('Match')
         file = request.FILES['file']
         location = request.POST['location']
         #fs = FileSystemStorage()
@@ -40,14 +39,12 @@ def external_epg_deployment(request):
         #fs.delete(filename)
 
         # Open workbook and build jason data structure.
-        RULE_LIST = EXTERNAL_EPG_EXCEL_OPEN_WORKBOOK(file, location)
-        print(str(RULE_LIST))
+        rule_list = EXTERNAL_EPG_EXCEL_OPEN_WORKBOOK(file, location)
         # Validate Request names and format
-        task = EXTERNAL_EPG_EXCEL_FORMAT_VALIDATION.delay(RULE_LIST)
+        task = EXTERNAL_EPG_VALIDATION.delay(rule_list, location, apic_username, apic_password)
 
         # Return file url.
         return HttpResponse(json.dumps({'task_id': task.id}), content_type='application/json')
-    print('No Match')
     content = {}
     return render(request, 'aci_deployment/aci_external_epg_deployment.html', content)
 
