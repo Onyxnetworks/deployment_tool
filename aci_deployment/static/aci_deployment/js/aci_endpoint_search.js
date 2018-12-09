@@ -1,6 +1,7 @@
 var frm = $('#endpoint_search');
 var rslt = $('#endpoint_results');
 frm.submit(function () {
+    document.getElementById("tablediv").style.visibility = "hidden";
     $.ajax({
         type: frm.attr('method'),
         url: frm.attr('action'),
