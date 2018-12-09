@@ -97,6 +97,7 @@
                     document.getElementById("resultdiv").style.visibility = "visible";
                     var results = data.result;
                     var result_location = document.getElementById("epg_deployment_results")
+                    var validation_error = false;
                     for (i = 0, len = results.length, text = ""; i < len; i++) {
                         if (results[i].Notifications) {
                             var p_not = document.createElement("p");
@@ -110,10 +111,14 @@
                         }
 
                         if ("Errors" in results[i]) {
-                            alert('Test')}
+                            var validation_error = true
+                        }
+                    }
 
-
-                }}
+                    if (validation_error){
+                        alert('Test')
+                    }
+                }
                 if (data.state != 'SUCCESS') {
                     setTimeout(function () {
                         get_task_info(task_id)
