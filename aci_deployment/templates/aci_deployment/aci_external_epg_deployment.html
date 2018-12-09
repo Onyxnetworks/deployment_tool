@@ -73,7 +73,7 @@
 
             success: function (data) {
                 if (data.task_id != null) {
-                    get_task_info(data.task_id, data.location, data.rule_list);
+                    get_validation_task_info(data.task_id, data.location, data.rule_list);
                 }
             },
             error: function (data) {
@@ -84,18 +84,10 @@
         return false;
     });
 
-    function deploy_configuration(location, rule_list) {
-        $("#deploy_btn").click(function(){
-            alert(location)
-
-        });
-
-    }
-
-    function get_task_info(task_id, location, rule_list) {
+    function get_validation_task_info(task_id, location, rule_list) {
         $.ajax({
             type: 'get',
-            url: '/get_task_info/',
+            url: '/get_validation_task_info/',
             data: {'task_id': task_id},
             success: function (data) {
                 rslt.html('');
@@ -145,7 +137,7 @@
                 }
                 if (data.state != 'SUCCESS') {
                     setTimeout(function () {
-                        get_task_info(task_id, location, rule_list)
+                        get_validation_task_info(task_id, location, rule_list)
                     }, 1000);
                 }
             },
@@ -156,6 +148,52 @@
             success()
             }
         });
+    }
+
+    function deploy_configuration(location, rule_list) {
+        $("#deploy_btn").click(function(){
+
+            $.ajax({
+                type: 'post',
+                url: '/aci/external_epg_deployment_push/',
+                data: {'location': location, 'rule_list': rule_list},
+
+                success: function (data) {
+                    if (data.task_id != null) {
+                        get_deployment_task_info(data.task_id);
+                    }},
+
+                error: function (data) {
+                    document.getElementById("tablediv").style.visibility = "hidden";
+                    console.log("Something went wrong!");
+                }
+            });
+        });
+    }
+
+    function get_deployment_task_info(task_id) {
+    $.ajax({
+        type: 'get',
+        url: '/get_task_info/',
+        data: {'task_id': task_id},
+        success: function (data) {
+            rslt.html('');
+            if (data.state == 'PENDING') {
+                rslt.html('Please wait...');
+            }
+            else if (data.state == 'SUCCESS') {
+
+            }
+            if (data.state != 'SUCCESS') {
+                setTimeout(function () {
+                    get_deployment_task_info(task_id)
+                }, 1000);
+            }},
+        error: function (data) {
+            document.getElementById("tablediv").style.visibility = "hidden";
+            rslt.html("Something went wrong!");success()
+        }
+    })
     }
 </script>
 <!--

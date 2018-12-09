@@ -47,6 +47,13 @@ def external_epg_deployment(request):
     return render(request, 'aci_deployment/aci_external_epg_deployment.html', content)
 
 
+def external_epg_deployment_push(request):
+
+    # Deploy External EPG configuration
+    if request.method == 'POST' and 'rule_list' in request.POST:
+        print('test')
+
+
 def contract_deployment(request):
     APIC_USERNAME = 'admin'
     APIC_PASSWORD = 'ciscopsdt'
