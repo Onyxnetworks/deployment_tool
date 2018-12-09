@@ -93,7 +93,6 @@
             url: '/get_task_info/',
             data: {'task_id': task_id},
             success: function (data) {
-                alert(location)
                 rslt.html('');
                 if (data.state == 'PENDING') {
                     rslt.html('Please wait...');
@@ -134,6 +133,7 @@
                         document.getElementById("upload_btn").style.visibility = "hidden";
                         document.getElementById("location").disabled = true;
                         document.getElementById("file").disabled = true;
+                        alert(location)
                         deploy_configuration(location, rule_list);
 
 
