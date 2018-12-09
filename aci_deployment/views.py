@@ -41,7 +41,7 @@ def external_epg_deployment(request):
         task = EXTERNAL_EPG_VALIDATION.delay(rule_list, location, apic_username, apic_password)
 
         # Return task id.
-        return HttpResponse(json.dumps({'task_id': task.id, 'rule_list': '123', 'location': location}), content_type='application/json')
+        return HttpResponse(json.dumps({'task_id': task.id, 'rule_list': rule_list, 'location': location}), content_type='application/json')
 
     content = {}
     return render(request, 'aci_deployment/aci_external_epg_deployment.html', content)
