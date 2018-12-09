@@ -40,6 +40,8 @@ def external_epg_deployment(request):
 
         # Open workbook and build jason data structure.
         rule_list = EXTERNAL_EPG_EXCEL_OPEN_WORKBOOK(file, location)
+        request.session['LOCATION'] = location
+        request.session['RULE_LIST'] = rule_list
         # Validate Request names and format
         task = EXTERNAL_EPG_VALIDATION.delay(rule_list, location, apic_username, apic_password)
 
