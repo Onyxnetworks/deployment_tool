@@ -42,6 +42,7 @@ def external_epg_deployment(request):
         rule_list = EXTERNAL_EPG_EXCEL_OPEN_WORKBOOK(file, location)
         request.session['LOCATION'] = location
         request.session['RULE_LIST'] = rule_list
+        print(rule_list)
         # Validate Request names and format
         task = EXTERNAL_EPG_VALIDATION.delay(rule_list, location, apic_username, apic_password)
         print(request.session.get('LOCATION'))
