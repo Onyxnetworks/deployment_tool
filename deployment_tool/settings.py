@@ -47,6 +47,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'deployment_tool.middleware.LoginRequiredMiddleware'
 ]
 
 ROOT_URLCONF = 'deployment_tool.urls'
@@ -127,3 +128,7 @@ MEDIA_URL = '/tmp/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'tmp')
 
 STATIC_URL = '/static/'
+
+# Login Config
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/index/'
