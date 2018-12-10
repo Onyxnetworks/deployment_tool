@@ -66,7 +66,7 @@ def contract_deployment(request):
         rule_list = CONTRACT_DEPLOYMENT_EXCEL_OPEN_WORKBOOK(file, location)
 
         # Validate Request names and format
-        task = CONTRACT_DEPLOYMENT_APIC_VALIDATION.delay(rule_list, location, apic_username, apic_password)
+        task = CONTRACT_DEPLOYMENT_VALIDATION.delay(rule_list, location, apic_username, apic_password)
 
         # Return task id.
         return HttpResponse(json.dumps({'task_id': task.id, 'rule_list': rule_list, 'location': location}), content_type='application/json')

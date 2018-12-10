@@ -597,13 +597,14 @@ def EXTERNAL_EPG_DEPLOYMENT(LOCATION, APIC_USERNAME, APIC_PASSWORD, RULE_LIST):
     return OUTPUT_LOG
 
 @shared_task
-def CONTRACT_DEPLOYMENT_APIC_VALIDATION(RULE_LIST, LOCATION, APIC_USERNAME, APIC_PASSWORD):
+def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, LOCATION, APIC_USERNAME, APIC_PASSWORD):
     CONTRACT_LIST = []
     FILTER_LIST = []
     DISPLAY_LIST = []
     OUTPUT_LOG = []
     ERROR = False
     HEADERS = {'content-type': 'application/json'}
+    TENANT_LIST = ['RED', 'GREEN', 'BLUE']
 
     if LOCATION == 'DC1':
         BASE_URL = 'https://sandboxapicdc.cisco.com/api/'
@@ -614,7 +615,156 @@ def CONTRACT_DEPLOYMENT_APIC_VALIDATION(RULE_LIST, LOCATION, APIC_USERNAME, APIC
     elif LOCATION == 'SANDBOX':
         BASE_URL = 'https://sandboxapicdc.cisco.com/api/'
 
+    # Validate Contract Name formatting
+    OUTPUT_LOG.append({'Notifications': ''})
+    OUTPUT_LOG.append({'Notifications': 'Validating Contract names in Workbook.'})
+    OUTPUT_LOG.append({'Notifications': '-----------------------------'})
+
+    try:
+        for rules in RULE_LIST:
+            if (len(rules['NAME'].split('_'))) > 2:
+                DISPLAY_LIST.append(rules['NAME'])
+                ERROR = True
+            elif rules['NAME'].split('_')[1].upper() != 'GCTR':
+                DISPLAY_LIST.append(rules['NAME'])
+                ERROR = True
+            elif rules['NAME'].split('-')[0].upper() not in TENANT_LIST:
+                DISPLAY_LIST.append(rules['NAME'])
+                ERROR = True
+
+            else:
+                pass
+
+        DISPLAY_SET = set(DISPLAY_LIST)
+        for contracts in DISPLAY_SET:
+            OUTPUT_LOG.append({'Errors': 'Contract "' + contracts + '" does not conform to the naming standard'})
+        DISPLAY_LIST = []
+
+    except:
+        OUTPUT_LOG.append({'Errors': 'Errors validating Contract names'})
+
+    if not ERROR:
+        OUTPUT_LOG.append({'Notifications': 'Contract formatting validated successfully'})
+
+    OUTPUT_LOG.append({'Notifications': ''})
+    OUTPUT_LOG.append({'Notifications': 'Validating EPG names in Workbook.'})
+    OUTPUT_LOG.append({'Notifications': '-----------------------------'})
+
+    for rules in RULE_LIST:
+        if rules['CONSUMER_EPG'] != 'BLANK':
+            try:
+                if len(rules['CONSUMER_EPG'].split('_')) > 2:
+                    DISPLAY_LIST.append(rules['CONSUMER_EPG'])
+                    ERROR = True
+                elif rules['CONSUMER_EPG'].split('_')[1].upper() != 'EPG':
+                    DISPLAY_LIST.append(rules['CONSUMER_EPG'])
+                    ERROR = True
+                elif rules['CONSUMER_EPG'].split('-')[0].upper() not in TENANT_LIST:
+                    DISPLAY_LIST.append(rules['CONSUMER_EPG'])
+                    ERROR = True
+
+                else:
+                    pass
+
+            except:
+                ERROR = True
+                OUTPUT_LOG.append(
+                    {'Errors': 'EPG "' + rules['CONSUMER_EPG'] + '" does not conform to the naming standard'})
+
+        if rules['PROVIDER_EPG'] != 'BLANK':
+            try:
+                if len(rules['PROVIDER_EPG'].split('_')) > 2:
+                    DISPLAY_LIST.append(rules['PROVIDER_EPG'])
+                    ERROR = True
+
+                elif rules['PROVIDER_EPG'].split('_')[1].upper() != 'EPG':
+                    DISPLAY_LIST.append(rules['PROVIDER_EPG'])
+                    ERROR = True
+
+                elif rules['PROVIDER_EPG'].split('-')[0].upper() not in TENANT_LIST:
+                    DISPLAY_LIST.append(rules['PROVIDER_EPG'])
+                    ERROR = True
+
+                else:
+                    pass
+
+            except:
+                ERROR = True
+                OUTPUT_LOG.append(
+                    {'Errors': 'EPG "' + rules['PROVIDER_EPG'] + '" does not conform to the naming standard'})
+
+        DISPLAY_SET = set(DISPLAY_LIST)
+        for contracts in DISPLAY_SET:
+            OUTPUT_LOG.append({'Errors': 'EPG "' + contracts + '" does not conform to the naming standard'})
+        DISPLAY_LIST = []
+
+    if not ERROR:
+        OUTPUT_LOG.append({'Notifications': 'EPG formatting validated successfully'})
+
+    OUTPUT_LOG.append({'Notifications': ''})
+    OUTPUT_LOG.append({'Notifications': 'Validating Contract and EPG locality.'})
+    OUTPUT_LOG.append({'Notifications': '-----------------------------'})
+
+    for rules in RULE_LIST:
+
+        if rules['CONSUMER_EPG'] != 'BLANK':
+            if rules['CONSUMER_EPG'].split('-')[0].upper() != rules['NAME'].split('-')[0].upper():
+                DISPLAY_LIST.append(rules['CONSUMER_EPG'])
+                ERROR = True
+
+        if rules['PROVIDER_EPG'] != 'BLANK':
+            if rules['PROVIDER_EPG'].split('-')[0].upper() != rules['NAME'].split('-')[0].upper():
+                DISPLAY_LIST.append(rules['PROVIDER_EPG'])
+                ERROR = True
+
+        else:
+            pass
+
+    DISPLAY_SET = set(DISPLAY_LIST)
+    for contracts in DISPLAY_SET:
+        OUTPUT_LOG.append({'Errors': contracts + ' and Contract named for different Tenants.'})
+    DISPLAY_LIST = []
+
+    if not ERROR:
+        OUTPUT_LOG.append({'Notifications': 'Contract and EPG locality validated successfully'})
+
+    OUTPUT_LOG.append({'Notifications': ''})
+    OUTPUT_LOG.append({'Notifications': 'Validating Services in Workbook.'})
+    OUTPUT_LOG.append({'Notifications': '-----------------------------'})
+
+    for rules in RULE_LIST:
+        for services in rules['SERVICE']:
+            PROTOCOLS = ['TCP', 'UDP']
+            try:
+                value = int(services.split('-')[1])
+            except:
+                OUTPUT_LOG.append(
+                    {'Errors': 'Service port not correct format for ' + services + ' on line ' + str(rules['LINE'])})
+            if services.split('-')[0] not in PROTOCOLS:
+                OUTPUT_LOG.append({'Errors': 'TCP or UDP not specified for service ' + services})
+                ERROR = True
+
+            elif int(services.split('-')[1]) == 0:
+                OUTPUT_LOG.append({'Errors': 'Error Port out of range ' + services})
+                ERROR = True
+
+            elif int(services.split('-')[1]) not in range(1, 65536):
+                OUTPUT_LOG.append({'Errors': 'Error Port out of range ' + services})
+                ERROR = True
+
+            elif len(services.split('-')) == 3:
+                if int(services.split('-')[2]) not in range(1, 65536):
+                    OUTPUT_LOG.append({'Errors': 'Error Port out of range ' + services})
+                    ERROR = True
+
+            else:
+                pass
+
+    if not ERROR:
+        OUTPUT_LOG.append({'Notifications': 'Services validated successfully'})
+
     APIC_COOKIE = APIC_LOGIN(BASE_URL, APIC_USERNAME, APIC_PASSWORD)
+
     if APIC_COOKIE:
         OUTPUT_LOG.append({'Notifications': ''})
         OUTPUT_LOG.append({'Notifications': 'Connecting to APIC'})
