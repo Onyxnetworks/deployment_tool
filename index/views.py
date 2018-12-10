@@ -44,10 +44,12 @@ def login(request):
                 request.session['lab_password'] = password
 
             apic_cookie = APIC_LOGIN(base_url, username, password)
+            print(apic_cookie)
 
             if apic_cookie:
                 request.session['APIC_COOKIE'] = apic_cookie
-                return redirect('Endpoint_Search')
+                print('Test2')
+                return redirect(index)
 
             else:
                 message = 'Unable to authenticate, please check credentials.'
@@ -65,4 +67,4 @@ def index(request):
 def logout(request):
     # Delete session data containing user details
     request.session.flush()
-    return redirect(index)
+    return redirect(login)
