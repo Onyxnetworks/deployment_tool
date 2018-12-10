@@ -298,6 +298,7 @@ def EXTERNAL_EPG_VALIDATION(RULE_LIST, LOCATION, APIC_USERNAME, APIC_PASSWORD):
                             L3OUT_DN = vrf_l3o['fvRtEctx']['attributes']['tDn']
                             SUBNET_SEARCH_RESPONSE = SUBNET_SEARCH(BASE_URL, APIC_COOKIE, L3OUT_DN, HEADERS)
                             for subnets in SUBNET_SEARCH_RESPONSE['imdata']:
+                                print(subnets)
                                 L3OUT_SUBNETS.append(subnets['l3extSubnet']['attributes']['ip'])
                                 EXISTING_SUBNET = subnets['l3extSubnet']['attributes']['ip']
                                 EXISTING_L3OUT = subnets['l3extSubnet']['attributes']['dn'].split('/')[2][4:]
@@ -349,6 +350,7 @@ def EXTERNAL_EPG_VALIDATION(RULE_LIST, LOCATION, APIC_USERNAME, APIC_PASSWORD):
                             L3OUT_DN = vrf_l3o['fvRtEctx']['attributes']['tDn']
                             SUBNET_SEARCH_RESPONSE = SUBNET_SEARCH(BASE_URL, APIC_COOKIE, L3OUT_DN, HEADERS)
                             for subnets in SUBNET_SEARCH_RESPONSE['imdata']:
+                                print(subnets)
                                 L3OUT_SUBNETS.append(subnets['l3extSubnet']['attributes']['ip'])
                                 EXISTING_SUBNET = subnets['l3extSubnet']['attributes']['ip']
                                 EXISTING_L3OUT = subnets['l3extSubnet']['attributes']['dn'].split('/')[2][4:]
