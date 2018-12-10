@@ -46,18 +46,18 @@
                         <form role="form" id="login" method="post" enctype="multipart/form-data">{% csrf_token %}
                             <fieldset>
                                 <div class="form-group">
-                                    <select class="form-control" name="environment" id="environment" required="required">
-                                        <option value="" selected disabled>Select Environment</option>
+                                    <select class="form-control" name="environment" id="environment" required>
+                                        <option value="" hidden selected disabled>Select Environment</option>
                                         <option>Production</option>
                                         <option>Pre-Production</option>
                                         <option>Lab</option>
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                    <input class="form-control" placeholder="ADM Account"required="required" name="username" type="text" autofocus>
+                                    <input class="form-control" placeholder="ADM Account" required name="username" type="text" autofocus>
                                 </div>
                                 <div class="form-group">
-                                    <input class="form-control" placeholder="Password" name="password" type="password" required="required" value="">
+                                    <input class="form-control" placeholder="Password" name="password" type="password" required value="">
                                 </div>
                                 <!-- Change this to a button or input when using this as a form -->
                                 <button type="button" class="btn btn-outline btn-success btn-lg btn-block">Login</button>
