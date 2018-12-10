@@ -46,7 +46,8 @@
                         <form role="form" id="login" method="post" enctype="multipart/form-data">{% csrf_token %}
                             <fieldset>
                                 <div class="form-group">
-                                    <select class="form-control-sm" name="environment" id="environment" required="required">
+                                    <label>Environment</label>
+                                    <select class="form-control" name="environment" id="environment" required="required">
                                         <option>Production</option>
                                         <option>Pre-Production</option>
                                         <option>Lab</option>
@@ -57,7 +58,7 @@
                                     <input class="form-control" placeholder="Password" name="password" type="password" required="required" value="">
                                 </div>
                                 <!-- Change this to a button or input when using this as a form -->
-                                <a href="/index/" class="btn btn-lg btn-success btn-block">Login</a>
+                                <a href="" class="btn btn-lg btn-success btn-block">Login</a>
                             </fieldset>
                         </form>
                     </div>
@@ -84,7 +85,7 @@
     var rslt = $('#login_results');
     frm.submit(function () {
         $.ajax({
-            type: frm.attr('method'),
+            type: 'post',
             url: frm.attr('action'),
             data: frm.serialize(),
             success: function (data) {
