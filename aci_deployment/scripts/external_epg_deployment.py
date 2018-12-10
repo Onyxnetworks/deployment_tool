@@ -101,5 +101,4 @@ def SUBNET_SEARCH(BASE_URL, APIC_COOKIE, L3OUT_DN, HEADERS):
 
     get_response = requests.get(SUBNET_SEARCH_URL, cookies=APIC_COOKIE, headers=HEADERS, verify=False)
     SUBNET_SEARCH_RESPONSE = json.loads(get_response.text)
-    print (SUBNET_SEARCH_RESPONSE)
     return SUBNET_SEARCH_RESPONSE
