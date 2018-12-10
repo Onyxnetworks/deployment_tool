@@ -25,9 +25,6 @@ function get_task_info(task_id) {
         success: function (data) {
             rslt.html('');
             if (data.state == 'PENDING') {
-                document.getElementById("result_table").innerHTML = "";
-                document.getElementById("tablediv").style.visibility = "visible";
-                document.getElementById("tablediv").appendChild(loading_spinner.responseXML.documentElement);
                 rslt.html('Please wait...');
             }
             else if (data.state == 'SUCCESS') {
