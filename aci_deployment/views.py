@@ -52,9 +52,9 @@ def external_epg_deployment_push(request):
     apic_password = 'ciscopsdt'
     # Deploy External EPG configuration
     if request.method == 'POST':
-        print('Test')
         location = request.POST['location']
         rule_list = request.POST['rule_list']
+        print(str(rule_list))
 
         # Deploy APIC configuration
         task = EXTERNAL_EPG_DEPLOYMENT.delay(location, apic_username, apic_password, rule_list)

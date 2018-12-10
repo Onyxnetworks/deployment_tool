@@ -152,11 +152,13 @@
 
     function deploy_configuration(location, rule_list) {
         $("#deploy_btn").click(function(){
-
+            var post_data = {'location': location, 'rule_list': rule_list}
             $.ajax({
                 type: 'post',
                 url: '/aci/external_epg_deployment_push/',
-                data: {'location': location, 'rule_list': rule_list},
+                data: JSON.stringify(post_data),
+                dataType: 'json',
+                contentType: 'application/json',
 
                 success: function (data) {
                     if (data.task_id != null) {
