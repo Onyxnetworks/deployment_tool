@@ -54,7 +54,7 @@ def external_epg_deployment_push(request):
     if request.method == 'POST':
         location = request.POST['location']
         rule_list = request.POST['rule_list']
-        print(str(rule_list))
+        print(type(rule_list))
 
         # Deploy APIC configuration
         task = EXTERNAL_EPG_DEPLOYMENT.delay(location, apic_username, apic_password, rule_list)
