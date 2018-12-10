@@ -102,8 +102,8 @@
                     console.log(data.message);
                     document.getElementById("username_grp").setAttribute("class", "form-group has-error");
                     document.getElementById("password_grp").setAttribute("class", "form-group has-error");
+                    document.getElementById("login_result").setAttribute("class", "alert alert-danger");
                     document.getElementById("login_result").innerHTML = data.message;
-
                 }
             },
             error: function (data) {
