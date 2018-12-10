@@ -4,7 +4,7 @@ import openpyxl
 # Custom Functions
 from aci_deployment.scripts.endpoint_search import *
 from aci_deployment.scripts.external_epg_deployment import *
-from .baseline import APIC_LOGIN
+from aci_deployment.scripts.baseline import APIC_LOGIN
 # Celery Functions
 from celery import shared_task
 
