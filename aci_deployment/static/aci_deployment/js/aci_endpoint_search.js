@@ -25,7 +25,7 @@ function get_task_info(task_id) {
         success: function (data) {
             rslt.html('');
             if (data.state == 'PENDING') {
-                rslt.html('Please wait...');
+                rslt.html('Please wait...' + loading_spinner.responseXML.documentElement);
             }
             else if (data.state == 'SUCCESS') {
                 <!-- Clear Old table Data -->
