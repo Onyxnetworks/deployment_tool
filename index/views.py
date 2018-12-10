@@ -46,7 +46,8 @@ def login(request):
 
             if apic_cookie:
                 request.session['APIC_COOKIE'] = apic_cookie
-                return redirect('index')
+                return HttpResponse(json.dumps({'message': 'redirect', 'redirect_url': '/aci/endpoint_search/'}),
+                                    content_type='application/json')
 
             else:
                 message = 'Unable to authenticate, please check credentials.'

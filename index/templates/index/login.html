@@ -94,9 +94,9 @@
             url: frm.attr('action'),
             data: frm.serialize(),
             success: function (data) {
-                if (!data.message) {
-                    console.log('redirect')
-                    //window.location.replace = '/index/';//
+                if (data.message == 'redirect') {
+                    console.log('Redirecting to: ' + data.redirect_url)
+                    window.location.replace = 'data.redirect_url';
                 }
                 else {
                     console.log(data.message);
@@ -110,7 +110,6 @@
                 console.log("Something went wrong!");
             },
         });
-        return false;
     })
     </script>
     {% block scripts %}
