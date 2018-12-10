@@ -77,18 +77,18 @@ def contract_deployment(request):
 
 def contract_deployment_push(request):
     # Deploy External EPG configuration
-    #if request.method == 'POST':
-        #response_json = request.body
-        # response_json = json.dumps(response_json)
-        #data = json.loads(response_json)
-        #location = data['location']
-        #rule_list = data['rule_list']
-        #print(rule_list)
+    if request.method == 'POST':
+        response_json = request.body
+        response_json = json.dumps(response_json)
+        data = json.loads(response_json)
+        location = data['location']
+        rule_list = data['rule_list']
 
         # Deploy APIC configuration
-        #task = EXTERNAL_EPG_DEPLOYMENT.delay(location, apic_username, apic_password, rule_list)
+        task = CONTRACT_DEPLOYMENT.delay(location, apic_username, apic_password, rule_list)
 
         # Return task id back to client for ajax use.
-        #return HttpResponse(json.dumps({'task_id': task.id}), content_type='application/json')
+        return HttpResponse(json.dumps({'task_id': task.id}), content_type='application/json')
+
     content = {}
     return render(request, 'aci_deployment/aci_external_epg_deployment.html', content)

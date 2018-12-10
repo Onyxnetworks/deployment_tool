@@ -479,6 +479,7 @@ def EXTERNAL_EPG_DEPLOYMENT(LOCATION, APIC_USERNAME, APIC_PASSWORD, RULE_LIST):
     elif LOCATION == 'SANDBOX':
         BASE_URL = 'https://sandboxapicdc.cisco.com/api/'
         DC = LOCATION
+
     TENANT = 'common'
     OUTPUT_LOG = []
     HEADERS = {'content-type': 'application/json'}
@@ -836,5 +837,144 @@ def CONTRACT_DEPLOYMENT_APIC_VALIDATION(RULE_LIST, LOCATION, APIC_USERNAME, APIC
 
     if not ERROR:
         OUTPUT_LOG.append({'Notifications': 'APIC Configuration validated successfully'})
+
+    return OUTPUT_LOG
+
+@shared_task
+def CONTRACT_DEPLOYMENT(LOCATION, APIC_USERNAME, APIC_PASSWORD, RULE_LIST):
+
+    if LOCATION == 'DC1':
+        BASE_URL = 'https://sandboxapicdc.cisco.com/api/'
+        DC = LOCATION
+    elif LOCATION == 'DC2':
+        BASE_URL = 'https://sandboxapicdc.cisco.com/api/'
+        DC = LOCATION
+    elif LOCATION == 'LAB':
+        BASE_URL = 'https://lab-a-apic.test-lab.local/api/'
+        DC = LOCATION
+    elif LOCATION == 'SANDBOX':
+        BASE_URL = 'https://sandboxapicdc.cisco.com/api/'
+        DC = LOCATION
+
+    CONTRACT_LIST = []
+    FILTER_LIST = []
+    DISPLAY_LIST = []
+    OUTPUT_LOG = []
+    HEADERS = {'content-type': 'application/json'}
+    # --------------------------------------------------------------------------#
+    # Begin Configuration
+    # --------------------------------------------------------------------------#
+    OUTPUT_LOG.append({'Notifications': ''})
+    OUTPUT_LOG.append({'Notifications': 'Starting contract provisioning.'})
+    OUTPUT_LOG.append({'Notifications': '-----------------------------'})
+    APIC_COOKIE = APIC_LOGIN(BASE_URL, APIC_USERNAME, APIC_PASSWORD)
+    if APIC_COOKIE:
+        OUTPUT_LOG.append({'Notifications': 'Successfully generated authentication cookie'})
+    else:
+        OUTPUT_LOG.append({'Errors': 'Unable to connect to APIC. Please check your credentials'})
+
+    OUTPUT_LOG.append({'Notifications': ''})
+    OUTPUT_LOG.append({'Notifications': 'Creating Filters.'})
+    OUTPUT_LOG.append({'Notifications': '-----------------------------'})
+    # Create Filters in Filter SET
+    for rules in RULE_LIST:
+        for services in rules['SERVICE']:
+            FILTER_NAME = services
+            FILTER_SEARCH_RESPONSE = FILTER_SEARCH(BASE_URL, APIC_COOKIE, FILTER_NAME, HEADERS)
+            if int(FILTER_SEARCH_RESPONSE['totalCount']) == 1:
+                pass
+            else:
+                FILTER_LIST.append(FILTER_NAME)
+
+    FILTER_SET = set(FILTER_LIST)
+    if len(FILTER_SET) > 0:
+        OUTPUT_LOG = FILTER_CREATE(FILTER_SET, BASE_URL, APIC_COOKIE, HEADERS, OUTPUT_LOG)
+    else:
+        pass
+
+    OUTPUT_LOG.append({'Notifications': ''})
+    OUTPUT_LOG.append({'Notifications': 'Creating Contract & Subjects.'})
+    OUTPUT_LOG.append({'Notifications': '-----------------------------'})
+    # Create Contracts and Subjects in Contract SET
+    for rules in RULE_LIST:
+        CONTRACT_NAME = rules['NAME']
+        CONTRACT_SEARCH_RESPONSE = CONTRACT_SEARCH(BASE_URL, APIC_COOKIE, CONTRACT_NAME, HEADERS)
+        if int(CONTRACT_SEARCH_RESPONSE['totalCount']) == 1:
+            pass
+        else:
+            CONTRACT_LIST.append(CONTRACT_NAME)
+
+    CONTRACT_SET = set(CONTRACT_LIST)
+    if len(CONTRACT_SET) > 0:
+        OUTPUT_LOG = CONTRACT_CREATE(CONTRACT_SET, BASE_URL, APIC_COOKIE, HEADERS, OUTPUT_LOG)
+    else:
+        pass
+
+    # Add filters to subjects
+    for rules in RULE_LIST:
+        # Use the contract search to locate subject
+        CONTRACT_NAME = rules['NAME']
+        CONTRACT_SEARCH_RESPONSE = CONTRACT_SEARCH(BASE_URL, APIC_COOKIE, CONTRACT_NAME, HEADERS)
+        # Validate that a contract can be located
+        if int(CONTRACT_SEARCH_RESPONSE['totalCount']) == 1:
+            TENANT = CONTRACT_SEARCH_RESPONSE['imdata'][0]['vzBrCP']['attributes']['dn'].split('/')[1][3:]
+            CONTRACT_SUBJECT = \
+            CONTRACT_SEARCH_RESPONSE['imdata'][0]['vzBrCP']['attributes']['dn'].split('/')[2][4:].split('_')[0] + '_SBJ'
+            SUBJECT_SEARCH_RESPONSE = SUBJECT_SEARCH(BASE_URL, APIC_COOKIE, CONTRACT_NAME, TENANT, CONTRACT_SUBJECT,
+                                                     HEADERS)
+
+            # Add all filters for a subject to a list to be used for comparison.
+            SUBJECT_FILTERS = []
+            for filters in SUBJECT_SEARCH_RESPONSE['imdata']:
+                SUBJECT_FILTERS.append(filters['vzRsSubjFiltAtt']['attributes']['tnVzFilterName'])
+
+            # compare list of filters to those already in subject
+            NEW_FILTERS = rules['SERVICE']
+            FILTER_COMPARE = LIST_COMPARE(NEW_FILTERS, SUBJECT_FILTERS)
+            if len(FILTER_COMPARE[0]) == 0:
+                pass
+
+            elif len(FILTER_COMPARE[0]) > 0:
+                for FILTERS in FILTER_COMPARE[0]:
+                    OUTPUT_LOG = FILTER_ATTACH(BASE_URL, APIC_COOKIE, CONTRACT_NAME, CONTRACT_SUBJECT, FILTERS, HEADERS,
+                                               OUTPUT_LOG)
+
+            else:
+                OUTPUT_LOG.append({'Errors': 'Error adding Filters to subject!'})
+
+            NEW_FILTERS = ''
+
+        else:
+            pass
+
+    OUTPUT_LOG.append({'Notifications': ''})
+    OUTPUT_LOG.append({'Notifications': 'Consuming & Providing Contracts.'})
+    OUTPUT_LOG.append({'Notifications': '-----------------------------'})
+
+    for rules in RULE_LIST:
+        LINE = rules['LINE']
+        CONTRACT_NAME = rules['NAME']
+        # Consuming contract
+        EPG_NAME = rules['CONSUMER_EPG']
+        OUTPUT_LOG.append({'Notifications': 'Deploying Contracts for Line: ' + str(LINE)})
+        OUTPUT_LOG.append({'Notifications': '-----------------------------'})
+
+        if EPG_NAME != 'BLANK':
+            if rules['CONSUMER_L3OUT'] == 'INTERNAL':
+                INTERNL_EPG_CONTRACT_CONSUME(BASE_URL, EPG_NAME, CONTRACT_NAME, APIC_COOKIE, HEADERS, OUTPUT_LOG)
+            else:
+                L3OUT_NAME = rules['CONSUMER_L3OUT']
+                EXTERNAL_EPG_CONTRACT_CONSUME(L3OUT_NAME, EPG_NAME, CONTRACT_NAME, BASE_URL, APIC_COOKIE, HEADERS,
+                                              OUTPUT_LOG)
+
+        # Providing contract
+        EPG_NAME = rules['PROVIDER_EPG']
+        if EPG_NAME != 'BLANK':
+            if rules['PROVIDER_L3OUT'] == 'INTERNAL':
+                INTERNL_EPG_CONTRACT_PROVIDE(BASE_URL, EPG_NAME, CONTRACT_NAME, APIC_COOKIE, HEADERS, OUTPUT_LOG)
+            else:
+                L3OUT_NAME = rules['PROVIDER_L3OUT']
+                EXTERNAL_EPG_CONTRACT_PROVIDE(L3OUT_NAME, EPG_NAME, CONTRACT_NAME, BASE_URL, APIC_COOKIE, HEADERS,
+                                              OUTPUT_LOG)
 
     return OUTPUT_LOG
