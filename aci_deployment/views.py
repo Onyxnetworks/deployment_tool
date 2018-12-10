@@ -51,7 +51,7 @@ def external_epg_deployment_push(request):
     apic_username = 'admin'
     apic_password = 'ciscopsdt'
     # Deploy External EPG configuration
-    if request.method == 'POST' and 'rule_list' in request.POST:
+    if request.method == 'POST':
         print('Test')
         location = request.POST['location']
         rule_list = request.POST['rule_list']
