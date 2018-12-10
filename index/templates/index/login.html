@@ -91,10 +91,10 @@
             url: frm.attr('action'),
             data: frm.serialize(),
             success: function (data) {
-                alert('Test1')
+                console.log(data.message);
             },
             error: function (data) {
-                alert('Test2')
+                console.log("Something went wrong!");
             },
         });
         return false;
