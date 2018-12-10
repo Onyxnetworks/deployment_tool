@@ -285,104 +285,103 @@ def EXTERNAL_EPG_VALIDATION(RULE_LIST, LOCATION, APIC_USERNAME, APIC_PASSWORD):
             L3OUT_DATA = L3OUT_SEARCH_RESPONSE[1]['imdata']
             L3OUT_SUBNETS = []
             # Loop through the VRF pull out all other L3Outs and add any l3extsubnet to a list
-            for key in L3OUT_DATA:
-                # For Python 3+
-                if 'l3extRsEctx' in key:
-                # For Python 2.7
-                #if key.keys() == ['l3extRsEctx']:
-                    VRF_DN = key['l3extRsEctx']['attributes']['tDn']
-                    VRF_SEARCH_RESPONSE = VRF_SEARCH(BASE_URL, APIC_COOKIE, VRF_DN, HEADERS)
-                    for vrf_l3o in VRF_SEARCH_RESPONSE['imdata']:
-                        # For Python 3+
-                        if 'fvRtEctx' in vrf_l3o:
-                        # For Python 2.7
-                        #if vrf_l3o.keys() == ['fvRtEctx']:
-                            L3OUT_DN = vrf_l3o['fvRtEctx']['attributes']['tDn']
-                            SUBNET_SEARCH_RESPONSE = SUBNET_SEARCH(BASE_URL, APIC_COOKIE, L3OUT_DN, HEADERS)
-                            for subnets in SUBNET_SEARCH_RESPONSE['imdata']:
-                                print(subnets)
-                                L3OUT_SUBNETS.append(subnets['l3extSubnet']['attributes']['ip'])
-                                EXISTING_SUBNET = subnets['l3extSubnet']['attributes']['ip']
-                                EXISTING_L3OUT = subnets['l3extSubnet']['attributes']['dn'].split('/')[2][4:]
-                                EXISTING_EPG = subnets['l3extSubnet']['attributes']['dn'].split('/')[3][6:]
-                                SCOPE = subnets['l3extSubnet']['attributes']['scope'].split(',')
-                                if EXISTING_SUBNET in rules['CONSUMER_IP']:
-                                    if 'import-security' in SCOPE:
-                                        if EXISTING_EPG == rules['CONSUMER_EPG']:
-                                            rules['CONSUMER_IP'].remove(EXISTING_SUBNET)
-                                        else:
-                                            OUTPUT_LOG.append({'Errors': EXISTING_SUBNET + ' already exists within ' + EXISTING_L3OUT + ' under EPG ' + EXISTING_EPG + ' no subnet configuration for this epg will be pushed.'})
-                                            ERROR = True
-                                            rules['CONSUMER_IP'].remove(EXISTING_SUBNET)
+            #for key in L3OUT_DATA:
+            #    # For Python 3+
+            #    if 'l3extRsEctx' in key:
+            #    # For Python 2.7
+            #    #if key.keys() == ['l3extRsEctx']:
+            #        VRF_DN = key['l3extRsEctx']['attributes']['tDn']
+            #        VRF_SEARCH_RESPONSE = VRF_SEARCH(BASE_URL, APIC_COOKIE, VRF_DN, HEADERS)
+            #        for vrf_l3o in VRF_SEARCH_RESPONSE['imdata']:
+            #            # For Python 3+
+            #            if 'fvRtEctx' in vrf_l3o:
+            #            # For Python 2.7
+            #            #if vrf_l3o.keys() == ['fvRtEctx']:
+            #                L3OUT_DN = vrf_l3o['fvRtEctx']['attributes']['tDn']
+            #                SUBNET_SEARCH_RESPONSE = SUBNET_SEARCH(BASE_URL, APIC_COOKIE, L3OUT_DN, HEADERS)
+            #                for subnets in SUBNET_SEARCH_RESPONSE['imdata']:
+            #                    L3OUT_SUBNETS.append(subnets['l3extSubnet']['attributes']['ip'])
+            #                    EXISTING_SUBNET = subnets['l3extSubnet']['attributes']['ip']
+            #                    EXISTING_L3OUT = subnets['l3extSubnet']['attributes']['dn'].split('/')[2][4:]
+            #                    EXISTING_EPG = subnets['l3extSubnet']['attributes']['dn'].split('/')[3][6:]
+            #                    SCOPE = subnets['l3extSubnet']['attributes']['scope'].split(',')
+            #                    if EXISTING_SUBNET in rules['CONSUMER_IP']:
+            #                        if 'import-security' in SCOPE:
+            #                            if EXISTING_EPG == rules['CONSUMER_EPG']:
+            #                                rules['CONSUMER_IP'].remove(EXISTING_SUBNET)
+            #                            else:
+            #                                OUTPUT_LOG.append({'Errors': EXISTING_SUBNET + ' already exists within ' + EXISTING_L3OUT + ' under EPG ' + EXISTING_EPG + ' no subnet configuration for this epg will be pushed.'})
+            #                                ERROR = True
+            #                                rules['CONSUMER_IP'].remove(EXISTING_SUBNET)
 
-                                else:
-                                    for rule_subnet in rules['CONSUMER_IP']:
-                                        if IPNetwork(rule_subnet) in IPNetwork(EXISTING_SUBNET):
-                                            if int(EXISTING_SUBNET.split('/')[1]) >= 20 and 'import-security' in SCOPE:
-                                                OUTPUT_LOG.append({'Errors': rule_subnet + ' already exists within ' + EXISTING_L3OUT + ' under EPG ' + EXISTING_EPG + ' inside ' + EXISTING_SUBNET})
-                                                ERROR = True
-                                                rules['CONSUMER_IP'].remove(rule_subnet)
-
-
-            if len(rules['CONSUMER_IP']) >= 1:
-                OUTPUT_LOG.append({'Notifications': 'The Following subnets will be added to the EPG: ' + rules['CONSUMER_EPG']})
-                OUTPUT_LOG.append({'Notifications': str(rules['CONSUMER_IP'])})
-
-            else:
-                OUTPUT_LOG.append({'Notifications': 'No subnets will be added to EPG: ' + rules['CONSUMER_EPG']})
-
-        if rules['PROVIDER_L3OUT'] != 'INTERNAL' and rules['PROVIDER_EPG'] != 'BLANK':
-            L3OUT_NAME = rules['PROVIDER_L3OUT']
-            L3OUT_SEARCH_RESPONSE = L3OUT_SEARCH(BASE_URL, APIC_COOKIE, TENANT, L3OUT_NAME, HEADERS)
-            L3OUT_DATA = L3OUT_SEARCH_RESPONSE[1]['imdata']
-            L3OUT_SUBNETS = []
-            # Loop through the VRF pull out all other L3Outs and add any l3extsubnet to a list
-            for key in L3OUT_DATA:
-                # For Python 3+
-                if 'l3extRsEctx' in key:
-                # For Python 2.7
-                #if key.keys() == ['l3extRsEctx']:
-                    VRF_DN = key['l3extRsEctx']['attributes']['tDn']
-                    VRF_SEARCH_RESPONSE = VRF_SEARCH(BASE_URL, APIC_COOKIE, VRF_DN, HEADERS)
-                    for vrf_l3o in VRF_SEARCH_RESPONSE['imdata']:
-                        # For Python 3+
-                        if 'fvRtEctx' in vrf_l3o:
-                        # For Python 2.7
-                        #if vrf_l3o.keys() == ['fvRtEctx']:
-                            L3OUT_DN = vrf_l3o['fvRtEctx']['attributes']['tDn']
-                            SUBNET_SEARCH_RESPONSE = SUBNET_SEARCH(BASE_URL, APIC_COOKIE, L3OUT_DN, HEADERS)
-                            for subnets in SUBNET_SEARCH_RESPONSE['imdata']:
-                                print(subnets)
-                                L3OUT_SUBNETS.append(subnets['l3extSubnet']['attributes']['ip'])
-                                EXISTING_SUBNET = subnets['l3extSubnet']['attributes']['ip']
-                                EXISTING_L3OUT = subnets['l3extSubnet']['attributes']['dn'].split('/')[2][4:]
-                                EXISTING_EPG = subnets['l3extSubnet']['attributes']['dn'].split('/')[3][6:]
-                                SCOPE = subnets['l3extSubnet']['attributes']['scope'].split(',')
-                                if EXISTING_SUBNET in rules['PROVIDER_IP']:
-                                    if 'import-security' in SCOPE:
-                                        if EXISTING_EPG == rules['PROVIDER_EPG']:
-                                            rules['PROVIDER_IP'].remove(EXISTING_SUBNET)
-
-                                        else:
-                                            OUTPUT_LOG.append({'Errors': EXISTING_SUBNET + ' already exists within ' + EXISTING_L3OUT + ' under EPG ' + EXISTING_EPG + ' no subnet configuration for this epg will be pushed.'})
-                                            ERROR = True
-                                            rules['PROVIDER_IP'].remove(EXISTING_SUBNET)
-
-                                else:
-                                    for rule_subnet in rules['PROVIDER_IP']:
-                                        if IPNetwork(rule_subnet) in IPNetwork(EXISTING_SUBNET):
-                                            if int(EXISTING_SUBNET.split('/')[1]) >= 20 and 'import-security' in SCOPE:
-                                                OUTPUT_LOG.append({'Errors': rule_subnet + ' already exists within ' + EXISTING_L3OUT + ' under EPG ' + EXISTING_EPG + ' inside ' + EXISTING_SUBNET})
-                                                ERROR = True
-                                                rules['PROVIDER_IP'].remove(rule_subnet)
+            #                    else:
+            #                        for rule_subnet in rules['CONSUMER_IP']:
+            #                            if IPNetwork(rule_subnet) in IPNetwork(EXISTING_SUBNET):
+            #                                if int(EXISTING_SUBNET.split('/')[1]) >= 20 and 'import-security' in SCOPE:
+            #                                    OUTPUT_LOG.append({'Errors': rule_subnet + ' already exists within ' + EXISTING_L3OUT + ' under EPG ' + EXISTING_EPG + ' inside ' + EXISTING_SUBNET})
+            #                                    ERROR = True
+            #                                    rules['CONSUMER_IP'].remove(rule_subnet)
 
 
-            if len(rules['PROVIDER_IP']) >= 1:
-                OUTPUT_LOG.append({'Notifications': 'The Following subnets will be added to the EPG: ' + rules['PROVIDER_EPG']})
-                OUTPUT_LOG.append({'Notifications': str(rules['PROVIDER_IP'])})
+            #if len(rules['CONSUMER_IP']) >= 1:
+            #    OUTPUT_LOG.append({'Notifications': 'The Following subnets will be added to the EPG: ' + rules['CONSUMER_EPG']})
+            #    OUTPUT_LOG.append({'Notifications': str(rules['CONSUMER_IP'])})
 
-            else:
-                OUTPUT_LOG.append({'Notifications': 'No subnets will be added to EPG: ' + rules['PROVIDER_EPG']})
+            #else:
+            #    OUTPUT_LOG.append({'Notifications': 'No subnets will be added to EPG: ' + rules['CONSUMER_EPG']})
+
+        #if rules['PROVIDER_L3OUT'] != 'INTERNAL' and rules['PROVIDER_EPG'] != 'BLANK':
+        #    L3OUT_NAME = rules['PROVIDER_L3OUT']
+        #    L3OUT_SEARCH_RESPONSE = L3OUT_SEARCH(BASE_URL, APIC_COOKIE, TENANT, L3OUT_NAME, HEADERS)
+        #    L3OUT_DATA = L3OUT_SEARCH_RESPONSE[1]['imdata']
+        #    L3OUT_SUBNETS = []
+        #    # Loop through the VRF pull out all other L3Outs and add any l3extsubnet to a list
+        #    for key in L3OUT_DATA:
+        #        # For Python 3+
+        #        if 'l3extRsEctx' in key:
+        #        # For Python 2.7
+        #        #if key.keys() == ['l3extRsEctx']:
+        #            VRF_DN = key['l3extRsEctx']['attributes']['tDn']
+        #            VRF_SEARCH_RESPONSE = VRF_SEARCH(BASE_URL, APIC_COOKIE, VRF_DN, HEADERS)
+        #            for vrf_l3o in VRF_SEARCH_RESPONSE['imdata']:
+        #                # For Python 3+
+        #                if 'fvRtEctx' in vrf_l3o:
+        #                # For Python 2.7
+        #                #if vrf_l3o.keys() == ['fvRtEctx']:
+        #                    L3OUT_DN = vrf_l3o['fvRtEctx']['attributes']['tDn']
+        #                    SUBNET_SEARCH_RESPONSE = SUBNET_SEARCH(BASE_URL, APIC_COOKIE, L3OUT_DN, HEADERS)
+        #                    for subnets in SUBNET_SEARCH_RESPONSE['imdata']:
+        #                        print(subnets)
+        #                        L3OUT_SUBNETS.append(subnets['l3extSubnet']['attributes']['ip'])
+        #                        EXISTING_SUBNET = subnets['l3extSubnet']['attributes']['ip']
+        #                        EXISTING_L3OUT = subnets['l3extSubnet']['attributes']['dn'].split('/')[2][4:]
+        #                        EXISTING_EPG = subnets['l3extSubnet']['attributes']['dn'].split('/')[3][6:]
+        #                        SCOPE = subnets['l3extSubnet']['attributes']['scope'].split(',')
+        #                        if EXISTING_SUBNET in rules['PROVIDER_IP']:
+        #                            if 'import-security' in SCOPE:
+        #                                if EXISTING_EPG == rules['PROVIDER_EPG']:
+        #                                    rules['PROVIDER_IP'].remove(EXISTING_SUBNET)
+
+        #                                else:
+        #                                    OUTPUT_LOG.append({'Errors': EXISTING_SUBNET + ' already exists within ' + EXISTING_L3OUT + ' under EPG ' + EXISTING_EPG + ' no subnet configuration for this epg will be pushed.'})
+        #                                    ERROR = True
+        #                                    rules['PROVIDER_IP'].remove(EXISTING_SUBNET)
+
+        #                        else:
+        #                            for rule_subnet in rules['PROVIDER_IP']:
+        #                                if IPNetwork(rule_subnet) in IPNetwork(EXISTING_SUBNET):
+        #                                    if int(EXISTING_SUBNET.split('/')[1]) >= 20 and 'import-security' in SCOPE:
+        #                                        OUTPUT_LOG.append({'Errors': rule_subnet + ' already exists within ' + EXISTING_L3OUT + ' under EPG ' + EXISTING_EPG + ' inside ' + EXISTING_SUBNET})
+        #                                        ERROR = True
+        #                                        rules['PROVIDER_IP'].remove(rule_subnet)
+
+
+        #    if len(rules['PROVIDER_IP']) >= 1:
+        #        OUTPUT_LOG.append({'Notifications': 'The Following subnets will be added to the EPG: ' + rules['PROVIDER_EPG']})
+        #        OUTPUT_LOG.append({'Notifications': str(rules['PROVIDER_IP'])})
+
+        #    else:
+        #        OUTPUT_LOG.append({'Notifications': 'No subnets will be added to EPG: ' + rules['PROVIDER_EPG']})
 
     # Search for VIPs
     OUTPUT_LOG.append({'Notifications': ''})
