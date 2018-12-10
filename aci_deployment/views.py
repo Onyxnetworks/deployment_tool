@@ -44,7 +44,6 @@ def external_epg_deployment_push(request):
     # Deploy External EPG configuration
     if request.method == 'POST':
         response_json = request.body
-        #response_json = json.dumps(response_json)
         data = json.loads(response_json)
         location = data['location']
         rule_list = data['rule_list']
@@ -79,7 +78,6 @@ def contract_deployment_push(request):
     # Deploy External EPG configuration
     if request.method == 'POST':
         response_json = request.body
-        response_json = json.dumps(response_json)
         data = json.loads(response_json)
         location = data['location']
         rule_list = data['rule_list']
