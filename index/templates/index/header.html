@@ -6,8 +6,8 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="">
+    <meta name="description" content="Network Deployment Tool">
+    <meta name="author" content="Fraser Henshaw">
     {% block head %}
     {% endblock %}
     <title>Network Deployment Tool</title>
@@ -55,7 +55,7 @@
                         <i class="fa fa-user fa-fw"></i> <i class="fa fa-caret-down"></i>
                     </a>
                     <ul class="dropdown-menu dropdown-user">
-                        <li><a href="/"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
+                        <li><a href="/logout/"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
                         </li>
                     </ul>
                     <!-- /.dropdown-user -->
@@ -117,24 +117,12 @@
     <!-- Custom Theme JavaScript -->
     <script src="{% static 'index/dist/js/sb-admin-2.js' %}"></script>
 
+    <!-- CSRF Token -->
+    <script src="{% static 'index/js/csrftoken.js' %}"></script>
+
     <!-- Load SVG Files
     <script src="{% static 'index/js/svg-load.js' %}"></script>
     -->
-<script>
-var csrftoken = Cookies.get('csrftoken');
-function csrfSafeMethod(method) {
-    // these HTTP methods do not require CSRF protection
-    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-}
-$.ajaxSetup({
-    beforeSend: function(xhr, settings) {
-        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-            xhr.setRequestHeader("X-CSRFToken", csrftoken);
-        }
-    }
-});
-
-</script>
 
     {% block scripts %}
     {% endblock %}

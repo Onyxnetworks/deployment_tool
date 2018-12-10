@@ -6,10 +6,11 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="">
-
-    <title>SB Admin 2 - Bootstrap Admin Theme</title>
+    <meta name="description" content="Network Deployment Tool">
+    <meta name="author" content="Fraser Henshaw">
+    {% block head %}
+    {% endblock %}
+    <title>Network Deployment Tool - Login</title>
 
     <!-- Bootstrap Core CSS -->
     <link href="{% static 'index/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
@@ -42,21 +43,21 @@
                         <h3 class="panel-title">Please Sign In</h3>
                     </div>
                     <div class="panel-body">
-                        <form role="form">
+                        <form role="form" id="login" method="post" enctype="multipart/form-data">{% csrf_token %}
                             <fieldset>
                                 <div class="form-group">
-                                    <input class="form-control" placeholder="ADM Account" name="text" type="text" autofocus>
+                                    <select class="form-control-sm" name="environment" id="environment" required="required">
+                                        <option>Production</option>
+                                        <option>Pre-Production</option>
+                                        <option>Lab</option>
+                                    </select>
+                                    <input class="form-control" placeholder="ADM Account"required="required" name="username" type="text" autofocus>
                                 </div>
                                 <div class="form-group">
-                                    <input class="form-control" placeholder="Password" name="password" type="password" value="">
-                                </div>
-                                <div class="checkbox">
-                                    <label>
-                                        <input name="remember" type="checkbox" value="Remember Me">Remember Me
-                                    </label>
+                                    <input class="form-control" placeholder="Password" name="password" type="password" required="required" value="">
                                 </div>
                                 <!-- Change this to a button or input when using this as a form -->
-                                <a href="index.html" class="btn btn-lg btn-success btn-block">Login</a>
+                                <a href="/index/" class="btn btn-lg btn-success btn-block">Login</a>
                             </fieldset>
                         </form>
                     </div>
@@ -77,6 +78,29 @@
     <!-- Custom Theme JavaScript -->
     <script src="{% static 'index/dist/js/sb-admin-2.js' %}"></script>
 
+    <script type="application/javascript">
+
+    var frm = $('#login');
+    var rslt = $('#login_results');
+    frm.submit(function () {
+        $.ajax({
+            type: frm.attr('method'),
+            url: frm.attr('action'),
+            data: frm.serialize(),
+            success: function (data) {
+                alert(data.message)
+            },
+            error: function (data) {
+                alert(data.message)
+            },
+        });
+        return false;
+    })
+    </script>
+    {% block scripts %}
+
+
+    {% endblock %}
 </body>
 
 </html>
