@@ -22,7 +22,64 @@ def ENDPOINT_SEARCH(BASE_URL, APIC_USERNAME, APIC_PASSWORD, SUBNET):
 
     return RESULTS
 
-@shared_task
+
+def CONTRACT_DEPLOYMENT_EXCEL_OPEN_WORKBOOK(WORKBOOK, LOCATION):
+    WB = openpyxl.load_workbook(WORKBOOK, data_only=True)
+    if LOCATION == 'DC1':
+        PY_WS = WB['ACI_DC1']
+    elif LOCATION == 'DC2':
+        PY_WS = WB['ACI_DC2']
+    elif LOCATION == 'LAB':
+        PY_WS = WB['ACI_LAB']
+    elif LOCATION == 'SANDBOX':
+        PY_WS = WB['ACI_SANDBOX']
+
+    SERVICE_LIST = []
+    RULE_LIST = []
+    INDEX = 1
+
+    # Loops through the rows in the worksheet to build contract information
+    for row in PY_WS.iter_rows(min_row=2, max_col=10):
+        CONSUMER_IP_LIST = []
+        PROVIDER_IP_LIST = []
+        CONTRACT_NAME = row[2].value.upper()
+        if row[8].value:
+            CONSUMER_EPG = row[8].value.upper()
+        else:
+            CONSUMER_EPG = 'BLANK'
+        if row[5].value:
+            PROVIDER_EPG = row[5].value.upper()
+        else:
+            PROVIDER_EPG = 'BLANK'
+        if row[9].value:
+            CONSUMER_IP_LIST = row[9].value.split()
+        else:
+            pass
+        if row[6].value:
+            PROVIDER_IP_LIST = row[6].value.split()
+        else:
+            pass
+        if row[3].value:
+            SERVICE_LIST = row[3].value.upper().split()
+        if row[7].value:
+            CONSUMER_L3OUT = row[7].value.upper()
+        else:
+            CONSUMER_L3OUT = 'INTERNAL'
+        if row[4].value:
+            PROVIDER_L3OUT = row[4].value.upper()
+        else:
+            PROVIDER_L3OUT = 'INTERNAL'
+
+        INDEX += 1
+        RULE_LIST.append(
+            {'LINE': INDEX, 'PROVIDER_L3OUT': PROVIDER_L3OUT, 'CONSUMER_L3OUT': CONSUMER_L3OUT, 'NAME': CONTRACT_NAME,
+             'CONSUMER_EPG': CONSUMER_EPG, 'CONSUMER_IP': CONSUMER_IP_LIST, 'PROVIDER_EPG': PROVIDER_EPG,
+             'PROVIDER_IP': PROVIDER_IP_LIST, 'SERVICE': SERVICE_LIST})
+        SERVICE_LIST = []
+
+    return RULE_LIST
+
+
 def EXTERNAL_EPG_EXCEL_OPEN_WORKBOOK(WORKBOOK, LOCATION):
     WB = openpyxl.load_workbook(WORKBOOK, data_only=True)
     if LOCATION == 'DC1':
@@ -534,5 +591,248 @@ def EXTERNAL_EPG_DEPLOYMENT(LOCATION, APIC_USERNAME, APIC_PASSWORD, RULE_LIST):
                             EPG_NAME = rules['PROVIDER_EPG']
                             SCOPE = 'import-security'
                             EXTERNAL_EPG_SUBNET_ADD(BASE_URL, APIC_COOKIE, TENANT, L3OUT_NAME, EPG_NAME, HEADERS, IP, SCOPE, OUTPUT_LOG)
+
+    return OUTPUT_LOG
+
+@shared_task
+def CONTRACT_DEPLOYMENT_APIC_VALIDATION(RULE_LIST, LOCATION, APIC_USERNAME, APIC_PASSWORD):
+    CONTRACT_LIST = []
+    FILTER_LIST = []
+    DISPLAY_LIST = []
+    ERROR = False
+    HEADERS = {'content-type': 'application/json'}
+
+    if LOCATION == 'DC1':
+        BASE_URL = 'https://sandboxapicdc.cisco.com/api/'
+    elif LOCATION == 'DC2':
+        BASE_URL = 'https://sandboxapicdc.cisco.com/api/'
+    elif LOCATION == 'LAB':
+        BASE_URL = 'https://lab-a-apic.test-lab.local/api/'
+    elif LOCATION == 'SANDBOX':
+        BASE_URL = 'https://sandboxapicdc.cisco.com/api/'
+
+    APIC_COOKIE = APIC_LOGIN(BASE_URL, APIC_USERNAME, APIC_PASSWORD)
+    if APIC_COOKIE:
+        OUTPUT_LOG.append({'Notifications': ''})
+        OUTPUT_LOG.append({'Notifications': 'Connecting to APIC'})
+        OUTPUT_LOG.append({'Notifications': '-----------------------------'})
+        OUTPUT_LOG.append({'Notifications': 'Successfully generated authentication cookie'})
+    else:
+        OUTPUT_LOG.append({'Errors': 'Unable to connect to APIC. Please check your credentials'})
+
+    # Check if Contracts Exist
+    OUTPUT_LOG.append({'Notifications': ''})
+    OUTPUT_LOG.append({'Notifications': 'Checking if Contracts exist'})
+    OUTPUT_LOG.append({'Notifications': '-----------------------------'})
+    for rules in RULE_LIST:
+        CONTRACT_NAME = rules['NAME']
+        CONTRACT_SEARCH_RESPONSE = CONTRACT_SEARCH(BASE_URL, APIC_COOKIE, CONTRACT_NAME, HEADERS)
+        if int(CONTRACT_SEARCH_RESPONSE['totalCount']) == 1:
+            pass
+        else:
+            CONTRACT_LIST.append(CONTRACT_NAME)
+
+    CONTRACT_SET = set(CONTRACT_LIST)
+    for contracts in CONTRACT_SET:
+        OUTPUT_LOG.append({'Notifications': 'Contract ' + contracts + ' will be created'})
+
+    # Check if Filters Exist
+    OUTPUT_LOG.append({'Notifications': ''})
+    OUTPUT_LOG.append({'Notifications': 'Checking if Filters exist'})
+    OUTPUT_LOG.append({'Notifications': '-----------------------------'})
+    for rules in RULE_LIST:
+        for services in rules['SERVICE']:
+            FILTER_NAME = services
+            FILTER_SEARCH_RESPONSE = FILTER_SEARCH(BASE_URL, APIC_COOKIE, FILTER_NAME, HEADERS)
+            if int(FILTER_SEARCH_RESPONSE['totalCount']) == 1:
+                pass
+            else:
+                FILTER_LIST.append(FILTER_NAME)
+
+    FILTER_SET = set(FILTER_LIST)
+    for filters in FILTER_SET:
+        OUTPUT_LOG.append({'Notifications': 'Filter ' + filters + ' will be created'})
+
+    # Check if Filters are applied to contracts
+    OUTPUT_LOG.append({'Notifications': ''})
+    OUTPUT_LOG.append({'Notifications': 'Checking if Filters are applied to contracts'})
+    OUTPUT_LOG.append({'Notifications': '-----------------------------'})
+    for rules in RULE_LIST:
+        # Use the contract search to locate subject
+        CONTRACT_NAME = rules['NAME']
+        CONTRACT_SEARCH_RESPONSE = CONTRACT_SEARCH(BASE_URL, APIC_COOKIE, CONTRACT_NAME, HEADERS)
+        # Validate that a contract can be located
+        if int(CONTRACT_SEARCH_RESPONSE['totalCount']) == 1:
+            TENANT = CONTRACT_SEARCH_RESPONSE['imdata'][0]['vzBrCP']['attributes']['dn'].split('/')[1][3:]
+            CONTRACT_SUBJECT = \
+            CONTRACT_SEARCH_RESPONSE['imdata'][0]['vzBrCP']['attributes']['dn'].split('/')[2][4:].split('_')[0] + '_SBJ'
+            SUBJECT_SEARCH_RESPONSE = SUBJECT_SEARCH(BASE_URL, APIC_COOKIE, CONTRACT_NAME, TENANT, CONTRACT_SUBJECT,
+                                                     HEADERS)
+
+            # Add all filters for a subject to a list to be used for comparison.
+            SUBJECT_FILTERS = []
+            for filters in SUBJECT_SEARCH_RESPONSE['imdata']:
+                SUBJECT_FILTERS.append(filters['vzRsSubjFiltAtt']['attributes']['tnVzFilterName'])
+
+            # compare list of filters to those already in subject
+
+            FILTER_COMPARE = LIST_COMPARE(rules['SERVICE'], SUBJECT_FILTERS)
+            if len(FILTER_COMPARE[0]) == 0:
+                pass
+
+            elif len(FILTER_COMPARE[0]) > 0:
+                OUTPUT_LOG.append({'Notifications': 'The below filters will be added to contract ' + CONTRACT_NAME})
+                OUTPUT_LOG.append({'Notifications': FILTER_COMPARE[0]})
+
+            else:
+                ERROR = True
+        else:
+            pass
+
+    # Check if L3Outs Exist
+    OUTPUT_LOG.append({'Notifications': ''})
+    OUTPUT_LOG.append({'Notifications': 'Checking if L3Outs exist'})
+    OUTPUT_LOG.append({'Notifications': '-----------------------------'})
+    for rules in RULE_LIST:
+        if rules['CONSUMER_L3OUT'] == 'INTERNAL':
+            pass
+        else:
+            L3OUT_NAME = rules['CONSUMER_L3OUT']
+            L3OUT_SEARCH_RESPONSE = L3OUT_SEARCH(BASE_URL, APIC_COOKIE, L3OUT_NAME, HEADERS)
+            if int(L3OUT_SEARCH_RESPONSE['totalCount']) == 1:
+                if rules['CONSUMER_L3OUT'] == L3OUT_SEARCH_RESPONSE['imdata'][0]['l3extOut']['attributes']['name']:
+                    pass
+                else:
+                    ERROR = True
+
+            else:
+                DISPLAY_LIST.append(L3OUT_NAME)
+                ERROR = True
+
+    for rules in RULE_LIST:
+        if rules['PROVIDER_L3OUT'] == 'INTERNAL':
+            pass
+        else:
+            L3OUT_NAME = rules['PROVIDER_L3OUT']
+            L3OUT_SEARCH_RESPONSE = L3OUT_SEARCH(BASE_URL, APIC_COOKIE, L3OUT_NAME, HEADERS)
+            if int(L3OUT_SEARCH_RESPONSE['totalCount']) == 1:
+                if rules['PROVIDER_L3OUT'] == L3OUT_SEARCH_RESPONSE['imdata'][0]['l3extOut']['attributes']['name']:
+                    pass
+                else:
+                    ERROR = True
+
+            else:
+                DISPLAY_LIST.append(L3OUT_NAME)
+                ERROR = True
+
+    DISPLAY_SET = set(DISPLAY_LIST)
+    for l3out in DISPLAY_SET:
+        OUTPUT_LOG.append({'Errors': 'L3Out: ' + l3out + ' Does not exist, please check naming.'})
+    DISPLAY_LIST = []
+
+    # Check if Internal EPGs Exist
+    OUTPUT_LOG.append({'Notifications': ''})
+    OUTPUT_LOG.append({'Notifications': 'Checking if Internal EPGs are created'})
+    OUTPUT_LOG.append({'Notifications': '-----------------------------'})
+    EPG_LIST = []
+    # Search to validate internal EPG's are created
+    for rules in RULE_LIST:
+        if rules['CONSUMER_L3OUT'] == 'INTERNAL':
+            if rules['CONSUMER_EPG'] != 'BLANK':
+                CONSUMER_EPG = rules['CONSUMER_EPG']
+                # Search for consumer EPG
+                INTERNAL_EPG_SEARCH_RESPONSE = INTERNAL_EPG_SEARCH(BASE_URL, APIC_COOKIE, CONSUMER_EPG, HEADERS)
+                if int(INTERNAL_EPG_SEARCH_RESPONSE['totalCount']) == 1:
+                    pass
+                else:
+                    DISPLAY_LIST.append(CONSUMER_EPG)
+                    ERROR = True
+        else:
+            pass
+
+    for rules in RULE_LIST:
+        if rules['PROVIDER_L3OUT'] == 'INTERNAL':
+            if rules['PROVIDER_EPG'] != 'BLANK':
+                PROVIDER_EPG = rules['PROVIDER_EPG']
+                # Search for Provider EPG
+                INTERNAL_EPG_SEARCH_RESPONSE = INTERNAL_EPG_SEARCH(BASE_URL, APIC_COOKIE, PROVIDER_EPG, HEADERS)
+                if int(INTERNAL_EPG_SEARCH_RESPONSE['totalCount']) == 1:
+                    pass
+                else:
+                    DISPLAY_LIST.append(PROVIDER_EPG)
+                    ERROR = True
+        else:
+            pass
+
+    DISPLAY_SET = set(DISPLAY_LIST)
+    for epgs in DISPLAY_SET:
+        OUTPUT_LOG.append({'Errors': 'EPG "' + epgs + '" needs creating.'})
+    DISPLAY_LIST = []
+
+    # Check if External EPGs Exist
+    OUTPUT_LOG.append({'Notifications': ''})
+    OUTPUT_LOG.append({'Notifications': 'Checking if External EPGs are created'})
+    OUTPUT_LOG.append({'Notifications': '-----------------------------'})
+    for rules in RULE_LIST:
+        if rules['CONSUMER_L3OUT'] == 'INTERNAL':
+            pass
+        else:
+            if rules['CONSUMER_EPG'] != 'BLANK':
+                CONSUMER_L3OUT = rules['CONSUMER_L3OUT']
+                CONSUMER_EPG = rules['CONSUMER_EPG']
+                EXTERNAL_EPG_SEARCH_RESPONSE = EXTERNAL_EPG_SEARCH(BASE_URL, APIC_COOKIE, CONSUMER_L3OUT, CONSUMER_EPG,
+                                                                   HEADERS)
+                if int(EXTERNAL_EPG_SEARCH_RESPONSE['totalCount']) == 1:
+                    EPG_NAME = EXTERNAL_EPG_SEARCH_RESPONSE['imdata'][0]['l3extInstP']['attributes']['dn'].split('/')[
+                                   3][6:]
+                    L3OUT_NAME = EXTERNAL_EPG_SEARCH_RESPONSE['imdata'][0]['l3extInstP']['attributes']['dn'].split('/')[
+                                     2][4:]
+                    TENANT_NAME = \
+                    EXTERNAL_EPG_SEARCH_RESPONSE['imdata'][0]['l3extInstP']['attributes']['dn'].split('/')[1][3:]
+                    if L3OUT_NAME == rules['CONSUMER_L3OUT']:
+                        pass
+                    else:
+                        OUTPUT_LOG.append({
+                                              'Errors': 'EPG and L3OUT missmatch with ' + L3OUT_NAME + ' and ' + EPG_NAME + ' dont match value: ' +
+                                                        rules['CONSUMER_L3OUT']})
+
+                else:
+                    DISPLAY_LIST.append(CONSUMER_EPG)
+                    ERROR = True
+
+    for rules in RULE_LIST:
+        PROVIDER_EPG = rules['PROVIDER_EPG']
+        if rules['PROVIDER_L3OUT'] == 'INTERNAL':
+            pass
+        else:
+            if rules['PROVIDER_EPG'] != 'BLANK':
+                PROVIDER_EPG = rules['PROVIDER_EPG']
+                PROVIDER_L3OUT = rules['PROVIDER_L3OUT']
+                EXTERNAL_EPG_SEARCH_RESPONSE = EXTERNAL_EPG_SEARCH(BASE_URL, APIC_COOKIE, PROVIDER_L3OUT, PROVIDER_EPG,
+                                                                   HEADERS)
+                if int(EXTERNAL_EPG_SEARCH_RESPONSE['totalCount']) == 1:
+                    EPG_NAME = EXTERNAL_EPG_SEARCH_RESPONSE['imdata'][0]['l3extInstP']['attributes']['dn'].split('/')[
+                                   3][6:]
+                    L3OUT_NAME = EXTERNAL_EPG_SEARCH_RESPONSE['imdata'][0]['l3extInstP']['attributes']['dn'].split('/')[
+                                     2][4:]
+                    TENANT_NAME = \
+                    EXTERNAL_EPG_SEARCH_RESPONSE['imdata'][0]['l3extInstP']['attributes']['dn'].split('/')[1][3:]
+                    if L3OUT_NAME == rules['PROVIDER_L3OUT']:
+                        pass
+                    else:
+                        OUTPUT_LOG.append({
+                                              'Errors': 'EPG and L3OUT missmatch with ' + L3OUT_NAME + ' and ' + EPG_NAME + ' dont match value: ' +
+                                                        rules['PROVIDER_L3OUT']})
+
+                else:
+                    DISPLAY_LIST.append(PROVIDER_EPG)
+                    ERROR = True
+
+    DISPLAY_SET = set(DISPLAY_LIST)
+    for epgs in DISPLAY_SET:
+        OUTPUT_LOG.append({'Errors': 'EPG "' + epgs + '" needs creating.'})
+
+    if not ERROR:
+        OUTPUT_LOG.append({'Notifications': 'APIC Configuration validated successfully'})
 
     return OUTPUT_LOG
