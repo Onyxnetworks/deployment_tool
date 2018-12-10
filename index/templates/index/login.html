@@ -81,13 +81,13 @@
     <!-- Custom Theme JavaScript -->
     <script src="{% static 'index/dist/js/sb-admin-2.js' %}"></script>
 
-    <script type="application/javascript">
+    <script>
 
     var frm = $('#login');
     var rslt = $('#login_results');
     frm.submit(function () {
         $.ajax({
-            type: 'post',
+            type: frm.attr('method'),
             url: frm.attr('action'),
             data: frm.serialize(),
             success: function (data) {
