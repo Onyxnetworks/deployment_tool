@@ -246,18 +246,6 @@ def CONTRACT_SEARCH(BASE_URL, APIC_COOKIE, CONTRACT_NAME, HEADERS):
     return CONTRACT_SEARCH_RESPONSE
 
 
-def SUBNET_SEARCH(ENDPOINT_LIST, SUBNET):
-    RESULTS = []
-
-    for i in ENDPOINT_LIST:
-        if IPNetwork(SUBNET) in IPNetwork(i['Subnet']) or IPNetwork(i['Subnet']) in IPNetwork(SUBNET):
-            RESULTS.append(
-                {'Subnet': i['Subnet'], 'Locality': i['Locality'], 'Location': i['Location'], 'EPG': i['EPG'],
-                 'Scope': i['Scope'], 'AppProfile': i['AppProfile'], 'Tenant': i['Tenant']})
-
-    return RESULTS
-
-
 def CONTRACT_SEARCH(BASE_URL, APIC_COOKIE, CONTRACT_NAME, HEADERS):
     CONTRACT_SEARCH_URL = BASE_URL + 'node/class/vzBrCP.json?query-target-filter=and(eq(vzBrCP.name,"{0}"))'.format(
         CONTRACT_NAME)
