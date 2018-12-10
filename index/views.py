@@ -24,7 +24,6 @@ def get_task_info(request):
 def login(request):
     if request.method == 'POST':
         if 'username' and 'password' in request.POST:
-            print('Test')
             username = request.POST['username']
             password = request.POST['password']
             environment = request.POST['environment']
@@ -44,12 +43,10 @@ def login(request):
                 request.session['lab_password'] = password
 
             apic_cookie = APIC_LOGIN(base_url, username, password)
-            print(apic_cookie)
 
             if apic_cookie:
                 request.session['APIC_COOKIE'] = apic_cookie
-                print('Test2')
-                return redirect('/index/')
+                return redirect('index')
 
             else:
                 message = 'Unable to authenticate, please check credentials.'
@@ -61,6 +58,7 @@ def login(request):
 
 
 def index(request):
+    print('test')
     return render(request, 'index/home.html')
 
 
