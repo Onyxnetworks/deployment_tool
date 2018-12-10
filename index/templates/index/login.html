@@ -96,13 +96,13 @@
             success: function (data) {
                 if (!data.message) {
                     console.log('redirect')
-                    window.location.replace = '/index/';
+                    //window.location.replace = '/index/';//
                 }
                 else {
                     console.log(data.message);
                     document.getElementById("username_grp").setAttribute("class", "form-group has-error");
                     document.getElementById("password_grp").setAttribute("class", "form-group has-error");
-                    document.getElementById("login_result").setAttribute("class", "alert alert-danger");
+                    document.getElementById("login_result").setAttribute("class", "alert-danger");
                     document.getElementById("login_result").innerHTML = data.message;
                 }
             },
