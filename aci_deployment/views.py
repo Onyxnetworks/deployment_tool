@@ -1,10 +1,9 @@
-from django.shortcuts import render, redirect, reverse
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from django.core.files.storage import FileSystemStorage
 
-import json
 from .tasks import *
 from aci_deployment.scripts.secrets import *
+
 
 def endpoint_search(request):
 
@@ -34,7 +33,8 @@ def external_epg_deployment(request):
         task = EXTERNAL_EPG_VALIDATION.delay(rule_list, location, apic_username, apic_password)
 
         # Return task id.
-        return HttpResponse(json.dumps({'task_id': task.id, 'rule_list': rule_list, 'location': location}), content_type='application/json')
+        return HttpResponse(json.dumps({'task_id': task.id, 'rule_list': rule_list, 'location': location}),
+                            content_type='application/json')
 
     content = {}
     return render(request, 'aci_deployment/aci_external_epg_deployment.html', content)
@@ -53,8 +53,9 @@ def external_epg_deployment_push(request):
 
         # Return task id back to client for ajax use.
         return HttpResponse(json.dumps({'task_id': task.id}), content_type='application/json')
-    content = {}
-    return render(request, 'aci_deployment/aci_external_epg_deployment.html', content)
+
+    return redirect('/external_epg_deployment/')
+
 
 def contract_deployment(request):
     # Present file upload to screen and give options to user
@@ -69,7 +70,8 @@ def contract_deployment(request):
         task = CONTRACT_DEPLOYMENT_VALIDATION.delay(rule_list, location, apic_username, apic_password)
 
         # Return task id.
-        return HttpResponse(json.dumps({'task_id': task.id, 'rule_list': rule_list, 'location': location}), content_type='application/json')
+        return HttpResponse(json.dumps({'task_id': task.id, 'rule_list': rule_list, 'location': location}),
+                            content_type='application/json')
     content = {}
     return render(request, 'aci_deployment/aci_contract_deployment.html', content)
 
@@ -88,5 +90,4 @@ def contract_deployment_push(request):
         # Return task id back to client for ajax use.
         return HttpResponse(json.dumps({'task_id': task.id}), content_type='application/json')
 
-    content = {}
-    return render(request, 'aci_deployment/aci_external_epg_deployment.html', content)
+    return redirect('/contract_deployment/')
