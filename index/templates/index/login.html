@@ -91,7 +91,12 @@
             url: frm.attr('action'),
             data: frm.serialize(),
             success: function (data) {
-                console.log(data.message);
+                if (!data.message) {
+                    window.location.href = response.redirect;
+                }
+                else {
+                    console.log(data.message);
+                }
             },
             error: function (data) {
                 console.log("Something went wrong!");
