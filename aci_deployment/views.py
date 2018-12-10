@@ -48,13 +48,18 @@ def external_epg_deployment(request):
 
 
 def external_epg_deployment_push(request):
-
+    apic_username = 'admin'
+    apic_password = 'ciscopsdt'
     # Deploy External EPG configuration
     if request.method == 'POST' and 'location' and 'rule_list' in request.POST:
-        print('test')
+        location = request.POST['location']
+        rule_list = request.POST['rule_list']
+
+        # Deploy APIC configuration
+        task = EXTERNAL_EPG_DEPLOYMENT.delay(location, apic_username, apic_password, rule_list)
 
         # Return task id back to client for ajax use.
-        return HttpResponse(json.dumps({'task_id': 'test'}), content_type='application/json')
+        return HttpResponse(json.dumps({'task_id': task.id}), content_type='application/json')
     content = {}
     return render(request, 'aci_deployment/aci_external_epg_deployment.html', content)
 

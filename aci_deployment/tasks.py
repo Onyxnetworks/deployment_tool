@@ -93,13 +93,13 @@ def EXTERNAL_EPG_VALIDATION(RULE_LIST, LOCATION, APIC_USERNAME, APIC_PASSWORD):
     TENANT = 'common'
 
     if LOCATION == 'DC1':
-        base_url = 'https://sandboxapicdc.cisco.com/api/'
+        BASE_URL = 'https://sandboxapicdc.cisco.com/api/'
     elif LOCATION == 'DC2':
-        base_url = 'https://sandboxapicdc.cisco.com/api/'
+        BASE_URL = 'https://sandboxapicdc.cisco.com/api/'
     elif LOCATION == 'LAB':
-        base_url = 'https://sandboxapicdc.cisco.com/api/'
+        BASE_URL = 'https://sandboxapicdc.cisco.com/api/'
     elif LOCATION == 'SANDBOX':
-        base_url = 'https://sandboxapicdc.cisco.com/api/'
+        BASE_URL = 'https://sandboxapicdc.cisco.com/api/'
 
 
     OUTPUT_LOG.append({'Notifications': ''})
@@ -403,5 +403,135 @@ def EXTERNAL_EPG_VALIDATION(RULE_LIST, LOCATION, APIC_USERNAME, APIC_PASSWORD):
 
     if not ERROR:
         OUTPUT_LOG.append({'Notifications': 'APIC Configuration validated successfully'})
+
+    return OUTPUT_LOG
+
+@shared_task
+def EXTERNAL_EPG_DEPLOYMENT(LOCATION, APIC_USERNAME, APIC_PASSWORD, RULE_LIST):
+    if LOCATION == 'DC1':
+        BASE_URL = 'https://sandboxapicdc.cisco.com/api/'
+        DC = LOCATION
+    elif LOCATION == 'DC2':
+        BASE_URL = 'https://sandboxapicdc.cisco.com/api/'
+        DC = LOCATION
+    elif LOCATION == 'LAB':
+        BASE_URL = 'https://sandboxapicdc.cisco.com/api/'
+        DC = LOCATION
+    elif LOCATION == 'SANDBOX':
+        BASE_URL = 'https://sandboxapicdc.cisco.com/api/'
+        DC = LOCATION
+
+    TENANT = 'common'
+    OUTPUT_LOG = []
+    HEADERS = {'content-type': 'application/json'}
+    # --------------------------------------------------------------------------#
+    # Begin Configuration
+    # --------------------------------------------------------------------------#
+    OUTPUT_LOG.append({'Notifications': ''})
+    OUTPUT_LOG.append({'Notifications': 'Starting External EPG Deployment.'})
+    OUTPUT_LOG.append({'Notifications': '-----------------------------'})
+    APIC_COOKIE = APIC_LOGIN(BASE_URL, APIC_USERNAME, APIC_PASSWORD)
+    if APIC_COOKIE:
+        OUTPUT_LOG.append({'Notifications': 'Successfully generated authentication cookie'})
+    else:
+        OUTPUT_LOG.append({'Errors': 'Unable to connect to APIC. Please check your credentials'})
+
+    for rules in RULE_LIST:
+        L3OUT_CONSUME_EPG_CREATED = False
+        L3OUT_PROVIDE_EPG_CREATED = False
+        OUTPUT_LOG.append({'Notifications': 'Adding EPGs & Subnets for line: ' + str(rules['LINE'])})
+        if rules['CONSUMER_L3OUT'] != 'INTERNAL' and rules['CONSUMER_EPG'] != 'BLANK':
+            EPG_NAME = rules['CONSUMER_EPG']
+            L3OUT_NAME = rules['CONSUMER_L3OUT']
+            EXTERNAL_EPG_SEARCH_RESPONSE = EXTERNAL_EPG_SEARCH(BASE_URL, APIC_COOKIE, TENANT, L3OUT_NAME, EPG_NAME, HEADERS)
+            if int(EXTERNAL_EPG_SEARCH_RESPONSE['totalCount']) == 1:
+                OUTPUT_LOG.append({'Notifications': 'EPG: ' + EPG_NAME + ' already exists under ' + L3OUT_NAME + ' and wont be created'})
+                L3OUT_CONSUME_EPG_CREATED = True
+            if not L3OUT_CONSUME_EPG_CREATED:
+                OUTPUT_LOG.append({'Notifications': 'Adding External EPG: ' + EPG_NAME + ' TO L3Out: ' + L3OUT_NAME})
+                EXTERNAL_EPG_ADD(BASE_URL, APIC_COOKIE, TENANT, L3OUT_NAME, EPG_NAME, HEADERS, OUTPUT_LOG)
+            # Add subnets to external EPG
+            if len(rules['CONSUMER_IP']) != 0:
+                OUTPUT_LOG.append({'Notifications': 'Adding Subnets to External EPG: '})
+                for IP in rules['CONSUMER_IP']:
+                    # SEARCH TO SEE IF SUBNET ALREADY EXISTS IN EPG:
+                    L3OUT_DN = 'uni/tn-common/out-' + L3OUT_NAME + '/instP-' + EPG_NAME + '/extsubnet-[' + IP + ']'
+                    SUBNET_SEARCH_RESPONSE = SUBNET_SEARCH_EXACT(BASE_URL, APIC_COOKIE, L3OUT_DN, HEADERS)
+                    if int(SUBNET_SEARCH_RESPONSE['totalCount']) == 1:
+                        for subnets in SUBNET_SEARCH_RESPONSE['imdata']:
+                            EXISTING_SUBNET = subnets['l3extSubnet']['attributes']['ip']
+                            SCOPE = subnets['l3extSubnet']['attributes']['scope'].split(',')
+                            if EXISTING_SUBNET == IP:
+                                #IP Already Configured under EPG
+                                pass
+
+                    else:
+                        SCOPE = 'import-security'
+                        EXTERNAL_EPG_SUBNET_ADD(BASE_URL, APIC_COOKIE, TENANT, L3OUT_NAME, EPG_NAME, HEADERS, IP, SCOPE, OUTPUT_LOG)
+
+        if rules['PROVIDER_L3OUT'] != 'INTERNAL' and rules['PROVIDER_EPG'] != 'BLANK':
+            EPG_NAME = rules['PROVIDER_EPG']
+            L3OUT_NAME = rules['PROVIDER_L3OUT']
+            EXTERNAL_EPG_SEARCH_RESPONSE = EXTERNAL_EPG_SEARCH(BASE_URL, APIC_COOKIE, TENANT, L3OUT_NAME, EPG_NAME, HEADERS)
+            if int(EXTERNAL_EPG_SEARCH_RESPONSE['totalCount']) == 1:
+                OUTPUT_LOG.append({'Notifications': 'EPG: ' + EPG_NAME + ' already exists under ' + L3OUT_NAME + ' and wont be created'})
+                L3OUT_PROVIDE_EPG_CREATED = True
+            if not L3OUT_PROVIDE_EPG_CREATED:
+                OUTPUT_LOG.append({'Notifications': 'Adding External EPG: ' + EPG_NAME + ' TO L3Out: ' + L3OUT_NAME})
+                EXTERNAL_EPG_ADD(BASE_URL, APIC_COOKIE, TENANT, L3OUT_NAME, EPG_NAME, HEADERS, OUTPUT_LOG)
+            # Add subnets to external EPG
+            if len(rules['PROVIDER_IP']) != 0:
+                OUTPUT_LOG.append({'Adding Subnets to External EPG: '})
+                for IP in rules['PROVIDER_IP']:
+                    # SEARCH TO SEE IF SUBNET ALREADY EXISTS IN EPG:
+                    L3OUT_DN = 'uni/tn-common/out-' + L3OUT_NAME + '/instP-' + EPG_NAME + '/extsubnet-[' + IP + ']'
+                    SUBNET_SEARCH_RESPONSE = SUBNET_SEARCH_EXACT(BASE_URL, APIC_COOKIE, L3OUT_DN, HEADERS)
+                    if int(SUBNET_SEARCH_RESPONSE['totalCount']) == 1:
+                        for subnets in SUBNET_SEARCH_RESPONSE['imdata']:
+                            EXISTING_SUBNET = subnets['l3extSubnet']['attributes']['ip']
+                            SCOPE = subnets['l3extSubnet']['attributes']['scope'].split(',')
+                            if EXISTING_SUBNET == IP:
+                                #IP Already Configured under EPG
+                                pass
+
+                    else:
+                        if len(IP.split('/')) != 0:
+                            subnet = IP.split('/')[0]
+                        else:
+                            subnet = IP
+                        # Check for VS EPGs
+                        if rules['PROVIDER_EPG'].split('_')[0].endswith('VS') and rules['PROVIDER_L3OUT'].endswith('DCI_L3O'):
+
+                            if not ipaddress.ip_address(subnet).is_private:
+                                # Import Under DCI
+                                SCOPE = 'import-rtctrl,import-security'
+                                L3OUT_NAME = rules['PROVIDER_L3OUT']
+                                EPG_NAME = rules['PROVIDER_EPG']
+                                EXTERNAL_EPG_SUBNET_ADD(BASE_URL, APIC_COOKIE, TENANT, L3OUT_NAME, EPG_NAME, HEADERS, IP, SCOPE, OUTPUT_LOG)
+
+                                # Export Under Inet
+                                SCOPE = 'export-rtctrl'
+                                # Build L3out name for Inet L3Out
+                                # Temp fix for BLUE INET
+                                if rules['PROVIDER_L3OUT'].split('-')[0] == 'BLUE':
+                                    L3OUT_NAME = rules['PROVIDER_L3OUT'].split('-')[0] + '-' + DC + '-INET_L3O'
+                                else:
+                                    L3OUT_NAME = rules['PROVIDER_L3OUT'].split('-')[0] + '-INET_L3O'
+
+                                EPG_NAME = rules['PROVIDER_L3OUT'].split('_')[0] + '-ROUTING_EPG'
+                                EXTERNAL_EPG_SUBNET_ADD(BASE_URL, APIC_COOKIE, TENANT, L3OUT_NAME, EPG_NAME, HEADERS, IP, SCOPE, OUTPUT_LOG)
+
+                            if ipaddress.ip_address(subnet).is_private:
+                                # Import Under DCI
+                                L3OUT_NAME = rules['PROVIDER_L3OUT']
+                                EPG_NAME = rules['PROVIDER_EPG']
+                                SCOPE = 'import-rtctrl,import-security'
+                                EXTERNAL_EPG_SUBNET_ADD(BASE_URL, APIC_COOKIE, TENANT, L3OUT_NAME, EPG_NAME, HEADERS, IP, SCOPE, OUTPUT_LOG)
+
+                        else:
+                            L3OUT_NAME = rules['PROVIDER_L3OUT']
+                            EPG_NAME = rules['PROVIDER_EPG']
+                            SCOPE = 'import-security'
+                            EXTERNAL_EPG_SUBNET_ADD(BASE_URL, APIC_COOKIE, TENANT, L3OUT_NAME, EPG_NAME, HEADERS, IP, SCOPE, OUTPUT_LOG)
 
     return OUTPUT_LOG
