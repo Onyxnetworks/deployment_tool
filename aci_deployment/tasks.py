@@ -599,6 +599,7 @@ def CONTRACT_DEPLOYMENT_APIC_VALIDATION(RULE_LIST, LOCATION, APIC_USERNAME, APIC
     CONTRACT_LIST = []
     FILTER_LIST = []
     DISPLAY_LIST = []
+    OUTPUT_LOG = []
     ERROR = False
     HEADERS = {'content-type': 'application/json'}
 
