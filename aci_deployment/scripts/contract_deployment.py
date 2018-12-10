@@ -285,7 +285,7 @@ def SUBJECT_SEARCH(BASE_URL, APIC_COOKIE, CONTRACT_NAME, TENANT, CONTRACT_SUBJEC
     return SUBJECT_SEARCH_RESPONSE
 
 
-def L3OUT_SEARCH(BASE_URL, APIC_COOKIE, L3OUT_NAME, HEADERS):
+def CONTRACT_L3OUT_SEARCH(BASE_URL, APIC_COOKIE, L3OUT_NAME, HEADERS):
     L3OUT_SEARCH_URL = BASE_URL + 'node/mo/uni/tn-common/out-{0}.json?query-target=self'.format(L3OUT_NAME)
     get_response = requests.get(L3OUT_SEARCH_URL, cookies=APIC_COOKIE, headers=HEADERS, verify=False)
     L3OUT_SEARCH_RESPONSE = json.loads(get_response.text)
@@ -299,7 +299,7 @@ def INTERNAL_EPG_SEARCH(BASE_URL, APIC_COOKIE, EPG_NAME, HEADERS):
     return INTERNAL_EPG_SEARCH_RESPONSE
 
 
-def EXTERNAL_EPG_SEARCH(BASE_URL, APIC_COOKIE, L3OUT_NAME, EPG_NAME, HEADERS):
+def CONTRACT_EXTERNAL_EPG_SEARCH(BASE_URL, APIC_COOKIE, L3OUT_NAME, EPG_NAME, HEADERS):
     EPG_SEARCH_URL = BASE_URL + 'node/class/l3extInstP.json?query-target-filter=and(wcard(l3extInstP.dn,"/out-{0}/instP-{1}"))'.format(
         L3OUT_NAME, EPG_NAME)
     get_response = requests.get(EPG_SEARCH_URL, cookies=APIC_COOKIE, headers=HEADERS, verify=False)

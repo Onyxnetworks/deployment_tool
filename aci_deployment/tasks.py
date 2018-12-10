@@ -701,7 +701,7 @@ def CONTRACT_DEPLOYMENT_APIC_VALIDATION(RULE_LIST, LOCATION, APIC_USERNAME, APIC
             pass
         else:
             L3OUT_NAME = rules['CONSUMER_L3OUT']
-            L3OUT_SEARCH_RESPONSE = L3OUT_SEARCH(BASE_URL, APIC_COOKIE, L3OUT_NAME, HEADERS)
+            L3OUT_SEARCH_RESPONSE = CONTRACT_L3OUT_SEARCH(BASE_URL, APIC_COOKIE, L3OUT_NAME, HEADERS)
             if int(L3OUT_SEARCH_RESPONSE['totalCount']) == 1:
                 if rules['CONSUMER_L3OUT'] == L3OUT_SEARCH_RESPONSE['imdata'][0]['l3extOut']['attributes']['name']:
                     pass
@@ -717,7 +717,7 @@ def CONTRACT_DEPLOYMENT_APIC_VALIDATION(RULE_LIST, LOCATION, APIC_USERNAME, APIC
             pass
         else:
             L3OUT_NAME = rules['PROVIDER_L3OUT']
-            L3OUT_SEARCH_RESPONSE = L3OUT_SEARCH(BASE_URL, APIC_COOKIE, L3OUT_NAME, HEADERS)
+            L3OUT_SEARCH_RESPONSE = CONTRACT_L3OUT_SEARCH(BASE_URL, APIC_COOKIE, L3OUT_NAME, HEADERS)
             if int(L3OUT_SEARCH_RESPONSE['totalCount']) == 1:
                 if rules['PROVIDER_L3OUT'] == L3OUT_SEARCH_RESPONSE['imdata'][0]['l3extOut']['attributes']['name']:
                     pass
@@ -783,7 +783,7 @@ def CONTRACT_DEPLOYMENT_APIC_VALIDATION(RULE_LIST, LOCATION, APIC_USERNAME, APIC
             if rules['CONSUMER_EPG'] != 'BLANK':
                 CONSUMER_L3OUT = rules['CONSUMER_L3OUT']
                 CONSUMER_EPG = rules['CONSUMER_EPG']
-                EXTERNAL_EPG_SEARCH_RESPONSE = EXTERNAL_EPG_SEARCH(BASE_URL, APIC_COOKIE, CONSUMER_L3OUT, CONSUMER_EPG,
+                EXTERNAL_EPG_SEARCH_RESPONSE = CONTRACT_EXTERNAL_EPG_SEARCH(BASE_URL, APIC_COOKIE, CONSUMER_L3OUT, CONSUMER_EPG,
                                                                    HEADERS)
                 if int(EXTERNAL_EPG_SEARCH_RESPONSE['totalCount']) == 1:
                     EPG_NAME = EXTERNAL_EPG_SEARCH_RESPONSE['imdata'][0]['l3extInstP']['attributes']['dn'].split('/')[
@@ -811,7 +811,7 @@ def CONTRACT_DEPLOYMENT_APIC_VALIDATION(RULE_LIST, LOCATION, APIC_USERNAME, APIC
             if rules['PROVIDER_EPG'] != 'BLANK':
                 PROVIDER_EPG = rules['PROVIDER_EPG']
                 PROVIDER_L3OUT = rules['PROVIDER_L3OUT']
-                EXTERNAL_EPG_SEARCH_RESPONSE = EXTERNAL_EPG_SEARCH(BASE_URL, APIC_COOKIE, PROVIDER_L3OUT, PROVIDER_EPG,
+                EXTERNAL_EPG_SEARCH_RESPONSE = CONTRACT_EXTERNAL_EPG_SEARCH(BASE_URL, APIC_COOKIE, PROVIDER_L3OUT, PROVIDER_EPG,
                                                                    HEADERS)
                 if int(EXTERNAL_EPG_SEARCH_RESPONSE['totalCount']) == 1:
                     EPG_NAME = EXTERNAL_EPG_SEARCH_RESPONSE['imdata'][0]['l3extInstP']['attributes']['dn'].split('/')[
