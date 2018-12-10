@@ -49,7 +49,7 @@ def login(request):
             if apic_cookie:
                 request.session['APIC_COOKIE'] = apic_cookie
                 print('Test2')
-                return redirect(index)
+                return redirect('/index/')
 
             else:
                 message = 'Unable to authenticate, please check credentials.'
