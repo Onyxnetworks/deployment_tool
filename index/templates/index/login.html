@@ -86,8 +86,7 @@
 
     var frm = $('#login');
     var rslt = $('#login_result');
-    var username_grp = $('#username_grp');
-    var password_grp = $('#password_grp');
+
 
     frm.submit(function () {
         $.ajax({
@@ -96,13 +95,14 @@
             data: frm.serialize(),
             success: function (data) {
                 if (!data.message) {
+                    console.log('redirect')
                     window.location.replace = '/index/';
                 }
                 else {
                     console.log(data.message);
-                    username_grp.setAttribute("class", "form-group has-error");
-                    password_grp.setAttribute("class", "form-group has-error");
-                    rslt.innerHTML = data.message;
+                    document.getElementById("username_grp").setAttribute("class", "form-group has-error");
+                    document.getElementById("password_grp").setAttribute("class", "form-group has-error");
+                    document.getElementById("login_result").innerHTML = data.message;
 
                 }
             },
