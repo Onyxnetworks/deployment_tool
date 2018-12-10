@@ -211,6 +211,8 @@ def EXTERNAL_EPG_VALIDATION(RULE_LIST, LOCATION, APIC_USERNAME, APIC_PASSWORD):
 
     # Login to fabric
     APIC_COOKIE = APIC_LOGIN(BASE_URL, APIC_USERNAME, APIC_PASSWORD)
+    print(BASE_URL + APIC_PASSWORD + APIC_USERNAME)
+    print(APIC_COOKIE)
     if APIC_COOKIE:
         OUTPUT_LOG.append({'Notifications': ''})
         OUTPUT_LOG.append({'Notifications': 'Connecting to APIC'})
