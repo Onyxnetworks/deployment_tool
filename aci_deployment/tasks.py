@@ -157,9 +157,7 @@ def EXTERNAL_EPG_VALIDATION(RULE_LIST, location, url_dict,  APIC_USERNAME, APIC_
     BASE_URL = url_dict[location]
 
 
-    OUTPUT_LOG.append({'Notifications': ''})
-    OUTPUT_LOG.append({'Notifications': 'Validating EPG names in Workbook.'})
-    OUTPUT_LOG.append({'Notifications': '-----------------------------'})
+    OUTPUT_LOG.append({'Headers': 'Validating EPG names in Workbook.'})
 
     for rules in RULE_LIST:
         if rules['CONSUMER_EPG'] != 'BLANK' and rules['CONSUMER_L3OUT'] != 'INTERNAL':
@@ -236,9 +234,7 @@ def EXTERNAL_EPG_VALIDATION(RULE_LIST, location, url_dict,  APIC_USERNAME, APIC_
         OUTPUT_LOG.append({'Notifications': 'EPG formatting validated successfully'})
 
 
-    OUTPUT_LOG.append({'Notifications': ''})
-    OUTPUT_LOG.append({'Notifications': 'Validating IP addresses'})
-    OUTPUT_LOG.append({'Notifications': '-----------------------------'})
+    OUTPUT_LOG.append({'Headers': 'Validating IP addresses'})
     for addresses in RULE_LIST:
         if len(addresses['CONSUMER_IP']) >= 1:
             for subnets in addresses['CONSUMER_IP']:
@@ -266,17 +262,12 @@ def EXTERNAL_EPG_VALIDATION(RULE_LIST, location, url_dict,  APIC_USERNAME, APIC_
     # Login to fabric
     APIC_COOKIE = APIC_LOGIN(BASE_URL, APIC_USERNAME, APIC_PASSWORD)
     if APIC_COOKIE:
-        OUTPUT_LOG.append({'Notifications': ''})
-        OUTPUT_LOG.append({'Notifications': 'Connecting to APIC'})
-        OUTPUT_LOG.append({'Notifications': '-----------------------------'})
-        OUTPUT_LOG.append({'Notifications': 'Successfully generated authentication cookie'})
+        OUTPUT_LOG.append({'Headers': 'Connecting to APIC'})
     else:
         OUTPUT_LOG.append({'Errors': 'Unable to connect to APIC. Please check your credentials'})
 
     # Search for L3out and build URL to add IP's
-    OUTPUT_LOG.append({'Notifications': ''})
-    OUTPUT_LOG.append({'Notifications': 'Validating L3Out Names'})
-    OUTPUT_LOG.append({'Notifications': '-----------------------------'})
+    OUTPUT_LOG.append({'Headers': 'Validating L3Out Names'})
     L3OUT_LIST = []
 
     for rules in RULE_LIST:
@@ -323,9 +314,7 @@ def EXTERNAL_EPG_VALIDATION(RULE_LIST, location, url_dict,  APIC_USERNAME, APIC_
         OUTPUT_LOG.append({'Notifications': 'L3Out validation successful'})
 
     # Check if IP already exists in Same L3Out or same VRF
-    OUTPUT_LOG.append({'Notifications': ''})
-    OUTPUT_LOG.append({'Notifications': 'Checking if IP currently exists within VRF'})
-    OUTPUT_LOG.append({'Notifications': '-----------------------------'})
+    OUTPUT_LOG.append({'Headers': 'Checking if IP currently exists within VRF'})
 
     # Get L3out VRF
     for rules in RULE_LIST:
@@ -435,9 +424,7 @@ def EXTERNAL_EPG_VALIDATION(RULE_LIST, location, url_dict,  APIC_USERNAME, APIC_
                 OUTPUT_LOG.append({'Notifications': 'No subnets will be added to EPG: ' + rules['PROVIDER_EPG']})
 
     # Search for VIPs
-    OUTPUT_LOG.append({'Notifications': ''})
-    OUTPUT_LOG.append({'Notifications': 'Checking if any EPGs are for VIPS'})
-    OUTPUT_LOG.append({'Notifications': '-----------------------------'})
+    OUTPUT_LOG.append({'Headers': 'Checking if any EPGs are for VIPS'})
 #
     for rules in RULE_LIST:
         if rules['PROVIDER_EPG'].split('_')[0].endswith('VS') and rules['PROVIDER_L3OUT'].endswith('DCI_L3O'):
@@ -479,9 +466,7 @@ def EXTERNAL_EPG_DEPLOYMENT(RULE_LIST, location, url_dict, APIC_USERNAME, APIC_P
     # --------------------------------------------------------------------------#
     # Begin Configuration
     # --------------------------------------------------------------------------#
-    OUTPUT_LOG.append({'Notifications': ''})
-    OUTPUT_LOG.append({'Notifications': 'Starting External EPG Deployment.'})
-    OUTPUT_LOG.append({'Notifications': '-----------------------------'})
+    OUTPUT_LOG.append({'Headers': 'Starting External EPG Deployment.'})
     APIC_COOKIE = APIC_LOGIN(BASE_URL, APIC_USERNAME, APIC_PASSWORD)
     if APIC_COOKIE:
         OUTPUT_LOG.append({'Notifications': 'Successfully generated authentication cookie'})
@@ -492,7 +477,7 @@ def EXTERNAL_EPG_DEPLOYMENT(RULE_LIST, location, url_dict, APIC_USERNAME, APIC_P
         check_i = check_i + 1
         L3OUT_CONSUME_EPG_CREATED = False
         L3OUT_PROVIDE_EPG_CREATED = False
-        OUTPUT_LOG.append({'Notifications': 'Adding EPGs & Subnets for line: ' + str(rules['LINE'])})
+        OUTPUT_LOG.append({'Headers2': 'Adding EPGs & Subnets for line: ' + str(rules['LINE'])})
         if rules['CONSUMER_L3OUT'] != 'INTERNAL' and rules['CONSUMER_EPG'] != 'BLANK':
             EPG_NAME = rules['CONSUMER_EPG']
             L3OUT_NAME = rules['CONSUMER_L3OUT']

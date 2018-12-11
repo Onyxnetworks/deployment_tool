@@ -40,15 +40,24 @@ function get_validation_task_info(task_id, location, rule_list) {
                 var result_location = document.getElementById("epg_deployment_results")
                 var validation_error = false;
                 for (i = 0, len = results.length, text = ""; i < len; i++) {
+                    if (results[i].Headers) {
+                        var br = document.createElement("br");
+                        var header = document.createElement("dt");
+                        result_location.appendChild(br);
+                        result_location.appendChild(header);
+                        header.innerHTML = results[i].Headers;
+                    }
                     if (results[i].Notifications) {
-                        var p_not = document.createElement("p");
-                        result_location.appendChild(p_not);
-                        p_not.innerHTML = results[i].Notifications;
+                        var notifications = document.createElement("dd");
+                        result_location.appendChild(notifications);
+                        notifications.innerHTML = results[i].Notifications;
                     }
                     if (results[i].Errors) {
-                        var p_err = document.createElement("p");
-                        result_location.appendChild(p_err);
-                        p_err.innerHTML = results[i].Errors;
+                        var errors = document.createElement("dd");
+                        errors.setAttribute("class", "text-danger");
+                        result_location.appendChild(errors);
+                        errors.innerHTML = results[i].Errors;
+
                     }
                     if ("Errors" in results[i]) {
                         var validation_error = true
@@ -118,15 +127,30 @@ function get_deployment_task_info(task_id) {$.ajax({
             var result_location = document.getElementById("epg_deployment_results")
             var validation_error = false;
             for (i = 0, len = results.length, text = ""; i < len; i++) {
+                if (results[i].Headers) {
+                    var br = document.createElement("br");
+                    var header = document.createElement("dt");
+                    result_location.appendChild(br);
+                    result_location.appendChild(header);
+                    header.innerHTML = results[i].Headers;
+                }
+                if (results[i].Headers2) {
+                    var header2 = document.createElement("dt");
+                    header2.setAttribute("class", "text-muted");
+                    result_location.appendChild(header2);
+                    header2.innerHTML = results[i].Headers2;
+                }
                 if (results[i].Notifications) {
-                    var p_not = document.createElement("p");
-                    result_location.appendChild(p_not);
-                    p_not.innerHTML = results[i].Notifications;
+                    var notifications = document.createElement("dd");
+                    notifications.setAttribute("class", "text-info");
+                    result_location.appendChild(notifications);
+                    notifications.innerHTML = results[i].Notifications;
                 }
                 if (results[i].Errors) {
-                    var p_err = document.createElement("p");
-                    result_location.appendChild(p_err);
-                    p_err.innerHTML = results[i].Errors;
+                    var errors = document.createElement("dd");
+                    errors.setAttribute("class", "text-danger");
+                    result_location.appendChild(errors);
+                    errors.innerHTML = results[i].Errors;
                 }
                 if ("Errors" in results[i]) {
                     var validation_error = true
