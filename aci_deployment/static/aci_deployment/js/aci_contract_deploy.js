@@ -140,6 +140,12 @@ function get_deployment_task_info(task_id) {$.ajax({
                     result_location.appendChild(header);
                     header.innerHTML = results[i].Headers;
                 }
+                if (results[i].Headers-2) {
+                    var header2 = document.createElement("dt");
+                    header2.setAttribute("class", "text-muted");
+                    result_location.appendChild(header2);
+                    header2.innerHTML = results[i].Headers-2;
+                }
                 if (results[i].Notifications) {
                     var notifications = document.createElement("dd");
                     notifications.setAttribute("class", "text-info");
