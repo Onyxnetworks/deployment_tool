@@ -49,12 +49,12 @@ function get_validation_task_info(task_id, location, rule_list) {
                     }
                     if (results[i].Notifications) {
                         var notifications = document.createElement("dd");
-                        document.getElementById(result_location).appendChild(notifications);
+                        result_location.appendChild(notifications);
                         notifications.innerHTML = results[i].Notifications;
                     }
                     if (results[i].Errors) {
                         var errors = document.createElement("dd");
-                        document.getElementById(result_location).appendChild(errors);
+                        result_location.appendChild(errors);
                         notifications.innerHTML = results[i].Errors;
 
                     }
