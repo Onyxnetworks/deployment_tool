@@ -96,7 +96,7 @@
             success: function (data) {
                 if (data.message == 'redirect') {
                     console.log('Redirecting to: ' + data.redirect-url)
-                    window.location.replace = data.redirect-url;
+                    window.location = data.redirect-url;
                 }
                 else {
                     console.log(data.message);
