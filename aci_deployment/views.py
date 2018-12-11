@@ -16,7 +16,6 @@ def endpoint_search(request):
             username = request.session.get('prod_username')
             password = request.session.get('prod_password')
 
-
         elif environment == 'Pre-Production':
             # Need to put in an error as PPE search wont work!
             username = request.session.get('ppe_username')
