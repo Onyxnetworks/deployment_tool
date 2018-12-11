@@ -54,10 +54,10 @@
                                     </select>
                                 </div>
                                 <div class="form-group" id="username_grp">
-                                    <input class="form-control is-invalid" placeholder="ADM Account" required name="username" type="text" autofocus>
+                                    <input class="form-control is-invalid" placeholder="ADM Account" id="username" required name="username" type="text" autofocus>
                                 </div>
                                 <div class="form-group" id="password_grp">
-                                    <input class="form-control" placeholder="Password" name="password" type="password" required value="">
+                                    <input class="form-control" placeholder="Password" name="password" id="password" type="password" required value="">
                                     <span id="login_result"></span>
                                 </div>
                                 <!-- Change this to a button or input when using this as a form -->
@@ -86,12 +86,15 @@
 
     var frm = $('#login');
     var rslt = $('#login_result');
+    var environment =  $('#environment');
+    var username =  $('#username');
+    var password =  $('#password');
     frm.submit(function(e) {e.preventDefault();
-    var formData = new FormData(this);
+    post_data = JSON.stringify({'environment': environment, 'username': username, 'password': password});
     $.ajax({
         type: 'post',
         url: frm.attr('action'),
-        data: formData,
+        data: post_data,
         contentType: 'application/json',
         dataType: 'json',
         success: function (data) {

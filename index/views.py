@@ -23,10 +23,13 @@ def get_task_info(request):
 
 def login(request):
     if request.method == 'POST':
-        if 'username' and 'password' in request.POST:
-            username = request.POST['username']
-            password = request.POST['password']
-            environment = request.POST['environment']
+        response_json = request.body
+        data = json.loads(response_json)
+        if 'username' and 'password' in data:
+            username = data['username']
+            password = data['password']
+            environment = data['environment']
+
             print(username + password + environment)
 
             if environment == 'Production':

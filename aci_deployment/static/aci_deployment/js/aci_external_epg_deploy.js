@@ -81,7 +81,6 @@ function get_validation_task_info(task_id, location, rule_list) {
 }
 function deploy_configuration(location, rule_list) {
     $("#deploy_btn").click(function(){
-        var raw_json = {'location': location, 'rule_list': rule_list};
         post_data = JSON.stringify({'location': location, 'rule_list': rule_list});
         $.ajax({
             type: 'post',
