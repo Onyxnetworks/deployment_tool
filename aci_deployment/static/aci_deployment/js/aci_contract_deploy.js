@@ -43,7 +43,9 @@ function get_validation_task_info(task_id, location, rule_list) {
 
 
                     if (results[i].Headers) {
+                        var br = document.createElement("br");
                         var header = document.createElement("dt");
+                        result_location.appendChild(br);
                         result_location.appendChild(header);
                         header.innerHTML = results[i].Headers;
                     }
