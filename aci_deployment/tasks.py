@@ -590,7 +590,7 @@ def EXTERNAL_EPG_DEPLOYMENT(RULE_LIST, location, url_dict, APIC_USERNAME, APIC_P
     return OUTPUT_LOG
 
 @shared_task
-def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, LOCATION, APIC_USERNAME, APIC_PASSWORD):
+def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, APIC_USERNAME, APIC_PASSWORD):
     CONTRACT_LIST = []
     FILTER_LIST = []
     DISPLAY_LIST = []
@@ -599,14 +599,7 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, LOCATION, APIC_USERNAME, APIC_PASS
     HEADERS = {'content-type': 'application/json'}
     TENANT_LIST = ['RED', 'GREEN', 'BLUE']
 
-    if LOCATION == 'DC1':
-        BASE_URL = 'https://sandboxapicdc.cisco.com/api/'
-    elif LOCATION == 'DC2':
-        BASE_URL = 'https://sandboxapicdc.cisco.com/api/'
-    elif LOCATION == 'LAB':
-        BASE_URL = 'https://lab-a-apic.test-lab.local/api/'
-    elif LOCATION == 'SANDBOX':
-        BASE_URL = 'https://sandboxapicdc.cisco.com/api/'
+    BASE_URL = url_dict[location]
 
     # Validate Contract Name formatting
     OUTPUT_LOG.append({'Notifications': ''})
