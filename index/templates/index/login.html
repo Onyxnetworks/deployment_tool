@@ -95,8 +95,6 @@
         type: 'post',
         url: frm.attr('action'),
         data: frm.serialize(),
-        contentType: 'application/json',
-        dataType: 'json',
         success: function (data) {
             if (data.redirect-url != null) {
                 console.log('Redirecting to: ' + data.redirect-url)
