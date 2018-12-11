@@ -43,20 +43,18 @@ function get_validation_task_info(task_id, location, rule_list) {
 
 
                     if (results[i].Headers) {
-                        var header_id = 'header_id_' + i;
                         var header = document.createElement("dt");
-                        header.setAttribute("id", header_id);
                         result_location.appendChild(header);
                         header.innerHTML = results[i].Headers;
                     }
                     if (results[i].Notifications) {
                         var notifications = document.createElement("dd");
-                        document.getElementById(header_id).appendChild(notifications);
+                        document.getElementById(result_location).appendChild(notifications);
                         notifications.innerHTML = results[i].Notifications;
                     }
                     if (results[i].Errors) {
                         var errors = document.createElement("dd");
-                        document.getElementById(header_id).appendChild(errors);
+                        document.getElementById(result_location).appendChild(errors);
                         notifications.innerHTML = results[i].Errors;
 
                     }
