@@ -28,10 +28,9 @@ def endpoint_search(request):
 
         # Get base url to use
         base_urls = get_base_url(environment)
-        url_dict = base_urls['ACI']
 
         # Submit task to celery to process
-        task = ENDPOINT_SEARCH.delay(url_dict, username, password, subnet)
+        task = ENDPOINT_SEARCH.delay(base_urls, username, password, subnet)
 
         # Return task id back to client for ajax use.
         return HttpResponse(json.dumps({'task_id': task.id}), content_type='application/json')        

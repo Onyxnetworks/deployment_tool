@@ -11,13 +11,13 @@ from index.scripts.baseline import get_base_url
 from celery import shared_task
 
 @shared_task
-def ENDPOINT_SEARCH(url_dict, APIC_USERNAME, APIC_PASSWORD, SUBNET):
+def ENDPOINT_SEARCH(base_urls, APIC_USERNAME, APIC_PASSWORD, SUBNET):
     RESULTS = []
 
     # Build URL List to search.
     url_list = []
-    for url in url_dict['ACI']:
-        url_list.append(url_dict['ACI'][url])
+    for url in base_urls['ACI']:
+        url_list.append(base_urls['ACI'][url])
 
     ENDPOINT_LIST = GET_ENDPOINTS(url_list, APIC_USERNAME, APIC_PASSWORD)
 

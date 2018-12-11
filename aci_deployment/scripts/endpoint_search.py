@@ -12,6 +12,7 @@ def GET_ENDPOINTS(url_list, APIC_USERNAME, APIC_PASSWORD):
 
     # Loop through URL list and Get Endpoints
     for BASE_URL in url_list:
+        print(BASE_URL)
         LOCATION = BASE_URL.split('-')[0][8:]
         # Login to fabric
         APIC_COOKIE = APIC_LOGIN(BASE_URL, APIC_USERNAME, APIC_PASSWORD)
