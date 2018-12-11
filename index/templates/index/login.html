@@ -86,33 +86,33 @@
 
     var frm = $('#login');
     var rslt = $('#login_result');
-
-
-    frm.submit(function () {
-        $.ajax({
-            type: frm.attr('method'),
-            url: frm.attr('action'),
-            data: frm.serialize(),
-            success: function (data) {
-                if (data.message == 'redirect') {
-                    console.log('Redirecting to: ' + data.redirect-url)
-                    window.location = data.redirect-url;
-                }
-                else {
-                    console.log(data.message);
-                    document.getElementById("username_grp").setAttribute("class", "form-group has-error");
-                    document.getElementById("password_grp").setAttribute("class", "form-group has-error");
-                    document.getElementById("login_result").setAttribute("class", "alert-danger");
-                    document.getElementById("login_result").innerHTML = data.message;
-                }
-            },
-            error: function (data) {
-                console.log("Something went wrong!");
-            },
-        });
+    frm.submit(function(e) {e.preventDefault();
+    var formData = new FormData(this);
+    $.ajax({
+        type: 'post',
+        url: frm.attr('action'),
+        data: formData,
+        success: function (data) {
+            if (data.redirect-url != null) {
+                console.log('Redirecting to: ' + data.redirect-url)
+                window.location = data.redirect-url
+            }
+            else {
+                console.log(data.message);
+                document.getElementById("username_grp").setAttribute("class", "form-group has-error");
+                document.getElementById("password_grp").setAttribute("class", "form-group has-error");
+                document.getElementById("login_result").setAttribute("class", "alert-danger");
+                document.getElementById("login_result").innerHTML = data.message;
+            }
+        },
+        error: function (data) {
+            console.log("Something went wrong!");
+            document.getElementById("login_result").innerHTML = "Something went wrong!";
+        }
+    });
     return false;
-});
-    </script>
+    });
+        </script>
     {% block scripts %}
 
 
