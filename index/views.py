@@ -22,6 +22,7 @@ def get_task_info(request):
 
 
 def login(request):
+    content = {}
     if request.method == 'POST':
         if 'username' and 'password' in request.POST:
             username = request.POST['username']
@@ -46,16 +47,14 @@ def login(request):
 
             if apic_cookie:
                 request.session['APIC_COOKIE'] = apic_cookie
-                return HttpResponse(json.dumps({'message': 'redirect', 'redirect-url': '/aci/endpoint_search/'}),
-                                    content_type='application/json')
+                return redirect(index)
 
             else:
-                message = 'Unable to authenticate, please check credentials.'
-                return HttpResponse(json.dumps({'message': message}),
-                                    content_type='application/json')
+                content = {'error': True, 'message': 'Unable to authenticate, please check credentials.'}
+                redirect(request.path_info)
 
 
-    return render(request, 'index/login.html')
+    return render(request, 'index/login.html', content)
 
 
 def index(request):

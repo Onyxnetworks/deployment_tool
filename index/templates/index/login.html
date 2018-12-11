@@ -53,12 +53,12 @@
                                         <option>Lab</option>
                                     </select>
                                 </div>
-                                <div class="form-group" id="username_grp">
-                                    <input class="form-control is-invalid" placeholder="ADM Account" id="username" required name="username" type="text" autofocus>
+                                <div class="form-group {% if error %} form-group has-error {% endif %}" id="username_grp">
+                                    <input class="form-control" placeholder="ADM Account" id="username" required name="username" type="text" autofocus>
                                 </div>
-                                <div class="form-group" id="password_grp">
+                                <div class="form-group {% if error %} form-group has-error {% endif %}" id="password_grp">
                                     <input class="form-control" placeholder="Password" name="password" id="password" type="password" required value="">
-                                    <span id="login_result"></span>
+                                    <span id="login_result">{% if error %}{{ message }}{% endif %}</span>
                                 </div>
                                 <!-- Change this to a button or input when using this as a form -->
                                 <button type="submit" class="btn btn-success btn-lg btn-block">Login</button>
@@ -87,35 +87,6 @@
     <!-- CSRF Token -->
     <script src="{% static 'index/js/csrftoken.js' %}"></script>
 
-    <script>
-    var frm = $('#login');
-    var rslt = $('#login_result');
-    frm.submit(function () {
-    $.ajax({
-        type: 'post',
-        url: frm.attr('action'),
-        data: frm.serialize(),
-        success: function (data) {
-            if (data.redirect-url != null) {
-                console.log('Redirecting to: ' + data.redirect-url)
-                window.location = data.redirect-url
-            }
-            else {
-                console.log(data.message);
-                document.getElementById("username_grp").setAttribute("class", "form-group has-error");
-                document.getElementById("password_grp").setAttribute("class", "form-group has-error");
-                document.getElementById("login_result").setAttribute("class", "alert-danger");
-                document.getElementById("login_result").innerHTML = data.message;
-            }
-        },
-        error: function (data) {
-            console.log("Something went wrong!");
-            document.getElementById("login_result").innerHTML = "Something went wrong!";
-        }
-    });
-    return false;
-});
-        </script>
     {% block scripts %}
 
 
