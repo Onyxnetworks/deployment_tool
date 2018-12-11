@@ -133,23 +133,23 @@ function get_deployment_task_info(task_id) {$.ajax({
             for (i = 0, len = results.length, text = ""; i < len; i++) {
 
                 if (results[i].Headers) {
-                    var header_id = 'header_id_' + i;
+                    var br = document.createElement("br");
                     var header = document.createElement("dt");
-                    header.setAttribute("id", header_id);
+                    result_location.appendChild(br);
                     result_location.appendChild(header);
                     header.innerHTML = results[i].Headers;
                 }
                 if (results[i].Notifications) {
                     var notifications = document.createElement("dd");
-                    document.getElementById(header_id).appendChild(notifications);
+                    result_location.appendChild(notifications);
                     notifications.innerHTML = results[i].Notifications;
                 }
                 if (results[i].Errors) {
                     var errors = document.createElement("dd");
-                    document.getElementById(header_id).appendChild(errors);
+                    result_location.appendChild(errors);
                     notifications.innerHTML = results[i].Errors;
-
                 }
+
                 if ("Errors" in results[i]) {
                     var validation_error = true
                 }
