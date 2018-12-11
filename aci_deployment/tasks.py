@@ -1047,7 +1047,7 @@ def CONTRACT_DEPLOYMENT(RULE_LIST, location, url_dict, APIC_USERNAME, APIC_PASSW
         CONTRACT_NAME = rules['NAME']
         # Consuming contract
         EPG_NAME = rules['CONSUMER_EPG']
-        OUTPUT_LOG.append({'Headers-2': 'Deploying Contracts for Line: ' + str(LINE)})
+        OUTPUT_LOG.append({'Headers2': 'Deploying Contracts for Line: ' + str(LINE)})
 
         if EPG_NAME != 'BLANK':
             if rules['CONSUMER_L3OUT'] == 'INTERNAL':
