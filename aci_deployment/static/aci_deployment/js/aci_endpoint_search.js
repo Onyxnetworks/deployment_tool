@@ -27,8 +27,6 @@ function get_task_info(task_id) {
         success: function (data) {
             rslt.html('');
             if (data.state == 'PENDING') {
-                document.getElementById("tablediv").style.visibility = "visible";
-                document.getElementById("tablediv").innerHTML = "<object data="/static/index/svg/spinner.svg" width="110" height="60" type="image/svg+xml" codebase="http://www.savarese.com/software/svgplugin/"></object>";
                 rslt.html('Please wait...');
             }
             else if (data.state == 'SUCCESS') {
