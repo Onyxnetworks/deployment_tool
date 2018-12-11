@@ -34,14 +34,12 @@ def ENDPOINT_SEARCH(base_urls, APIC_USERNAME, APIC_PASSWORD, SUBNET):
 
 def CONTRACT_DEPLOYMENT_EXCEL_OPEN_WORKBOOK(WORKBOOK, LOCATION):
     WB = openpyxl.load_workbook(WORKBOOK, data_only=True)
-    if LOCATION == 'DC1':
+    if LOCATION == 'UKDC1':
         PY_WS = WB['ACI_DC1']
-    elif LOCATION == 'DC2':
+    elif LOCATION == 'UKDC2':
         PY_WS = WB['ACI_DC2']
     elif LOCATION == 'LAB':
         PY_WS = WB['ACI_LAB']
-    elif LOCATION == 'SANDBOX':
-        PY_WS = WB['ACI_SANDBOX']
 
     SERVICE_LIST = []
     RULE_LIST = []
@@ -91,14 +89,12 @@ def CONTRACT_DEPLOYMENT_EXCEL_OPEN_WORKBOOK(WORKBOOK, LOCATION):
 
 def EXTERNAL_EPG_EXCEL_OPEN_WORKBOOK(WORKBOOK, LOCATION):
     WB = openpyxl.load_workbook(WORKBOOK, data_only=True)
-    if LOCATION == 'DC1':
+    if LOCATION == 'UKDC1':
         PY_WS = WB['ACI_DC1']
-    elif LOCATION == 'DC2':
+    elif LOCATION == 'UKDC2':
         PY_WS = WB['ACI_DC2']
     elif LOCATION == 'LAB':
         PY_WS = WB['ACI_LAB']
-    elif LOCATION == 'SANDBOX':
-        PY_WS = WB['ACI_SANDBOX']
 
     RULE_LIST = []
     INDEX = 1
@@ -466,20 +462,16 @@ def EXTERNAL_EPG_VALIDATION(RULE_LIST, location, url_dict,  APIC_USERNAME, APIC_
    
         
 @shared_task
-def EXTERNAL_EPG_DEPLOYMENT(LOCATION, APIC_USERNAME, APIC_PASSWORD, RULE_LIST):
+def EXTERNAL_EPG_DEPLOYMENT(RULE_LIST, location, url_dict, APIC_USERNAME, APIC_PASSWORD):
 
-    if LOCATION == 'DC1':
-        BASE_URL = 'https://sandboxapicdc.cisco.com/api/'
-        DC = LOCATION
-    elif LOCATION == 'DC2':
-        BASE_URL = 'https://sandboxapicdc.cisco.com/api/'
-        DC = LOCATION
-    elif LOCATION == 'LAB':
-        BASE_URL = 'https://lab-a-apic.test-lab.local/api/'        
-        DC = LOCATION
-    elif LOCATION == 'SANDBOX':
-        BASE_URL = 'https://sandboxapicdc.cisco.com/api/'
-        DC = LOCATION
+    BASE_URL = url_dict[location]
+
+    if location == 'UKDC1':
+        DC = 'DC1'
+    elif location == 'UKDC2':
+        DC = 'DC2'
+    elif location == 'LAB':
+        DC = 'DC1'
 
     TENANT = 'common'
     OUTPUT_LOG = []
