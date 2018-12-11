@@ -160,8 +160,27 @@ def contract_deployment_push(request):
         location = data['location']
         rule_list = data['rule_list']
 
+        environment = request.session.get('environment')
+        if environment == 'Production':
+            username = request.session.get('prod_username')
+            password = request.session.get('prod_password')
+
+
+        elif environment == 'Pre-Production':
+            # Need to put in an error as PPE search wont work!
+            username = request.session.get('ppe_username')
+            password = request.session.get('ppe_password')
+
+        elif environment == 'Lab':
+            username = request.session.get('lab_username')
+            password = request.session.get('lab_password')
+
+        # Get base url to use
+        base_urls = get_base_url(environment)
+        url_dict = base_urls['ACI']
+
         # Deploy APIC configuration
-        task = CONTRACT_DEPLOYMENT.delay(location, apic_username, apic_password, rule_list)
+        task = CONTRACT_DEPLOYMENT.delay(rule_list, location, url_dict, username, password)
 
         # Return task id back to client for ajax use.
         return HttpResponse(json.dumps({'task_id': task.id}), content_type='application/json')

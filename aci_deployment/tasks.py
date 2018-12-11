@@ -977,20 +977,9 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, APIC_USERNAME,
     return OUTPUT_LOG
 
 @shared_task
-def CONTRACT_DEPLOYMENT(LOCATION, APIC_USERNAME, APIC_PASSWORD, RULE_LIST):
+def CONTRACT_DEPLOYMENT(RULE_LIST, location, url_dict, APIC_USERNAME, APIC_PASSWORD):
 
-    if LOCATION == 'DC1':
-        BASE_URL = 'https://sandboxapicdc.cisco.com/api/'
-        DC = LOCATION
-    elif LOCATION == 'DC2':
-        BASE_URL = 'https://sandboxapicdc.cisco.com/api/'
-        DC = LOCATION
-    elif LOCATION == 'LAB':
-        BASE_URL = 'https://lab-a-apic.test-lab.local/api/'
-        DC = LOCATION
-    elif LOCATION == 'SANDBOX':
-        BASE_URL = 'https://sandboxapicdc.cisco.com/api/'
-        DC = LOCATION
+    BASE_URL = url_dict[location]
 
     CONTRACT_LIST = []
     FILTER_LIST = []
