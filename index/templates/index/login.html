@@ -54,7 +54,7 @@
                                     </select>
                                 </div>
                                 <div class="form-group {% if error %} form-group has-error {% endif %}" id="username_grp">
-                                    <input class="form-control" placeholder="ADM Account" id="username" required name="username" type="text" autofocus>
+                                    <input class="form-control" placeholder="ADM Account" id="username" required name="username" type="text" {% if not error %}autofocus{% endif %}>
                                 </div>
                                 <div class="form-group {% if error %} form-group has-error {% endif %}" id="password_grp">
                                     <input class="form-control" placeholder="Password" name="password" id="password" type="password" required value="">
