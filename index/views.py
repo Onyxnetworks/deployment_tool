@@ -29,7 +29,7 @@ def login(request):
             username = request.POST['username']
             password = request.POST['password']
             environment = request.POST['environment']
-
+            request.session['environment'] = environment
             if environment == 'Production':
                 request.session['prod_username'] = username
                 request.session['prod_password'] = password
