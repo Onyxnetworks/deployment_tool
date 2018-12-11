@@ -88,18 +88,13 @@
     <script src="{% static 'index/js/csrftoken.js' %}"></script>
 
     <script>
-
     var frm = $('#login');
     var rslt = $('#login_result');
-    var environment =  $('#environment');
-    var username =  $('#username');
-    var password =  $('#password');
-    frm.submit(function(e) {e.preventDefault();
-    post_data = JSON.stringify({'environment': environment, 'username': username, 'password': password});
+    frm.submit(function () {
     $.ajax({
         type: 'post',
         url: frm.attr('action'),
-        data: post_data,
+        data: frm.serialize(),
         contentType: 'application/json',
         dataType: 'json',
         success: function (data) {
@@ -121,7 +116,7 @@
         }
     });
     return false;
-    });
+});
         </script>
     {% block scripts %}
 
