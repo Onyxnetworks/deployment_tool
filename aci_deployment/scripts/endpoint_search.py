@@ -1,6 +1,5 @@
 import json, requests, ipaddress, openpyxl, time, os
 from netaddr import IPNetwork, IPAddress
-from .secrets import *
 from .baseline import APIC_LOGIN
 
 # Ignore SSL Errors
@@ -13,14 +12,12 @@ def GET_ENDPOINTS(BASE_URL, APIC_USERNAME, APIC_PASSWORD):
     HEADERS = {'content-type': 'application/json'}
     # Login to fabric
     APIC_COOKIE = APIC_LOGIN(BASE_URL, APIC_USERNAME, APIC_PASSWORD)
-    print(APIC_COOKIE)
     # Get External Endpoints
     ENDPOINT_EXTERNAL_RESPONSE = GET_ENDPOINT_EXTERNAL(BASE_URL, APIC_COOKIE, HEADERS)
     # Get Internal Endpoint data.
     ENDPOINT_INTERNAL_RESPONSE = GET_ENDPOINT_INTERNAL(BASE_URL, APIC_COOKIE, HEADERS)
     # Loop over endpoints and build endpoint lists.
     for i in ENDPOINT_EXTERNAL_RESPONSE['imdata']:
-        print(i)
         IMPORT = ''
         EXPORT = ''
         SECURITY = ''
@@ -40,7 +37,6 @@ def GET_ENDPOINTS(BASE_URL, APIC_USERNAME, APIC_PASSWORD):
              'Subnet': i['l3extSubnet']['attributes']['ip'], 'Scope': SCOPE, 'Locality': 'External'})
 
     for i in ENDPOINT_INTERNAL_RESPONSE['imdata']:
-        print(i)
         ENDPOINT_LIST.append({'Location': LOCATION, 'Tenant': i['fvCEp']['attributes']['dn'].split('/')[1][3:],
                                        'AppProfile': i['fvCEp']['attributes']['dn'].split('/')[2][3:],
                                        'EPG': i['fvCEp']['attributes']['dn'].split('/')[3][4:],

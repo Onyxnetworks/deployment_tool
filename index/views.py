@@ -29,7 +29,6 @@ def login(request):
             username = request.POST['username']
             password = request.POST['password']
             environment = request.POST['environment']
-            print(username + password + environment)
 
             if environment == 'Production':
                 request.session['prod_username'] = username
@@ -44,8 +43,9 @@ def login(request):
                 request.session['lab_username'] = username
                 request.session['lab_password'] = password
 
-            # Get base url to use for authentication and scripts
+            # Get base url to use for authentication and scripts and try to login to UKDC1 APIC
             base_urls = get_base_url(environment)
+            base_url = base_urls['ACI']['UKDC1']
             # Attempt to authenticate user
             apic_cookie = APIC_LOGIN(base_url, username, password)
 

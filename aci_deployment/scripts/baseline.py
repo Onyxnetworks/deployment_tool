@@ -1,5 +1,4 @@
 import json, requests
-from secrets import *
 
 # Ignore SSL Errors
 requests.packages.urllib3.disable_warnings()

@@ -1,5 +1,4 @@
 import json, requests, openpyxl, time, os
-from .secrets import *
 from .baseline import APIC_LOGIN
 
 # Ignore SSL Errors

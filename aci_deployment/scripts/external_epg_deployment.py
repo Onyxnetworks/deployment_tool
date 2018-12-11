@@ -1,7 +1,6 @@
 import json, requests, ipaddress, openpyxl, time, os
 from netaddr import IPNetwork, IPAddress
 
-from .secrets import *
 from .baseline import APIC_LOGIN
 
 # Ignore SSL Errors
