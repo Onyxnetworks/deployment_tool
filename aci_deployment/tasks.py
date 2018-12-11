@@ -904,13 +904,11 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, APIC_USERNAME,
                                    3][6:]
                     L3OUT_NAME = EXTERNAL_EPG_SEARCH_RESPONSE['imdata'][0]['l3extInstP']['attributes']['dn'].split('/')[
                                      2][4:]
-                    TENANT_NAME = \
                     EXTERNAL_EPG_SEARCH_RESPONSE['imdata'][0]['l3extInstP']['attributes']['dn'].split('/')[1][3:]
                     if L3OUT_NAME == rules['CONSUMER_L3OUT']:
                         pass
                     else:
-                        OUTPUT_LOG.append({
-                                              'Errors': 'EPG and L3OUT missmatch with ' + L3OUT_NAME + ' and ' + EPG_NAME + ' dont match value: ' +
+                        OUTPUT_LOG.append({'Errors': 'EPG and L3OUT missmatch with ' + L3OUT_NAME + ' and ' + EPG_NAME + ' dont match value: ' +
                                                         rules['CONSUMER_L3OUT']})
 
                 else:
@@ -932,13 +930,11 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, APIC_USERNAME,
                                    3][6:]
                     L3OUT_NAME = EXTERNAL_EPG_SEARCH_RESPONSE['imdata'][0]['l3extInstP']['attributes']['dn'].split('/')[
                                      2][4:]
-                    TENANT_NAME = \
                     EXTERNAL_EPG_SEARCH_RESPONSE['imdata'][0]['l3extInstP']['attributes']['dn'].split('/')[1][3:]
                     if L3OUT_NAME == rules['PROVIDER_L3OUT']:
                         pass
                     else:
-                        OUTPUT_LOG.append({
-                                              'Errors': 'EPG and L3OUT missmatch with ' + L3OUT_NAME + ' and ' + EPG_NAME + ' dont match value: ' +
+                        OUTPUT_LOG.append({'Errors': 'EPG and L3OUT missmatch with ' + L3OUT_NAME + ' and ' + EPG_NAME + ' dont match value: ' +
                                                         rules['PROVIDER_L3OUT']})
 
                 else:
@@ -949,8 +945,8 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, APIC_USERNAME,
     for epgs in DISPLAY_SET:
         OUTPUT_LOG.append({'Errors': 'EPG "' + epgs + '" needs creating.'})
 
-    if not ERROR:
-        OUTPUT_LOG.append({'Notifications': 'APIC Configuration validated successfully'})
+    if ERROR:
+        OUTPUT_LOG.append({'Errors': ' '})
 
     return OUTPUT_LOG
 
@@ -967,18 +963,14 @@ def CONTRACT_DEPLOYMENT(RULE_LIST, location, url_dict, APIC_USERNAME, APIC_PASSW
     # --------------------------------------------------------------------------#
     # Begin Configuration
     # --------------------------------------------------------------------------#
-    OUTPUT_LOG.append({'Notifications': ''})
-    OUTPUT_LOG.append({'Notifications': 'Starting contract provisioning.'})
-    OUTPUT_LOG.append({'Notifications': '-----------------------------'})
+    OUTPUT_LOG.append({'Headers': 'Starting contract provisioning.'})
     APIC_COOKIE = APIC_LOGIN(BASE_URL, APIC_USERNAME, APIC_PASSWORD)
     if APIC_COOKIE:
         OUTPUT_LOG.append({'Notifications': 'Successfully generated authentication cookie'})
     else:
         OUTPUT_LOG.append({'Errors': 'Unable to connect to APIC. Please check your credentials'})
 
-    OUTPUT_LOG.append({'Notifications': ''})
-    OUTPUT_LOG.append({'Notifications': 'Creating Filters.'})
-    OUTPUT_LOG.append({'Notifications': '-----------------------------'})
+    OUTPUT_LOG.append({'Headers': 'Creating Filters.'})
     # Create Filters in Filter SET
     for rules in RULE_LIST:
         for services in rules['SERVICE']:
@@ -995,9 +987,7 @@ def CONTRACT_DEPLOYMENT(RULE_LIST, location, url_dict, APIC_USERNAME, APIC_PASSW
     else:
         pass
 
-    OUTPUT_LOG.append({'Notifications': ''})
-    OUTPUT_LOG.append({'Notifications': 'Creating Contract & Subjects.'})
-    OUTPUT_LOG.append({'Notifications': '-----------------------------'})
+    OUTPUT_LOG.append({'Headers': 'Creating Contract & Subjects.'})
     # Create Contracts and Subjects in Contract SET
     for rules in RULE_LIST:
         CONTRACT_NAME = rules['NAME']
@@ -1050,17 +1040,14 @@ def CONTRACT_DEPLOYMENT(RULE_LIST, location, url_dict, APIC_USERNAME, APIC_PASSW
         else:
             pass
 
-    OUTPUT_LOG.append({'Notifications': ''})
-    OUTPUT_LOG.append({'Notifications': 'Consuming & Providing Contracts.'})
-    OUTPUT_LOG.append({'Notifications': '-----------------------------'})
+    OUTPUT_LOG.append({'Headers': 'Consuming & Providing Contracts.'})
 
     for rules in RULE_LIST:
         LINE = rules['LINE']
         CONTRACT_NAME = rules['NAME']
         # Consuming contract
         EPG_NAME = rules['CONSUMER_EPG']
-        OUTPUT_LOG.append({'Notifications': 'Deploying Contracts for Line: ' + str(LINE)})
-        OUTPUT_LOG.append({'Notifications': '-----------------------------'})
+        OUTPUT_LOG.append({'Headers_': 'Deploying Contracts for Line: ' + str(LINE)})
 
         if EPG_NAME != 'BLANK':
             if rules['CONSUMER_L3OUT'] == 'INTERNAL':

@@ -89,11 +89,9 @@ def EXTERNAL_EPG_CONTRACT_CONSUME(L3OUT_NAME, EPG_NAME, CONTRACT_NAME, BASE_URL,
             post_response = requests.post(CONTRACT_ATTACH_URL, cookies=APIC_COOKIE,
                                           data=json.dumps(CONTRACT_ATTACH_JSON, sort_keys=True), headers=HEADERS, verify=False)
             if post_response.text == '{"totalCount":"0","imdata":[]}':
-                OUTPUT_LOG.append({
-                                      'Notifications': 'Contract:  ' + CONTRACT_NAME + ' consumed on EPG: ' + EPG_NAME + ' Under L3Out ' + L3OUT})
+                OUTPUT_LOG.append({'Notifications': 'Contract:  ' + CONTRACT_NAME + ' consumed on EPG: ' + EPG_NAME + ' Under L3Out ' + L3OUT})
             else:
-                OUTPUT_LOG.append({
-                                      'Errors': 'Failed to consume contract: ' + CONTRACT_NAME + 'on EPG: ' + EPG_NAME + ' under L3Out ' + L3OUT})
+                OUTPUT_LOG.append({'Errors': 'Failed to consume contract: ' + CONTRACT_NAME + 'on EPG: ' + EPG_NAME + ' under L3Out ' + L3OUT})
                 OUTPUT_LOG.append({'Errors': 'Error: ' + post_response.text})
 
         except:
@@ -127,11 +125,9 @@ def EXTERNAL_EPG_CONTRACT_PROVIDE(L3OUT_NAME, EPG_NAME, CONTRACT_NAME, BASE_URL,
             post_response = requests.post(CONTRACT_ATTACH_URL, cookies=APIC_COOKIE,
                                           data=json.dumps(CONTRACT_ATTACH_JSON, sort_keys=True), headers=HEADERS, verify=False)
             if post_response.text == '{"totalCount":"0","imdata":[]}':
-                OUTPUT_LOG.append({
-                                      'Notifications': 'Contract:  ' + CONTRACT_NAME + '  provided on EPG: ' + EPG_NAME + ' Under L3Out ' + L3OUT})
+                OUTPUT_LOG.append({'Notifications': 'Contract:  ' + CONTRACT_NAME + '  provided on EPG: ' + EPG_NAME + ' Under L3Out ' + L3OUT})
             else:
-                OUTPUT_LOG.append({
-                                      'Errors': 'Failed to provide contract: ' + CONTRACT_NAME + 'on EPG: ' + EPG_NAME + ' under L3Out ' + L3OUT})
+                OUTPUT_LOG.append({'Errors': 'Failed to provide contract: ' + CONTRACT_NAME + 'on EPG: ' + EPG_NAME + ' under L3Out ' + L3OUT})
                 OUTPUT_LOG.append({'Errors': 'Error: ' + post_response.text})
         except:
             OUTPUT_LOG.append({'Errors': 'Error Posting JSON: ' + json.dumps(CONTRACT_ATTACH_JSON)})
