@@ -151,21 +151,14 @@ def EXTERNAL_EPG_EXCEL_OPEN_WORKBOOK(WORKBOOK, LOCATION):
 
 
 @shared_task
-def EXTERNAL_EPG_VALIDATION(RULE_LIST, LOCATION, APIC_USERNAME, APIC_PASSWORD):
+def EXTERNAL_EPG_VALIDATION(RULE_LIST, location, url_dict,  APIC_USERNAME, APIC_PASSWORD):
     OUTPUT_LOG = []
     DISPLAY_LIST = []
     TENANT_LIST = ['RED', 'GREEN', 'BLUE']
     ERROR = False
     TENANT = 'common'
 
-    if LOCATION == 'DC1':
-        BASE_URL = 'https://sandboxapicdc.cisco.com/api/'
-    elif LOCATION == 'DC2':
-        BASE_URL = 'https://sandboxapicdc.cisco.com/api/'
-    elif LOCATION == 'LAB':
-        BASE_URL = 'https://lab-a-apic.test-lab.local/api/'
-    elif LOCATION == 'SANDBOX':
-        BASE_URL = 'https://sandboxapicdc.cisco.com/api/'
+    BASE_URL = url_dict[location]
 
 
     OUTPUT_LOG.append({'Notifications': ''})

@@ -45,7 +45,10 @@ def login(request):
 
             # Get base url to use for authentication and scripts and try to login to UKDC1 APIC
             base_urls = get_base_url(environment)
-            base_url = base_urls['ACI']['UKDC1']
+
+            # Get a value from the dictionary to use for login URL.
+            base_url = next(iter(base_urls['ACI'].values()))
+
             # Attempt to authenticate user
             apic_cookie = APIC_LOGIN(base_url, username, password)
 
