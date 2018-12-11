@@ -19,12 +19,6 @@ class LoginRequiredMiddleware:
     def process_view(self, request, view_func, view_args, view_kwargs):
 
         path = request.path_info.lstrip('/')
-        # if not request.session.has_key('APIC_COOKIE'):
-        #    if not path in EXEMPT_URL:
-        #        print('Test')
-        #        print(request.session.has_key('APIC_COOKIE'))
-        #        return redirect(settings.LOGIN_URL)
-
 
         if request.session.has_key('APIC_COOKIE') and path in EXEMPT_URL:
             return redirect(settings.LOGIN_REDIRECT_URL)

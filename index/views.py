@@ -4,6 +4,7 @@ from django.http import HttpResponse
 from celery.result import AsyncResult
 
 from aci_deployment.scripts.baseline import APIC_LOGIN
+from index.scripts.baseline import get_base_url
 
 # Function to get task state and results to be used by ajax.
 def get_task_info(request):
@@ -43,6 +44,9 @@ def login(request):
                 request.session['lab_username'] = username
                 request.session['lab_password'] = password
 
+            # Get base url to use for authentication and scripts
+            base_urls = get_base_url(environment)
+            # Attempt to authenticate user
             apic_cookie = APIC_LOGIN(base_url, username, password)
 
             if apic_cookie:
