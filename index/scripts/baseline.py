@@ -1,4 +1,4 @@
-def get_base_url(environment):
+xadef get_base_url(environment):
     if environment == 'Production':
         base_urls = {'ACI': {'UKDC1': 'prod_aci_url1', 'UKDC2': 'prod_aci_url2'}, 'F5': {'UKDC1': 'prod_f5_url1', 'UKDC2': 'prod_f5_url2'}}
         return base_urls
