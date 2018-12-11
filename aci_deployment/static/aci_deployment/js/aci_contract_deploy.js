@@ -58,7 +58,7 @@ function get_validation_task_info(task_id, location, rule_list) {
                         var errors = document.createElement("dd");
                         errors.setAttribute("class", "text-danger");
                         result_location.appendChild(errors);
-                        notifications.innerHTML = results[i].Errors;
+                        errors.innerHTML = results[i].Errors;
 
                     }
 
@@ -150,7 +150,7 @@ function get_deployment_task_info(task_id) {$.ajax({
                     var errors = document.createElement("dd");
                     errors.setAttribute("class", "text-danger");
                     result_location.appendChild(errors);
-                    notifications.innerHTML = results[i].Errors;
+                    errors.innerHTML = results[i].Errors;
                 }
 
                 if ("Errors" in results[i]) {
