@@ -46,7 +46,7 @@ def login(request):
 
             if apic_cookie:
                 request.session['APIC_COOKIE'] = apic_cookie
-                return HttpResponse(json.dumps({'message': 'redirect', 'redirect_url': '/aci/endpoint_search/'}),
+                return HttpResponse(json.dumps({'message': 'redirect', 'redirect-url': '/aci/endpoint_search/'}),
                                     content_type='application/json')
 
             else:

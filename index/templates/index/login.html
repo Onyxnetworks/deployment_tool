@@ -95,8 +95,8 @@
             data: frm.serialize(),
             success: function (data) {
                 if (data.message == 'redirect') {
-                    console.log('Redirecting to: ' + data.redirect_url)
-                    window.location.replace = 'data.redirect_url';
+                    console.log('Redirecting to: ' + data.redirect-url)
+                    window.location.replace = data.redirect-url;
                 }
                 else {
                     console.log(data.message);
