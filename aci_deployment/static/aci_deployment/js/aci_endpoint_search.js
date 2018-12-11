@@ -27,7 +27,7 @@ function get_task_info(task_id) {
         success: function (data) {
             rslt.html('');
             if (data.state == 'PENDING') {
-                rslt.html('Please wait...');
+                rslt.html('Searching Endpoints...');
             }
             else if (data.state == 'SUCCESS') {
                 <!-- Clear Old table Data -->

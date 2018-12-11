@@ -29,6 +29,7 @@ def login(request):
             username = request.POST['username']
             password = request.POST['password']
             environment = request.POST['environment']
+
             request.session['environment'] = environment
             if environment == 'Production':
                 request.session['prod_username'] = username
@@ -65,7 +66,6 @@ def login(request):
 
 
 def index(request):
-    print('test')
     return render(request, 'index/home.html')
 
 
