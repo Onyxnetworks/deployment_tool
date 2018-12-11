@@ -1,4 +1,5 @@
 import json, requests
+from index.scripts.baseline import get_base_url
 
 # Ignore SSL Errors
 requests.packages.urllib3.disable_warnings()
@@ -20,7 +21,6 @@ def APIC_LOGIN(BASE_URL, APIC_USERNAME, APIC_PASSWORD):
             APIC_COOKIE['APIC-Cookie'] = token
         else:
             APIC_COOKIE = ''
-
 
     except:
         APIC_COOKIE = ''

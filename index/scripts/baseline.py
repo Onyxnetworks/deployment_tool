@@ -21,22 +21,3 @@ def get_base_url(environment):
 # base_url = url_list['ACI'][DC]
 # To get the url for F5 in DC1 Production:
 # base_url = url_list['F5'][DC]
-
-# Example for how to do ACI Endpoint search.
-#  for BASE_URL in DC_LIST:
-#         if 'DCx' in BASE_URL:
-#             LOCATION = 'DCX'
-#         elif 'DCy' in BASE_URL:
-#             LOCATION = 'DCY'
-#         else:
-#             LOCATION = 'UNKNOWN'
-#
-#         run get endpoint scripts.
-#
-#
-#
-#
-#
-#
-#
-##

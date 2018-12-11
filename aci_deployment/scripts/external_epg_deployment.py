@@ -2,6 +2,7 @@ import json, requests, ipaddress, openpyxl, time, os
 from netaddr import IPNetwork, IPAddress
 
 from .baseline import APIC_LOGIN
+from index.scripts.baseline import get_base_url
 
 # Ignore SSL Errors
 requests.packages.urllib3.disable_warnings()

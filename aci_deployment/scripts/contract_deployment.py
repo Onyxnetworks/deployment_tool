@@ -1,6 +1,8 @@
 import json, requests, openpyxl, time, os
 from .baseline import APIC_LOGIN
 
+from index.scripts.baseline import get_base_url
+
 # Ignore SSL Errors
 requests.packages.urllib3.disable_warnings()
 HEADERS = {'content-type': 'application/json'}

@@ -6,14 +6,22 @@ from aci_deployment.scripts.endpoint_search import *
 from aci_deployment.scripts.external_epg_deployment import *
 from aci_deployment.scripts.contract_deployment import *
 from aci_deployment.scripts.baseline import APIC_LOGIN
+from index.scripts.baseline import get_base_url
 # Celery Functions
 from celery import shared_task
 
 @shared_task
-def ENDPOINT_SEARCH(BASE_URL, APIC_USERNAME, APIC_PASSWORD, SUBNET):
+def ENDPOINT_SEARCH(url_dict, APIC_USERNAME, APIC_PASSWORD, SUBNET):
     RESULTS = []
 
-    ENDPOINT_LIST = GET_ENDPOINTS(BASE_URL, APIC_USERNAME, APIC_PASSWORD)
+    # Build URL List to search.
+    url_list = []
+    for url in url_dict['ACI']:
+        url_list.append(url_dict['ACI'][url])
+
+    ENDPOINT_LIST = GET_ENDPOINTS(url_list, APIC_USERNAME, APIC_PASSWORD)
+
+
 
     for i in ENDPOINT_LIST:
         if IPNetwork(SUBNET) in IPNetwork(i['Subnet']) or IPNetwork(i['Subnet']) in IPNetwork(SUBNET):
