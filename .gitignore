@@ -3,3 +3,6 @@
 
 # Ignore file with sensitive information
 secrets.py
+
+# Ignore file with sensitive URL's
+index/scripts/baseline.py
