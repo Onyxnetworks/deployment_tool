@@ -56,6 +56,7 @@ function get_validation_task_info(task_id, location, rule_list) {
                     }
                     if (results[i].Errors) {
                         var errors = document.createElement("dd");
+                        errors.setAttribute("class", "text-danger");
                         result_location.appendChild(errors);
                         notifications.innerHTML = results[i].Errors;
 
@@ -141,11 +142,13 @@ function get_deployment_task_info(task_id) {$.ajax({
                 }
                 if (results[i].Notifications) {
                     var notifications = document.createElement("dd");
+                    notifications.setAttribute("class", "text-info");
                     result_location.appendChild(notifications);
                     notifications.innerHTML = results[i].Notifications;
                 }
                 if (results[i].Errors) {
                     var errors = document.createElement("dd");
+                    errors.setAttribute("class", "text-danger");
                     result_location.appendChild(errors);
                     notifications.innerHTML = results[i].Errors;
                 }
