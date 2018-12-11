@@ -121,7 +121,6 @@ function get_deployment_task_info(task_id) {$.ajax({
             for (i = 0, len = results.length, text = ""; i < len; i++) {
 
                 if (results[i].Headers) {
-                    alert('Test')
                     var header_id = 'header_id_' + i;
                     var header = document.createElement("dt");
                     header.setAttribute("id", header_id);
