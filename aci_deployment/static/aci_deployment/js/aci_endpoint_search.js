@@ -48,13 +48,13 @@ function get_task_info(task_id) {
                         var Security = ''
                     }
                     if (results[i].Scope.includes('I')) {
-                        var Import = '<span class="glyphicon glyphicon-ok-circle" title="External Subnets for External EPGs"></span>'
+                        var Import = '<span class="glyphicon glyphicon-ok-circle" title="Import route control"></span>'
                     }
                     else {
                         var Import = ''
                     }
                     if (results[i].Scope.includes('E')) {
-                        var Export = '<span class="glyphicon glyphicon-ok-circle" title="External Subnets for External EPGs"></span>'
+                        var Export = '<span class="glyphicon glyphicon-ok-circle" title="Export route control"></span>'
                     }
                     else {
                         var Export = ''

@@ -602,9 +602,7 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, APIC_USERNAME,
     BASE_URL = url_dict[location]
 
     # Validate Contract Name formatting
-    OUTPUT_LOG.append({'Notifications': ''})
-    OUTPUT_LOG.append({'Notifications': 'Validating Contract names in Workbook.'})
-    OUTPUT_LOG.append({'Notifications': '-----------------------------'})
+    OUTPUT_LOG.append({'Headers': 'Validating Contract names in Workbook.'})
 
     try:
         for rules in RULE_LIST:
@@ -632,9 +630,7 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, APIC_USERNAME,
     if not ERROR:
         OUTPUT_LOG.append({'Notifications': 'Contract formatting validated successfully'})
 
-    OUTPUT_LOG.append({'Notifications': ''})
-    OUTPUT_LOG.append({'Notifications': 'Validating EPG names in Workbook.'})
-    OUTPUT_LOG.append({'Notifications': '-----------------------------'})
+    OUTPUT_LOG.append({'Headers': 'Validating EPG names in Workbook.'})
 
     for rules in RULE_LIST:
         if rules['CONSUMER_EPG'] != 'BLANK':
@@ -687,9 +683,7 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, APIC_USERNAME,
     if not ERROR:
         OUTPUT_LOG.append({'Notifications': 'EPG formatting validated successfully'})
 
-    OUTPUT_LOG.append({'Notifications': ''})
-    OUTPUT_LOG.append({'Notifications': 'Validating Contract and EPG locality.'})
-    OUTPUT_LOG.append({'Notifications': '-----------------------------'})
+    OUTPUT_LOG.append({'Headers': 'Validating Contract and EPG locality.'})
 
     for rules in RULE_LIST:
 
@@ -714,9 +708,7 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, APIC_USERNAME,
     if not ERROR:
         OUTPUT_LOG.append({'Notifications': 'Contract and EPG locality validated successfully'})
 
-    OUTPUT_LOG.append({'Notifications': ''})
-    OUTPUT_LOG.append({'Notifications': 'Validating Services in Workbook.'})
-    OUTPUT_LOG.append({'Notifications': '-----------------------------'})
+    OUTPUT_LOG.append({'Headers': 'Validating Services in Workbook.'})
 
     for rules in RULE_LIST:
         for services in rules['SERVICE']:
@@ -752,17 +744,13 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, APIC_USERNAME,
     APIC_COOKIE = APIC_LOGIN(BASE_URL, APIC_USERNAME, APIC_PASSWORD)
 
     if APIC_COOKIE:
-        OUTPUT_LOG.append({'Notifications': ''})
-        OUTPUT_LOG.append({'Notifications': 'Connecting to APIC'})
-        OUTPUT_LOG.append({'Notifications': '-----------------------------'})
+        OUTPUT_LOG.append({'Headers': 'Connecting to APIC'})
         OUTPUT_LOG.append({'Notifications': 'Successfully generated authentication cookie'})
     else:
         OUTPUT_LOG.append({'Errors': 'Unable to connect to APIC. Please check your credentials'})
 
     # Check if Contracts Exist
-    OUTPUT_LOG.append({'Notifications': ''})
-    OUTPUT_LOG.append({'Notifications': 'Checking if Contracts exist'})
-    OUTPUT_LOG.append({'Notifications': '-----------------------------'})
+    OUTPUT_LOG.append({'Headers': 'Checking if Contracts exist'})
     for rules in RULE_LIST:
         CONTRACT_NAME = rules['NAME']
         CONTRACT_SEARCH_RESPONSE = CONTRACT_SEARCH(BASE_URL, APIC_COOKIE, CONTRACT_NAME, HEADERS)
@@ -776,9 +764,7 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, APIC_USERNAME,
         OUTPUT_LOG.append({'Notifications': 'Contract ' + contracts + ' will be created'})
 
     # Check if Filters Exist
-    OUTPUT_LOG.append({'Notifications': ''})
-    OUTPUT_LOG.append({'Notifications': 'Checking if Filters exist'})
-    OUTPUT_LOG.append({'Notifications': '-----------------------------'})
+    OUTPUT_LOG.append({'Headers': 'Checking if Filters exist'})
     for rules in RULE_LIST:
         for services in rules['SERVICE']:
             FILTER_NAME = services
@@ -793,9 +779,7 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, APIC_USERNAME,
         OUTPUT_LOG.append({'Notifications': 'Filter ' + filters + ' will be created'})
 
     # Check if Filters are applied to contracts
-    OUTPUT_LOG.append({'Notifications': ''})
-    OUTPUT_LOG.append({'Notifications': 'Checking if Filters are applied to contracts'})
-    OUTPUT_LOG.append({'Notifications': '-----------------------------'})
+    OUTPUT_LOG.append({'Headers': 'Checking if Filters are applied to contracts'})
     for rules in RULE_LIST:
         # Use the contract search to locate subject
         CONTRACT_NAME = rules['NAME']
@@ -829,9 +813,7 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, APIC_USERNAME,
             pass
 
     # Check if L3Outs Exist
-    OUTPUT_LOG.append({'Notifications': ''})
-    OUTPUT_LOG.append({'Notifications': 'Checking if L3Outs exist'})
-    OUTPUT_LOG.append({'Notifications': '-----------------------------'})
+    OUTPUT_LOG.append({'Headers': 'Checking if L3Outs exist'})
     for rules in RULE_LIST:
         if rules['CONSUMER_L3OUT'] == 'INTERNAL':
             pass
@@ -870,9 +852,7 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, APIC_USERNAME,
     DISPLAY_LIST = []
 
     # Check if Internal EPGs Exist
-    OUTPUT_LOG.append({'Notifications': ''})
-    OUTPUT_LOG.append({'Notifications': 'Checking if Internal EPGs are created'})
-    OUTPUT_LOG.append({'Notifications': '-----------------------------'})
+    OUTPUT_LOG.append({'Headers': 'Checking if Internal EPGs are created'})
     EPG_LIST = []
     # Search to validate internal EPG's are created
     for rules in RULE_LIST:
@@ -909,9 +889,7 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, APIC_USERNAME,
     DISPLAY_LIST = []
 
     # Check if External EPGs Exist
-    OUTPUT_LOG.append({'Notifications': ''})
-    OUTPUT_LOG.append({'Notifications': 'Checking if External EPGs are created'})
-    OUTPUT_LOG.append({'Notifications': '-----------------------------'})
+    OUTPUT_LOG.append({'Headers': 'Checking if External EPGs are created'})
     for rules in RULE_LIST:
         if rules['CONSUMER_L3OUT'] == 'INTERNAL':
             pass

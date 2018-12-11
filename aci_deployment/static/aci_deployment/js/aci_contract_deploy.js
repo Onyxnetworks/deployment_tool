@@ -119,15 +119,24 @@ function get_deployment_task_info(task_id) {$.ajax({
             var result_location = document.getElementById("contract_deployment_results")
             var validation_error = false;
             for (i = 0, len = results.length, text = ""; i < len; i++) {
+
+                if (results[i].Headers) {
+                    var header_id = 'header_id_' + i
+                    var header = document.createElement("dt");
+                    header.setAttribute("id", header_id);
+                    result_location.appendChild(header);
+                    header.innerHTML = results[i].Headers;
+                }
                 if (results[i].Notifications) {
-                    var p_not = document.createElement("p");
-                    result_location.appendChild(p_not);
-                    p_not.innerHTML = results[i].Notifications;
+                    var notifications = document.createElement("dd");
+                    document.getElementById(header_id).appendChild(notifications);
+                    notifications.innerHTML = results[i].Notifications;
                 }
                 if (results[i].Errors) {
-                    var p_err = document.createElement("p");
-                    result_location.appendChild(p_err);
-                    p_err.innerHTML = results[i].Errors;
+                    var errors = document.createElement("dd");
+                    document.getElementById(header_id).appendChild(errors);
+                    notifications.innerHTML = results[i].Errors;
+
                 }
                 if ("Errors" in results[i]) {
                     var validation_error = true
