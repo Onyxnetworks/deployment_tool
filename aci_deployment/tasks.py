@@ -484,7 +484,7 @@ def EXTERNAL_EPG_DEPLOYMENT(RULE_LIST, location, url_dict, APIC_USERNAME, APIC_P
             L3OUT_NAME = rules['CONSUMER_L3OUT']
             EXTERNAL_EPG_SEARCH_RESPONSE = EXTERNAL_EPG_SEARCH(BASE_URL, APIC_COOKIE, TENANT, L3OUT_NAME, EPG_NAME, HEADERS)
             if int(EXTERNAL_EPG_SEARCH_RESPONSE['totalCount']) == 1:
-                OUTPUT_LOG.append({'Notifications': 'EPG: ' + EPG_NAME + ' already exists under ' + L3OUT_NAME + ' and wont be created'})
+                OUTPUT_LOG.append({'NotificationsWarning': 'EPG: ' + EPG_NAME + ' already exists under ' + L3OUT_NAME + ' and wont be created'})
                 L3OUT_CONSUME_EPG_CREATED = True
             if not L3OUT_CONSUME_EPG_CREATED:
                 OUTPUT_LOG.append({'Notifications': 'Adding External EPG: ' + EPG_NAME + ' TO L3Out: ' + L3OUT_NAME})
@@ -513,7 +513,7 @@ def EXTERNAL_EPG_DEPLOYMENT(RULE_LIST, location, url_dict, APIC_USERNAME, APIC_P
             L3OUT_NAME = rules['PROVIDER_L3OUT']
             EXTERNAL_EPG_SEARCH_RESPONSE = EXTERNAL_EPG_SEARCH(BASE_URL, APIC_COOKIE, TENANT, L3OUT_NAME, EPG_NAME, HEADERS)
             if int(EXTERNAL_EPG_SEARCH_RESPONSE['totalCount']) == 1:
-                OUTPUT_LOG.append({'Notifications': 'EPG: ' + EPG_NAME + ' already exists under ' + L3OUT_NAME + ' and wont be created'})
+                OUTPUT_LOG.append({'NotificationsWarning': 'EPG: ' + EPG_NAME + ' already exists under ' + L3OUT_NAME + ' and wont be created'})
                 L3OUT_PROVIDE_EPG_CREATED = True
             if not L3OUT_PROVIDE_EPG_CREATED:
                 OUTPUT_LOG.append({'Notifications': 'Adding External EPG: ' + EPG_NAME + ' TO L3Out: ' + L3OUT_NAME})

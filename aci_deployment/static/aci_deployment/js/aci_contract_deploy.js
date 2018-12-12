@@ -74,6 +74,13 @@ function get_validation_task_info(task_id, location, rule_list) {
                         result_location.appendChild(notifications_success);
                         notifications_success.innerHTML = results[i].NotificationsSuccess;
                     }
+                    if (results[i].NotificationsWarning) {
+                        var notifications_warning = document.createElement("dd");
+                        notifications_warning.setAttribute("style", "text-indent: 30px");
+                        notifications_warning.setAttribute("class", "text-warning");
+                        result_location.appendChild(notifications_warning);
+                        notifications_warning.innerHTML = results[i].NotificationsWarning;
+                    }
                     if (results[i].Errors) {
                         var errors = document.createElement("dd");
                         errors.setAttribute("class", "text-danger");
@@ -183,6 +190,13 @@ function get_deployment_task_info(task_id) {$.ajax({
                     notifications_success.setAttribute("class", "text-success");
                     result_location.appendChild(notifications_success);
                     notifications_success.innerHTML = results[i].NotificationsSuccess;
+                }
+                if (results[i].NotificationsWarning) {
+                    var notifications_warning = document.createElement("dd");
+                    notifications_warning.setAttribute("style", "text-indent: 30px");
+                    notifications_warning.setAttribute("class", "text-warning");
+                    result_location.appendChild(notifications_warning);
+                    notifications_warning.innerHTML = results[i].NotificationsWarning;
                 }
                 if (results[i].Errors) {
                     var errors = document.createElement("dd");
