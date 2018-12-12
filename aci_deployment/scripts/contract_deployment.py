@@ -25,7 +25,7 @@ def INTERNL_EPG_CONTRACT_CONSUME(BASE_URL, EPG_NAME, CONTRACT_NAME, APIC_COOKIE,
         CONTRACT_CONSUME_RESPONSE = json.loads(post_response.text)
 
         if int(CONTRACT_CONSUME_RESPONSE['totalCount']) == 0:
-            OUTPUT_LOG.append({'Notifications-Info': 'Contract:  ' + CONTRACT_NAME + ' consumed on EPG: ' + EPG_NAME})
+            OUTPUT_LOG.append({'NotificationsInfo': 'Contract:  ' + CONTRACT_NAME + ' consumed on EPG: ' + EPG_NAME})
         else:
             OUTPUT_LOG.append({'Errors': 'Failed to consume Contract: ' + CONTRACT_NAME + 'on EPG: ' + EPG_NAME})
             OUTPUT_LOG.append({'Errors': 'Error: ' + post_response.text})
@@ -51,7 +51,7 @@ def INTERNL_EPG_CONTRACT_PROVIDE(BASE_URL, EPG_NAME, CONTRACT_NAME, APIC_COOKIE,
         CONTRACT_PROVIDE_RESPONSE = json.loads(post_response.text)
 
         if int(CONTRACT_PROVIDE_RESPONSE['totalCount']) == 0:
-            OUTPUT_LOG.append({'Notifications-Info': 'Contract:  ' + CONTRACT_NAME + '  provided on EPG: ' + EPG_NAME})
+            OUTPUT_LOG.append({'NotificationsInfo': 'Contract:  ' + CONTRACT_NAME + '  provided on EPG: ' + EPG_NAME})
 
         else:
             OUTPUT_LOG.append({'Errors': 'Failed to provide Contract: ' + CONTRACT_NAME + 'on EPG: ' + EPG_NAME})
@@ -89,7 +89,7 @@ def EXTERNAL_EPG_CONTRACT_CONSUME(L3OUT_NAME, EPG_NAME, CONTRACT_NAME, BASE_URL,
             post_response = requests.post(CONTRACT_ATTACH_URL, cookies=APIC_COOKIE,
                                           data=json.dumps(CONTRACT_ATTACH_JSON, sort_keys=True), headers=HEADERS, verify=False)
             if post_response.text == '{"totalCount":"0","imdata":[]}':
-                OUTPUT_LOG.append({'Notifications-Info': 'Contract:  ' + CONTRACT_NAME + ' consumed on EPG: ' + EPG_NAME + ' Under L3Out ' + L3OUT})
+                OUTPUT_LOG.append({'NotificationsInfo': 'Contract:  ' + CONTRACT_NAME + ' consumed on EPG: ' + EPG_NAME + ' Under L3Out ' + L3OUT})
             else:
                 OUTPUT_LOG.append({'Errors': 'Failed to consume contract: ' + CONTRACT_NAME + 'on EPG: ' + EPG_NAME + ' under L3Out ' + L3OUT})
                 OUTPUT_LOG.append({'Errors': 'Error: ' + post_response.text})
@@ -125,7 +125,7 @@ def EXTERNAL_EPG_CONTRACT_PROVIDE(L3OUT_NAME, EPG_NAME, CONTRACT_NAME, BASE_URL,
             post_response = requests.post(CONTRACT_ATTACH_URL, cookies=APIC_COOKIE,
                                           data=json.dumps(CONTRACT_ATTACH_JSON, sort_keys=True), headers=HEADERS, verify=False)
             if post_response.text == '{"totalCount":"0","imdata":[]}':
-                OUTPUT_LOG.append({'Notifications-Info': 'Contract:  ' + CONTRACT_NAME + '  provided on EPG: ' + EPG_NAME + ' Under L3Out ' + L3OUT})
+                OUTPUT_LOG.append({'NotificationsInfo': 'Contract:  ' + CONTRACT_NAME + '  provided on EPG: ' + EPG_NAME + ' Under L3Out ' + L3OUT})
             else:
                 OUTPUT_LOG.append({'Errors': 'Failed to provide contract: ' + CONTRACT_NAME + 'on EPG: ' + EPG_NAME + ' under L3Out ' + L3OUT})
                 OUTPUT_LOG.append({'Errors': 'Error: ' + post_response.text})
@@ -146,7 +146,7 @@ def FILTER_ATTACH(BASE_URL, APIC_COOKIE, CONTRACT_NAME, CONTRACT_SUBJECT, FILTER
                                       headers=HEADERS, verify=False)
         CONTRACT_SUBJECT_RESPONSE = json.loads(post_response.text)
         if int(CONTRACT_SUBJECT_RESPONSE['totalCount']) == 0:
-            OUTPUT_LOG.append({'Notifications-Info': 'Attached filter: ' + FILTER + ' to Contract: ' + CONTRACT_NAME})
+            OUTPUT_LOG.append({'NotificationsInfo': 'Attached filter: ' + FILTER + ' to Contract: ' + CONTRACT_NAME})
         else:
             OUTPUT_LOG.append({'Errors': 'Failed to attach filter: ' + FILTER + 'to Contract: ' + CONTRACT_NAME})
             OUTPUT_LOG.append({'Errors': 'Error: ' + post_response.text})
@@ -186,7 +186,7 @@ def FILTER_CREATE(FILTER_SET, BASE_URL, APIC_COOKIE, HEADERS, OUTPUT_LOG):
             FILTER_CREATE_RESPONSE = json.loads(post_response.text)
 
             if int(FILTER_CREATE_RESPONSE['totalCount']) == 0:
-                OUTPUT_LOG.append({'Notifications-Info': 'Created Filter for ' + FILTER_NAME})
+                OUTPUT_LOG.append({'NotificationsInfo': 'Created Filter for ' + FILTER_NAME})
             else:
                 OUTPUT_LOG.append({'Errors': 'Failed to create Filter for:' + FILTER_NAME})
                 OUTPUT_LOG.append({'Errors': 'Error: ' + post_response.text})

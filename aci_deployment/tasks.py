@@ -231,7 +231,7 @@ def EXTERNAL_EPG_VALIDATION(RULE_LIST, location, url_dict,  APIC_USERNAME, APIC_
     DISPLAY_LIST = []
 
     if not ERROR:
-        OUTPUT_LOG.append({'Notifications-Success': 'EPG formatting validated successfully'})
+        OUTPUT_LOG.append({'NotificationsSuccess': 'EPG formatting validated successfully'})
 
 
     OUTPUT_LOG.append({'Headers': 'Validating IP addresses'})
@@ -257,7 +257,7 @@ def EXTERNAL_EPG_VALIDATION(RULE_LIST, location, url_dict,  APIC_USERNAME, APIC_
     if ERROR:
         OUTPUT_LOG.append({'Errors': 'Errors found in IP validation'})
     else:
-        OUTPUT_LOG.append({'Notifications-Success': 'IP validation successful'})
+        OUTPUT_LOG.append({'NotificationsSuccess': 'IP validation successful'})
 
     # Login to fabric
     APIC_COOKIE = APIC_LOGIN(BASE_URL, APIC_USERNAME, APIC_PASSWORD)
@@ -311,7 +311,7 @@ def EXTERNAL_EPG_VALIDATION(RULE_LIST, location, url_dict,  APIC_USERNAME, APIC_
     if ERROR:
         OUTPUT_LOG.append({'Errors': 'Errors found in L3Out validation'})
     else:
-        OUTPUT_LOG.append({'Notifications-Success': 'L3Out validation successful'})
+        OUTPUT_LOG.append({'NotificationsSuccess': 'L3Out validation successful'})
 
     # Check if IP already exists in Same L3Out or same VRF
     OUTPUT_LOG.append({'Headers': 'Checking if IP currently exists within VRF'})
@@ -442,7 +442,7 @@ def EXTERNAL_EPG_VALIDATION(RULE_LIST, location, url_dict,  APIC_USERNAME, APIC_
                     OUTPUT_LOG.append({'Notifications': subnets + ' will be imported under the DCI L3Out'})
 
     if not ERROR:
-        OUTPUT_LOG.append({'Notifications-Success': 'APIC Configuration validated successfully'})
+        OUTPUT_LOG.append({'NotificationsSuccess': 'APIC Configuration validated successfully'})
 
     return OUTPUT_LOG
    
@@ -612,7 +612,7 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, APIC_USERNAME,
         OUTPUT_LOG.append({'Errors': 'Errors validating Contract names'})
 
     if not ERROR:
-        OUTPUT_LOG.append({'Notifications-Success': 'Contract formatting validated successfully'})
+        OUTPUT_LOG.append({'NotificationsSuccess': 'Contract formatting validated successfully'})
 
     OUTPUT_LOG.append({'Headers': 'Validating EPG names in Workbook.'})
 
@@ -665,7 +665,7 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, APIC_USERNAME,
         DISPLAY_LIST = []
 
     if not ERROR:
-        OUTPUT_LOG.append({'Notifications-Success': 'EPG formatting validated successfully'})
+        OUTPUT_LOG.append({'NotificationsSuccess': 'EPG formatting validated successfully'})
 
     OUTPUT_LOG.append({'Headers': 'Validating Contract and EPG locality.'})
 
@@ -690,7 +690,7 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, APIC_USERNAME,
     DISPLAY_LIST = []
 
     if not ERROR:
-        OUTPUT_LOG.append({'Notifications-Success': 'Contract and EPG locality validated successfully'})
+        OUTPUT_LOG.append({'NotificationsSuccess': 'Contract and EPG locality validated successfully'})
 
     OUTPUT_LOG.append({'Headers': 'Validating Services in Workbook.'})
 
@@ -723,7 +723,7 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, APIC_USERNAME,
                 pass
 
     if not ERROR:
-        OUTPUT_LOG.append({'Notifications-Success': 'Services validated successfully'})
+        OUTPUT_LOG.append({'NotificationsSuccess': 'Services validated successfully'})
 
     APIC_COOKIE = APIC_LOGIN(BASE_URL, APIC_USERNAME, APIC_PASSWORD)
 
@@ -930,7 +930,7 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, APIC_USERNAME,
         OUTPUT_LOG.append({'Errors': 'EPG "' + epgs + '" needs creating.'})
 
     if not ERROR:
-        OUTPUT_LOG.append({'Notifications-Success': 'APIC Configuration validated successfully'})
+        OUTPUT_LOG.append({'NotificationsSuccess': 'APIC Configuration validated successfully'})
 
     return OUTPUT_LOG
 
