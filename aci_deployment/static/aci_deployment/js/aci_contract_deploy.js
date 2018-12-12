@@ -88,6 +88,14 @@ function get_validation_task_info(task_id, location, rule_list) {
                         result_location.appendChild(errors);
                         errors.innerHTML = results[i].Errors;
                     }
+                    if (results[i].ValidationSuccess) {
+                        var br = document.createElement("br");
+                        var validation_success = document.createElement("dt");
+                        validation_success.setAttribute("class", "text-success");
+                        result_location.appendChild(br);
+                        result_location.appendChild(validation_success);
+                        validation_success.innerHTML = results[i].ValidationSuccess;
+                    }
                     if ("Errors" in results[i]) {
                         var validation_error = true
                     }
@@ -204,6 +212,14 @@ function get_deployment_task_info(task_id) {$.ajax({
                     errors.setAttribute("style", "text-indent: 30px");
                     result_location.appendChild(errors);
                     errors.innerHTML = results[i].Errors;
+                }
+                if (results[i].ValidationSuccess) {
+                    var br = document.createElement("br");
+                    var validation_success = document.createElement("dt");
+                    validation_success.setAttribute("class", "text-success");
+                    result_location.appendChild(br);
+                    result_location.appendChild(validation_success);
+                    validation_success.innerHTML = results[i].ValidationSuccess;
                 }
                 if ("Errors" in results[i]) {
                     var validation_error = true

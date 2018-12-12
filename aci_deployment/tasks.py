@@ -443,7 +443,7 @@ def EXTERNAL_EPG_VALIDATION(RULE_LIST, location, url_dict,  APIC_USERNAME, APIC_
                     OUTPUT_LOG.append({'Notifications': subnets + ' will be imported under the DCI L3Out'})
 
     if not ERROR:
-        OUTPUT_LOG.append({'NotificationsSuccess': 'APIC Configuration validated successfully'})
+        OUTPUT_LOG.append({'ValidationSuccess': 'APIC Configuration validated successfully'})
 
     return OUTPUT_LOG
    
@@ -932,7 +932,7 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, APIC_USERNAME,
         OUTPUT_LOG.append({'Errors': 'EPG "' + epgs + '" needs creating.'})
 
     if not ERROR:
-        OUTPUT_LOG.append({'NotificationsSuccess': 'APIC Configuration validated successfully'})
+        OUTPUT_LOG.append({'ValidationSuccess': 'APIC Configuration validated successfully'})
 
     return OUTPUT_LOG
 
