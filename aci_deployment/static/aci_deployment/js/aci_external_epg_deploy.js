@@ -50,20 +50,22 @@ function get_validation_task_info(task_id, location, rule_list) {
                     if (results[i].Headers2) {
                         var header2 = document.createElement("dt");
                         header2.setAttribute("class", "text-muted");
+                        header2.setAttribute("style", "text-indent: 15px");
                         result_location.appendChild(header2);
                         header2.innerHTML = results[i].Headers2;
                     }
                     if (results[i].Notifications) {
                         var notifications = document.createElement("dd");
+                        notifications.setAttribute("style", "text-indent: 30px");
                         result_location.appendChild(notifications);
                         notifications.innerHTML = results[i].Notifications;
                     }
                     if (results[i].Errors) {
                         var errors = document.createElement("dd");
                         errors.setAttribute("class", "text-danger");
+                        errors.setAttribute("style", "text-indent: 30px");
                         result_location.appendChild(errors);
                         errors.innerHTML = results[i].Errors;
-
                     }
                     if ("Errors" in results[i]) {
                         var validation_error = true
@@ -143,18 +145,20 @@ function get_deployment_task_info(task_id) {$.ajax({
                 if (results[i].Headers2) {
                     var header2 = document.createElement("dt");
                     header2.setAttribute("class", "text-muted");
+                    header2.setAttribute("style", "text-indent: 15px");
                     result_location.appendChild(header2);
                     header2.innerHTML = results[i].Headers2;
                 }
                 if (results[i].Notifications) {
                     var notifications = document.createElement("dd");
-                    notifications.setAttribute("class", "text-info");
+                    notifications.setAttribute("style", "text-indent: 30px");
                     result_location.appendChild(notifications);
                     notifications.innerHTML = results[i].Notifications;
                 }
                 if (results[i].Errors) {
                     var errors = document.createElement("dd");
                     errors.setAttribute("class", "text-danger");
+                    errors.setAttribute("style", "text-indent: 30px");
                     result_location.appendChild(errors);
                     errors.innerHTML = results[i].Errors;
                 }
