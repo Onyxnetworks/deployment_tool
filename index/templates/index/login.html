@@ -58,7 +58,7 @@
                                 </div>
                                 <div class="form-group {% if error %} form-group has-error {% endif %}" id="password_grp">
                                     <input class="form-control" placeholder="Password" name="password" id="password" type="password" required value="">
-                                    <br><span id="login_result" {% if error %}class="text-center alert alert-danger"{% endif %}>{% if error %}{{ message }}{% endif %}</span>
+                                    <br><span id="login_result" {% if error %}class="text-center alert-danger"{% endif %}>{% if error %}{{ message }}{% endif %}</span>
                                 </div>
                                 <!-- Change this to a button or input when using this as a form -->
                                 <button type="submit" class="btn btn-success btn-lg btn-block">Login</button>
