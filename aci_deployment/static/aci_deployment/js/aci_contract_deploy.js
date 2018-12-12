@@ -40,8 +40,6 @@ function get_validation_task_info(task_id, location, rule_list) {
                 var result_location = document.getElementById("contract_deployment_results")
                 var validation_error = false;
                 for (i = 0, len = results.length, text = ""; i < len; i++) {
-
-
                     if (results[i].Headers) {
                         var br = document.createElement("br");
                         var header = document.createElement("dt");
@@ -61,6 +59,20 @@ function get_validation_task_info(task_id, location, rule_list) {
                         notifications.setAttribute("style", "text-indent: 30px");
                         result_location.appendChild(notifications);
                         notifications.innerHTML = results[i].Notifications;
+                    }
+                    if (results[i].Notifications-Info) {
+                        var notifications_info = document.createElement("dd");
+                        notifications_info.setAttribute("style", "text-indent: 30px");
+                        notifications_info.setAttribute("class", "text-info");
+                        result_location.appendChild(notifications_info);
+                        notifications_info.innerHTML = results[i].Notifications-Info;
+                    }
+                    if (results[i].Notifications-Success) {
+                        var notifications_success = document.createElement("dd");
+                        notifications_success.setAttribute("style", "text-indent: 30px");
+                        notifications_success.setAttribute("class", "text-success");
+                        result_location.appendChild(notifications_success);
+                        notifications_success.innerHTML = results[i].Notifications-Success;
                     }
                     if (results[i].Errors) {
                         var errors = document.createElement("dd");
@@ -138,7 +150,6 @@ function get_deployment_task_info(task_id) {$.ajax({
             var result_location = document.getElementById("contract_deployment_results")
             var validation_error = false;
             for (i = 0, len = results.length, text = ""; i < len; i++) {
-
                 if (results[i].Headers) {
                     var br = document.createElement("br");
                     var header = document.createElement("dt");
@@ -158,6 +169,20 @@ function get_deployment_task_info(task_id) {$.ajax({
                     notifications.setAttribute("style", "text-indent: 30px");
                     result_location.appendChild(notifications);
                     notifications.innerHTML = results[i].Notifications;
+                }
+                if (results[i].Notifications-Info) {
+                    var notifications_info = document.createElement("dd");
+                    notifications_info.setAttribute("style", "text-indent: 30px");
+                    notifications_info.setAttribute("class", "text-info");
+                    result_location.appendChild(notifications_info);
+                    notifications_info.innerHTML = results[i].Notifications-Info;
+                }
+                if (results[i].Notifications-Success) {
+                    var notifications_success = document.createElement("dd");
+                    notifications_success.setAttribute("style", "text-indent: 30px");
+                    notifications_success.setAttribute("class", "text-success");
+                    result_location.appendChild(notifications_success);
+                    notifications_success.innerHTML = results[i].Notifications-Success;
                 }
                 if (results[i].Errors) {
                     var errors = document.createElement("dd");
