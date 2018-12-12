@@ -1,5 +1,4 @@
 import json, requests
-from index.scripts.baseline import get_base_url
 
 # Ignore SSL Errors
 requests.packages.urllib3.disable_warnings()
@@ -12,7 +11,7 @@ def APIC_LOGIN(BASE_URL, APIC_USERNAME, APIC_PASSWORD):
     auth = {"aaaUser": {"attributes": {"name": APIC_USERNAME, "pwd": APIC_PASSWORD}}}
     auth_payload = json.dumps(auth)
     try:
-        post_response = requests.post(login_url, data=auth_payload, headers=HEADERS, verify=False)
+        post_response = requests.post(login_url, data=auth_payload, headers=HEADERS, timeout=5, verify=False)
         # Take token from response to use for future authentications
         payload_response = json.loads(post_response.text)
         if post_response.status_code == 200:
