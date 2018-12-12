@@ -259,10 +259,11 @@ def EXTERNAL_EPG_VALIDATION(RULE_LIST, location, url_dict,  APIC_USERNAME, APIC_
     else:
         OUTPUT_LOG.append({'NotificationsSuccess': 'IP validation successful'})
 
+    OUTPUT_LOG.append({'Headers': 'Connecting to APIC'})
     # Login to fabric
     APIC_COOKIE = APIC_LOGIN(BASE_URL, APIC_USERNAME, APIC_PASSWORD)
     if APIC_COOKIE:
-        OUTPUT_LOG.append({'Headers': 'Connecting to APIC'})
+        OUTPUT_LOG.append({'Notifications': 'Successfully generated authentication cookie'})
     else:
         OUTPUT_LOG.append({'Errors': 'Unable to connect to APIC. Please check your credentials'})
 
@@ -466,6 +467,7 @@ def EXTERNAL_EPG_DEPLOYMENT(RULE_LIST, location, url_dict, APIC_USERNAME, APIC_P
     # Begin Configuration
     # --------------------------------------------------------------------------#
     OUTPUT_LOG.append({'Headers': 'Starting External EPG Deployment.'})
+    OUTPUT_LOG.append({'Headers': 'Connecting to APIC'})
     APIC_COOKIE = APIC_LOGIN(BASE_URL, APIC_USERNAME, APIC_PASSWORD)
     if APIC_COOKIE:
         OUTPUT_LOG.append({'Notifications': 'Successfully generated authentication cookie'})
@@ -725,10 +727,10 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, APIC_USERNAME,
     if not ERROR:
         OUTPUT_LOG.append({'NotificationsSuccess': 'Services validated successfully'})
 
+    OUTPUT_LOG.append({'Headers': 'Connecting to APIC'})
     APIC_COOKIE = APIC_LOGIN(BASE_URL, APIC_USERNAME, APIC_PASSWORD)
 
     if APIC_COOKIE:
-        OUTPUT_LOG.append({'Headers': 'Connecting to APIC'})
         OUTPUT_LOG.append({'Notifications': 'Successfully generated authentication cookie'})
     else:
         OUTPUT_LOG.append({'Errors': 'Unable to connect to APIC. Please check your credentials'})
@@ -948,6 +950,7 @@ def CONTRACT_DEPLOYMENT(RULE_LIST, location, url_dict, APIC_USERNAME, APIC_PASSW
     # Begin Configuration
     # --------------------------------------------------------------------------#
     OUTPUT_LOG.append({'Headers': 'Starting contract provisioning.'})
+    OUTPUT_LOG.append({'Headers': 'Connecting to APIC'})
     APIC_COOKIE = APIC_LOGIN(BASE_URL, APIC_USERNAME, APIC_PASSWORD)
     if APIC_COOKIE:
         OUTPUT_LOG.append({'Notifications': 'Successfully generated authentication cookie'})
