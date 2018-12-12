@@ -49,6 +49,12 @@ function get_validation_task_info(task_id, location, rule_list) {
                         result_location.appendChild(header);
                         header.innerHTML = results[i].Headers;
                     }
+                    if (results[i].Headers2) {
+                        var header2 = document.createElement("dt");
+                        header2.setAttribute("class", "text-muted");
+                        result_location.appendChild(header2);
+                        header2.innerHTML = results[i].Headers2;
+                    }
                     if (results[i].Notifications) {
                         var notifications = document.createElement("dd");
                         result_location.appendChild(notifications);

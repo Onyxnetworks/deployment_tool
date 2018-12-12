@@ -318,8 +318,7 @@ def EXTERNAL_EPG_VALIDATION(RULE_LIST, location, url_dict,  APIC_USERNAME, APIC_
 
     # Get L3out VRF
     for rules in RULE_LIST:
-        OUTPUT_LOG.append({'Notifications': 'Checking subnets for line: ' + str(rules['LINE'])})
-        OUTPUT_LOG.append({'Notifications': ''})
+        OUTPUT_LOG.append({'Headers2': 'Checking subnets for line: ' + str(rules['LINE'])})
         if rules['CONSUMER_L3OUT'] != 'INTERNAL' and rules['CONSUMER_EPG'] != 'BLANK':
             L3OUT_NAME = rules['CONSUMER_L3OUT']
             L3OUT_SEARCH_RESPONSE = L3OUT_SEARCH(BASE_URL, APIC_COOKIE, TENANT, L3OUT_NAME, HEADERS)
