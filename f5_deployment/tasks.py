@@ -1,10 +1,2 @@
-{% extends "index/header.html" %}
-{% load static %}
-{% block head %}
-
-{% endblock %}
-{% block content %}
-{% endblock %}
-
-{% block scripts %}
-{% endblock %}
+# Celery Functions
+from celery import shared_task
