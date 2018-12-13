@@ -189,7 +189,7 @@ def EXTERNAL_EPG_VALIDATION(RULE_LIST, location, url_dict,  APIC_USERNAME, APIC_
 
             except:
                 ERROR = True
-                OUTPUT_LOG.append({'Errors': 'EPGs dont conform to the naming standard'})
+                OUTPUT_LOG.append({'Errors': rules['CONSUMER_EPG'] + ' does not conform to the naming standard'})
 
         if rules['PROVIDER_EPG'] != 'BLANK' and rules['PROVIDER_L3OUT'] != 'INTERNAL':
             try:
@@ -220,7 +220,7 @@ def EXTERNAL_EPG_VALIDATION(RULE_LIST, location, url_dict,  APIC_USERNAME, APIC_
 
             except:
                 ERROR = True
-                OUTPUT_LOG.append({'Errors': 'EPGs dont conform to the naming standard'})
+                OUTPUT_LOG.append({'Errors': rules['PROVIDER_EPG'] + ' does not conform to the naming standard'})
 
         else:
             pass
