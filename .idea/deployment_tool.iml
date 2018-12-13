@@ -23,6 +23,7 @@
       <list>
         <option value="$MODULE_DIR$/index/templates" />
         <option value="$MODULE_DIR$/aci_deployment/templates" />
+        <option value="$MODULE_DIR$/f5_deployment/templates" />
       </list>
     </option>
   </component>
