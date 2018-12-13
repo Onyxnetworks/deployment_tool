@@ -147,7 +147,7 @@ def EXTERNAL_EPG_EXCEL_OPEN_WORKBOOK(WORKBOOK, LOCATION):
 
 
 @shared_task
-def     EXTERNAL_EPG_VALIDATION(RULE_LIST, location, url_dict,  APIC_USERNAME, APIC_PASSWORD):
+def EXTERNAL_EPG_VALIDATION(RULE_LIST, location, url_dict,  APIC_USERNAME, APIC_PASSWORD):
     OUTPUT_LOG = []
     DISPLAY_LIST = []
     TENANT_LIST = ['RED', 'GREEN', 'BLUE']
@@ -839,6 +839,64 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, APIC_USERNAME,
                 OUTPUT_LOG.append({'Errors': 'L3Out: ' + l3out + ' Does not exist, please check naming.'})
             DISPLAY_LIST = []
 
+            if not ERROR:
+                # Check if External EPGs Exist
+                OUTPUT_LOG.append({'Headers': 'Checking if External EPGs are created'})
+                for rules in RULE_LIST:
+                    if rules['CONSUMER_L3OUT'] == 'INTERNAL':
+                        pass
+                    else:
+                        if rules['CONSUMER_EPG'] != 'BLANK':
+                            CONSUMER_L3OUT = rules['CONSUMER_L3OUT']
+                            CONSUMER_EPG = rules['CONSUMER_EPG']
+                            EXTERNAL_EPG_SEARCH_RESPONSE = CONTRACT_EXTERNAL_EPG_SEARCH(BASE_URL, APIC_COOKIE, CONSUMER_L3OUT, CONSUMER_EPG,
+                                                                               HEADERS)
+                            if int(EXTERNAL_EPG_SEARCH_RESPONSE['totalCount']) == 1:
+                                EPG_NAME = EXTERNAL_EPG_SEARCH_RESPONSE['imdata'][0]['l3extInstP']['attributes']['dn'].split('/')[
+                                               3][6:]
+                                L3OUT_NAME = EXTERNAL_EPG_SEARCH_RESPONSE['imdata'][0]['l3extInstP']['attributes']['dn'].split('/')[
+                                                 2][4:]
+                                EXTERNAL_EPG_SEARCH_RESPONSE['imdata'][0]['l3extInstP']['attributes']['dn'].split('/')[1][3:]
+                                if L3OUT_NAME == rules['CONSUMER_L3OUT']:
+                                    pass
+                                else:
+                                    OUTPUT_LOG.append({'Errors': 'EPG and L3OUT missmatch with ' + L3OUT_NAME + ' and ' + EPG_NAME + ' dont match value: ' +
+                                                                    rules['CONSUMER_L3OUT']})
+
+                            else:
+                                DISPLAY_LIST.append(CONSUMER_EPG)
+                                ERROR = True
+
+                for rules in RULE_LIST:
+                    PROVIDER_EPG = rules['PROVIDER_EPG']
+                    if rules['PROVIDER_L3OUT'] == 'INTERNAL':
+                        pass
+                    else:
+                        if rules['PROVIDER_EPG'] != 'BLANK':
+                            PROVIDER_EPG = rules['PROVIDER_EPG']
+                            PROVIDER_L3OUT = rules['PROVIDER_L3OUT']
+                            EXTERNAL_EPG_SEARCH_RESPONSE = CONTRACT_EXTERNAL_EPG_SEARCH(BASE_URL, APIC_COOKIE, PROVIDER_L3OUT, PROVIDER_EPG,
+                                                                               HEADERS)
+                            if int(EXTERNAL_EPG_SEARCH_RESPONSE['totalCount']) == 1:
+                                EPG_NAME = EXTERNAL_EPG_SEARCH_RESPONSE['imdata'][0]['l3extInstP']['attributes']['dn'].split('/')[
+                                               3][6:]
+                                L3OUT_NAME = EXTERNAL_EPG_SEARCH_RESPONSE['imdata'][0]['l3extInstP']['attributes']['dn'].split('/')[
+                                                 2][4:]
+                                EXTERNAL_EPG_SEARCH_RESPONSE['imdata'][0]['l3extInstP']['attributes']['dn'].split('/')[1][3:]
+                                if L3OUT_NAME == rules['PROVIDER_L3OUT']:
+                                    pass
+                                else:
+                                    OUTPUT_LOG.append({'Errors': 'EPG and L3OUT missmatch with ' + L3OUT_NAME + ' and ' + EPG_NAME + ' dont match value: ' +
+                                                                    rules['PROVIDER_L3OUT']})
+
+                            else:
+                                DISPLAY_LIST.append(PROVIDER_EPG)
+                                ERROR = True
+
+                DISPLAY_SET = set(DISPLAY_LIST)
+                for epgs in DISPLAY_SET:
+                    OUTPUT_LOG.append({'Errors': 'EPG "' + epgs + '" needs creating.'})
+
             # Check if Internal EPGs Exist
             OUTPUT_LOG.append({'Headers': 'Checking if Internal EPGs are created'})
             EPG_LIST = []
@@ -876,62 +934,6 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, APIC_USERNAME,
                 OUTPUT_LOG.append({'Errors': 'EPG "' + epgs + '" needs creating.'})
             DISPLAY_LIST = []
 
-            # Check if External EPGs Exist
-            OUTPUT_LOG.append({'Headers': 'Checking if External EPGs are created'})
-            for rules in RULE_LIST:
-                if rules['CONSUMER_L3OUT'] == 'INTERNAL':
-                    pass
-                else:
-                    if rules['CONSUMER_EPG'] != 'BLANK':
-                        CONSUMER_L3OUT = rules['CONSUMER_L3OUT']
-                        CONSUMER_EPG = rules['CONSUMER_EPG']
-                        EXTERNAL_EPG_SEARCH_RESPONSE = CONTRACT_EXTERNAL_EPG_SEARCH(BASE_URL, APIC_COOKIE, CONSUMER_L3OUT, CONSUMER_EPG,
-                                                                           HEADERS)
-                        if int(EXTERNAL_EPG_SEARCH_RESPONSE['totalCount']) == 1:
-                            EPG_NAME = EXTERNAL_EPG_SEARCH_RESPONSE['imdata'][0]['l3extInstP']['attributes']['dn'].split('/')[
-                                           3][6:]
-                            L3OUT_NAME = EXTERNAL_EPG_SEARCH_RESPONSE['imdata'][0]['l3extInstP']['attributes']['dn'].split('/')[
-                                             2][4:]
-                            EXTERNAL_EPG_SEARCH_RESPONSE['imdata'][0]['l3extInstP']['attributes']['dn'].split('/')[1][3:]
-                            if L3OUT_NAME == rules['CONSUMER_L3OUT']:
-                                pass
-                            else:
-                                OUTPUT_LOG.append({'Errors': 'EPG and L3OUT missmatch with ' + L3OUT_NAME + ' and ' + EPG_NAME + ' dont match value: ' +
-                                                                rules['CONSUMER_L3OUT']})
-
-                        else:
-                            DISPLAY_LIST.append(CONSUMER_EPG)
-                            ERROR = True
-
-            for rules in RULE_LIST:
-                PROVIDER_EPG = rules['PROVIDER_EPG']
-                if rules['PROVIDER_L3OUT'] == 'INTERNAL':
-                    pass
-                else:
-                    if rules['PROVIDER_EPG'] != 'BLANK':
-                        PROVIDER_EPG = rules['PROVIDER_EPG']
-                        PROVIDER_L3OUT = rules['PROVIDER_L3OUT']
-                        EXTERNAL_EPG_SEARCH_RESPONSE = CONTRACT_EXTERNAL_EPG_SEARCH(BASE_URL, APIC_COOKIE, PROVIDER_L3OUT, PROVIDER_EPG,
-                                                                           HEADERS)
-                        if int(EXTERNAL_EPG_SEARCH_RESPONSE['totalCount']) == 1:
-                            EPG_NAME = EXTERNAL_EPG_SEARCH_RESPONSE['imdata'][0]['l3extInstP']['attributes']['dn'].split('/')[
-                                           3][6:]
-                            L3OUT_NAME = EXTERNAL_EPG_SEARCH_RESPONSE['imdata'][0]['l3extInstP']['attributes']['dn'].split('/')[
-                                             2][4:]
-                            EXTERNAL_EPG_SEARCH_RESPONSE['imdata'][0]['l3extInstP']['attributes']['dn'].split('/')[1][3:]
-                            if L3OUT_NAME == rules['PROVIDER_L3OUT']:
-                                pass
-                            else:
-                                OUTPUT_LOG.append({'Errors': 'EPG and L3OUT missmatch with ' + L3OUT_NAME + ' and ' + EPG_NAME + ' dont match value: ' +
-                                                                rules['PROVIDER_L3OUT']})
-
-                        else:
-                            DISPLAY_LIST.append(PROVIDER_EPG)
-                            ERROR = True
-
-            DISPLAY_SET = set(DISPLAY_LIST)
-            for epgs in DISPLAY_SET:
-                OUTPUT_LOG.append({'Errors': 'EPG "' + epgs + '" needs creating.'})
 
         else:
             OUTPUT_LOG.append({'Errors': 'Unable to connect to APIC.'})
