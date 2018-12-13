@@ -101,9 +101,12 @@ function get_validation_task_info(task_id, location, rule_list) {
                     }
                 }
                 if (validation_error){
-                    var p_error = document.createElement("p");
-                    result_location.appendChild(p_error);
-                    p_error.innerHTML = "Errors found. Please fix and try again.";
+                    var br = document.createElement("br");
+                    var validation_error = document.createElement("dt");
+                    validation_error.setAttribute("class", "text-danger");
+                    result_location.appendChild(br);
+                    result_location.appendChild(validation_error);
+                    validation_error.innerHTML = "Errors found. Please fix and try again.";
                 }
                 if (!validation_error){
                     document.getElementById("deploy_btn").style.visibility = "visible";
