@@ -20,4 +20,5 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^', include('index.urls')),
     url(r'^aci/', include('aci_deployment.urls')),
+    url(r'^f5/', include('f5_deployment.urls')),
 ]
