@@ -264,183 +264,184 @@ def EXTERNAL_EPG_VALIDATION(RULE_LIST, location, url_dict,  APIC_USERNAME, APIC_
     APIC_COOKIE = APIC_LOGIN(BASE_URL, APIC_USERNAME, APIC_PASSWORD)
     if APIC_COOKIE:
         OUTPUT_LOG.append({'Notifications': 'Successfully generated authentication cookie'})
-    else:
-        OUTPUT_LOG.append({'Errors': 'Unable to connect to APIC. Please check your credentials'})
 
-    # Search for L3out and build URL to add IP's
-    OUTPUT_LOG.append({'Headers': 'Validating L3Out Names'})
-    L3OUT_LIST = []
+        # Search for L3out and build URL to add IP's
+        OUTPUT_LOG.append({'Headers': 'Validating L3Out Names'})
+        L3OUT_LIST = []
 
-    for rules in RULE_LIST:
-        if rules['CONSUMER_L3OUT'] == 'INTERNAL':
-            pass
-        else:
-            L3OUT_NAME = rules['CONSUMER_L3OUT']
-            L3OUT_SEARCH_RESPONSE = L3OUT_SEARCH(BASE_URL, APIC_COOKIE, TENANT, L3OUT_NAME, HEADERS)
-            if int(L3OUT_SEARCH_RESPONSE[0]['totalCount']) == 1:
-                if rules['CONSUMER_L3OUT'] == L3OUT_SEARCH_RESPONSE[0]['imdata'][0]['l3extOut']['attributes']['name']:
-                    pass
+        for rules in RULE_LIST:
+            if rules['CONSUMER_L3OUT'] == 'INTERNAL':
+                pass
+            else:
+                L3OUT_NAME = rules['CONSUMER_L3OUT']
+                L3OUT_SEARCH_RESPONSE = L3OUT_SEARCH(BASE_URL, APIC_COOKIE, TENANT, L3OUT_NAME, HEADERS)
+                if int(L3OUT_SEARCH_RESPONSE[0]['totalCount']) == 1:
+                    if rules['CONSUMER_L3OUT'] == L3OUT_SEARCH_RESPONSE[0]['imdata'][0]['l3extOut']['attributes']['name']:
+                        pass
+                    else:
+                        ERROR = True
+
                 else:
+                    L3OUT_LIST.append(L3OUT_NAME)
                     ERROR = True
 
+
+        for rules in RULE_LIST:
+            if rules['PROVIDER_L3OUT'] == 'INTERNAL':
+                pass
             else:
-                L3OUT_LIST.append(L3OUT_NAME)
-                ERROR = True
+                L3OUT_NAME = rules['PROVIDER_L3OUT']
+                L3OUT_SEARCH_RESPONSE = L3OUT_SEARCH(BASE_URL, APIC_COOKIE, TENANT, L3OUT_NAME, HEADERS)
+                if int(L3OUT_SEARCH_RESPONSE[0]['totalCount']) == 1:
+                    if rules['PROVIDER_L3OUT'] == L3OUT_SEARCH_RESPONSE[0]['imdata'][0]['l3extOut']['attributes']['name']:
+                        pass
+                    else:
+                        ERROR = True
 
-
-    for rules in RULE_LIST:
-        if rules['PROVIDER_L3OUT'] == 'INTERNAL':
-            pass
-        else:
-            L3OUT_NAME = rules['PROVIDER_L3OUT']
-            L3OUT_SEARCH_RESPONSE = L3OUT_SEARCH(BASE_URL, APIC_COOKIE, TENANT, L3OUT_NAME, HEADERS)
-            if int(L3OUT_SEARCH_RESPONSE[0]['totalCount']) == 1:
-                if rules['PROVIDER_L3OUT'] == L3OUT_SEARCH_RESPONSE[0]['imdata'][0]['l3extOut']['attributes']['name']:
-                    pass
                 else:
+                    L3OUT_LIST.append(L3OUT_NAME)
                     ERROR = True
 
-            else:
-                L3OUT_LIST.append(L3OUT_NAME)
-                ERROR = True
+        L3OUT_SET = set(L3OUT_LIST)
+        for l3out in L3OUT_SET:
+            OUTPUT_LOG.append({'Errors': 'L3Out: ' + l3out + ' Does not exist, please check naming.'})
+        L3OUT_LIST = []
 
-    L3OUT_SET = set(L3OUT_LIST)
-    for l3out in L3OUT_SET:
-        OUTPUT_LOG.append({'Errors': 'L3Out: ' + l3out + ' Does not exist, please check naming.'})
-    L3OUT_LIST = []
+        if ERROR:
+            OUTPUT_LOG.append({'Errors': 'Errors found in L3Out validation'})
+        else:
+            OUTPUT_LOG.append({'NotificationsSuccess': 'L3Out validation successful'})
 
-    if ERROR:
-        OUTPUT_LOG.append({'Errors': 'Errors found in L3Out validation'})
-    else:
-        OUTPUT_LOG.append({'NotificationsSuccess': 'L3Out validation successful'})
+        # Check if IP already exists in Same L3Out or same VRF
+        OUTPUT_LOG.append({'Headers': 'Checking if IP currently exists within VRF'})
 
-    # Check if IP already exists in Same L3Out or same VRF
-    OUTPUT_LOG.append({'Headers': 'Checking if IP currently exists within VRF'})
-
-    # Get L3out VRF
-    for rules in RULE_LIST:
-        OUTPUT_LOG.append({'Headers2': 'Checking subnets for line: ' + str(rules['LINE'])})
-        if rules['CONSUMER_L3OUT'] != 'INTERNAL' and rules['CONSUMER_EPG'] != 'BLANK':
-            L3OUT_NAME = rules['CONSUMER_L3OUT']
-            L3OUT_SEARCH_RESPONSE = L3OUT_SEARCH(BASE_URL, APIC_COOKIE, TENANT, L3OUT_NAME, HEADERS)
-            L3OUT_DATA = L3OUT_SEARCH_RESPONSE[1]['imdata']
-            L3OUT_SUBNETS = []
-            # Loop through the VRF pull out all other L3Outs and add any l3extsubnet to a list
-            for key in L3OUT_DATA:
-                # For Python 3+
-                if 'l3extRsEctx' in key:
-                # For Python 2.7
-                #if key.keys() == ['l3extRsEctx']:
-                    VRF_DN = key['l3extRsEctx']['attributes']['tDn']
-                    VRF_SEARCH_RESPONSE = VRF_SEARCH(BASE_URL, APIC_COOKIE, VRF_DN, HEADERS)
-                    for vrf_l3o in VRF_SEARCH_RESPONSE['imdata']:
-                        # For Python 3+
-                        if 'fvRtEctx' in vrf_l3o:
-                        # For Python 2.7
-                        #if vrf_l3o.keys() == ['fvRtEctx']:
-                            L3OUT_DN = vrf_l3o['fvRtEctx']['attributes']['tDn']
-                            SUBNET_SEARCH_RESPONSE = SUBNET_SEARCH(BASE_URL, APIC_COOKIE, L3OUT_DN, HEADERS)
-                            for subnets in SUBNET_SEARCH_RESPONSE['imdata']:
-                                L3OUT_SUBNETS.append(subnets['l3extSubnet']['attributes']['ip'])
-                                EXISTING_SUBNET = subnets['l3extSubnet']['attributes']['ip']
-                                EXISTING_L3OUT = subnets['l3extSubnet']['attributes']['dn'].split('/')[2][4:]
-                                EXISTING_EPG = subnets['l3extSubnet']['attributes']['dn'].split('/')[3][6:]
-                                SCOPE = subnets['l3extSubnet']['attributes']['scope'].split(',')
-                                if EXISTING_SUBNET in rules['CONSUMER_IP']:
-                                    if 'import-security' in SCOPE:
-                                        if EXISTING_EPG == rules['CONSUMER_EPG']:
-                                            rules['CONSUMER_IP'].remove(EXISTING_SUBNET)
-                                        else:
-                                            OUTPUT_LOG.append({'Errors': EXISTING_SUBNET + ' already exists within ' + EXISTING_L3OUT + ' under EPG ' + EXISTING_EPG + ' no subnet configuration for this epg will be pushed.'})
-                                            ERROR = True
-                                            rules['CONSUMER_IP'].remove(EXISTING_SUBNET)
-
-                                else:
-                                    for rule_subnet in rules['CONSUMER_IP']:
-                                        if IPNetwork(rule_subnet) in IPNetwork(EXISTING_SUBNET):
-                                            if int(EXISTING_SUBNET.split('/')[1]) >= 20 and 'import-security' in SCOPE:
-                                                OUTPUT_LOG.append({'Errors': rule_subnet + ' already exists within ' + EXISTING_L3OUT + ' under EPG ' + EXISTING_EPG + ' inside ' + EXISTING_SUBNET})
+        # Get L3out VRF
+        for rules in RULE_LIST:
+            OUTPUT_LOG.append({'Headers2': 'Checking subnets for line: ' + str(rules['LINE'])})
+            if rules['CONSUMER_L3OUT'] != 'INTERNAL' and rules['CONSUMER_EPG'] != 'BLANK':
+                L3OUT_NAME = rules['CONSUMER_L3OUT']
+                L3OUT_SEARCH_RESPONSE = L3OUT_SEARCH(BASE_URL, APIC_COOKIE, TENANT, L3OUT_NAME, HEADERS)
+                L3OUT_DATA = L3OUT_SEARCH_RESPONSE[1]['imdata']
+                L3OUT_SUBNETS = []
+                # Loop through the VRF pull out all other L3Outs and add any l3extsubnet to a list
+                for key in L3OUT_DATA:
+                    # For Python 3+
+                    if 'l3extRsEctx' in key:
+                    # For Python 2.7
+                    #if key.keys() == ['l3extRsEctx']:
+                        VRF_DN = key['l3extRsEctx']['attributes']['tDn']
+                        VRF_SEARCH_RESPONSE = VRF_SEARCH(BASE_URL, APIC_COOKIE, VRF_DN, HEADERS)
+                        for vrf_l3o in VRF_SEARCH_RESPONSE['imdata']:
+                            # For Python 3+
+                            if 'fvRtEctx' in vrf_l3o:
+                            # For Python 2.7
+                            #if vrf_l3o.keys() == ['fvRtEctx']:
+                                L3OUT_DN = vrf_l3o['fvRtEctx']['attributes']['tDn']
+                                SUBNET_SEARCH_RESPONSE = SUBNET_SEARCH(BASE_URL, APIC_COOKIE, L3OUT_DN, HEADERS)
+                                for subnets in SUBNET_SEARCH_RESPONSE['imdata']:
+                                    L3OUT_SUBNETS.append(subnets['l3extSubnet']['attributes']['ip'])
+                                    EXISTING_SUBNET = subnets['l3extSubnet']['attributes']['ip']
+                                    EXISTING_L3OUT = subnets['l3extSubnet']['attributes']['dn'].split('/')[2][4:]
+                                    EXISTING_EPG = subnets['l3extSubnet']['attributes']['dn'].split('/')[3][6:]
+                                    SCOPE = subnets['l3extSubnet']['attributes']['scope'].split(',')
+                                    if EXISTING_SUBNET in rules['CONSUMER_IP']:
+                                        if 'import-security' in SCOPE:
+                                            if EXISTING_EPG == rules['CONSUMER_EPG']:
+                                                rules['CONSUMER_IP'].remove(EXISTING_SUBNET)
+                                            else:
+                                                OUTPUT_LOG.append({'Errors': EXISTING_SUBNET + ' already exists within ' + EXISTING_L3OUT + ' under EPG ' + EXISTING_EPG + ' no subnet configuration for this epg will be pushed.'})
                                                 ERROR = True
-                                                rules['CONSUMER_IP'].remove(rule_subnet)
+                                                rules['CONSUMER_IP'].remove(EXISTING_SUBNET)
+
+                                    else:
+                                        for rule_subnet in rules['CONSUMER_IP']:
+                                            if IPNetwork(rule_subnet) in IPNetwork(EXISTING_SUBNET):
+                                                if int(EXISTING_SUBNET.split('/')[1]) >= 20 and 'import-security' in SCOPE:
+                                                    OUTPUT_LOG.append({'Errors': rule_subnet + ' already exists within ' + EXISTING_L3OUT + ' under EPG ' + EXISTING_EPG + ' inside ' + EXISTING_SUBNET})
+                                                    ERROR = True
+                                                    rules['CONSUMER_IP'].remove(rule_subnet)
 
 
-            if len(rules['CONSUMER_IP']) >= 1:
-                OUTPUT_LOG.append({'Notifications': 'The Following subnets will be added to the EPG: ' + rules['CONSUMER_EPG']})
-                OUTPUT_LOG.append({'Notifications': str(rules['CONSUMER_IP'])})
+                if len(rules['CONSUMER_IP']) >= 1:
+                    OUTPUT_LOG.append({'Notifications': 'The Following subnets will be added to the EPG: ' + rules['CONSUMER_EPG']})
+                    OUTPUT_LOG.append({'Notifications': str(rules['CONSUMER_IP'])})
 
-            else:
-                OUTPUT_LOG.append({'Notifications': 'No subnets will be added to EPG: ' + rules['CONSUMER_EPG']})
-
-        if rules['PROVIDER_L3OUT'] != 'INTERNAL' and rules['PROVIDER_EPG'] != 'BLANK':
-            L3OUT_NAME = rules['PROVIDER_L3OUT']
-            L3OUT_SEARCH_RESPONSE = L3OUT_SEARCH(BASE_URL, APIC_COOKIE, TENANT, L3OUT_NAME, HEADERS)
-            L3OUT_DATA = L3OUT_SEARCH_RESPONSE[1]['imdata']
-            L3OUT_SUBNETS = []
-            # Loop through the VRF pull out all other L3Outs and add any l3extsubnet to a list
-            for key in L3OUT_DATA:
-                # For Python 3+
-                if 'l3extRsEctx' in key:
-                # For Python 2.7
-                #if key.keys() == ['l3extRsEctx']:
-                    VRF_DN = key['l3extRsEctx']['attributes']['tDn']
-                    VRF_SEARCH_RESPONSE = VRF_SEARCH(BASE_URL, APIC_COOKIE, VRF_DN, HEADERS)
-                    for vrf_l3o in VRF_SEARCH_RESPONSE['imdata']:
-                        # For Python 3+
-                        if 'fvRtEctx' in vrf_l3o:
-                        # For Python 2.7
-                        #if vrf_l3o.keys() == ['fvRtEctx']:
-                            L3OUT_DN = vrf_l3o['fvRtEctx']['attributes']['tDn']
-                            SUBNET_SEARCH_RESPONSE = SUBNET_SEARCH(BASE_URL, APIC_COOKIE, L3OUT_DN, HEADERS)
-                            for subnets in SUBNET_SEARCH_RESPONSE['imdata']:
-                                L3OUT_SUBNETS.append(subnets['l3extSubnet']['attributes']['ip'])
-                                EXISTING_SUBNET = subnets['l3extSubnet']['attributes']['ip']
-                                EXISTING_L3OUT = subnets['l3extSubnet']['attributes']['dn'].split('/')[2][4:]
-                                EXISTING_EPG = subnets['l3extSubnet']['attributes']['dn'].split('/')[3][6:]
-                                SCOPE = subnets['l3extSubnet']['attributes']['scope'].split(',')
-                                if EXISTING_SUBNET in rules['PROVIDER_IP']:
-                                    if 'import-security' in SCOPE:
-                                        if EXISTING_EPG == rules['PROVIDER_EPG']:
-                                            rules['PROVIDER_IP'].remove(EXISTING_SUBNET)
-
-                                        else:
-                                            OUTPUT_LOG.append({'Errors': EXISTING_SUBNET + ' already exists within ' + EXISTING_L3OUT + ' under EPG ' + EXISTING_EPG + ' no subnet configuration for this epg will be pushed.'})
-                                            ERROR = True
-                                            rules['PROVIDER_IP'].remove(EXISTING_SUBNET)
-
-                                else:
-                                    for rule_subnet in rules['PROVIDER_IP']:
-                                        if IPNetwork(rule_subnet) in IPNetwork(EXISTING_SUBNET):
-                                            if int(EXISTING_SUBNET.split('/')[1]) >= 20 and 'import-security' in SCOPE:
-                                                OUTPUT_LOG.append({'Errors': rule_subnet + ' already exists within ' + EXISTING_L3OUT + ' under EPG ' + EXISTING_EPG + ' inside ' + EXISTING_SUBNET})
-                                                ERROR = True
-                                                rules['PROVIDER_IP'].remove(rule_subnet)
-
-
-            if len(rules['PROVIDER_IP']) >= 1:
-                OUTPUT_LOG.append({'Notifications': 'The Following subnets will be added to the EPG: ' + rules['PROVIDER_EPG']})
-                OUTPUT_LOG.append({'Notifications': str(rules['PROVIDER_IP'])})
-
-            else:
-                OUTPUT_LOG.append({'Notifications': 'No subnets will be added to EPG: ' + rules['PROVIDER_EPG']})
-
-    # Search for VIPs
-    OUTPUT_LOG.append({'Headers': 'Checking if any EPGs are for VIPS'})
-#
-    for rules in RULE_LIST:
-        if rules['PROVIDER_EPG'].split('_')[0].endswith('VS') and rules['PROVIDER_L3OUT'].endswith('DCI_L3O'):
-            for subnets in rules['PROVIDER_IP']:
-                if len(subnets.split('/')) != 0:
-                    subnet = subnets.split('/')[0]
                 else:
-                    subnet = subnets
-                if not ipaddress.ip_address(subnet).is_private:
-                    OUTPUT_LOG.append({'Notifications': rules['PROVIDER_EPG'] + ' contains a public address.'})
-                    OUTPUT_LOG.append({'Notifications': subnets + ' will be imported under the DCI and exported under the INET L3Outs'})
+                    OUTPUT_LOG.append({'Notifications': 'No subnets will be added to EPG: ' + rules['CONSUMER_EPG']})
+
+            if rules['PROVIDER_L3OUT'] != 'INTERNAL' and rules['PROVIDER_EPG'] != 'BLANK':
+                L3OUT_NAME = rules['PROVIDER_L3OUT']
+                L3OUT_SEARCH_RESPONSE = L3OUT_SEARCH(BASE_URL, APIC_COOKIE, TENANT, L3OUT_NAME, HEADERS)
+                L3OUT_DATA = L3OUT_SEARCH_RESPONSE[1]['imdata']
+                L3OUT_SUBNETS = []
+                # Loop through the VRF pull out all other L3Outs and add any l3extsubnet to a list
+                for key in L3OUT_DATA:
+                    # For Python 3+
+                    if 'l3extRsEctx' in key:
+                    # For Python 2.7
+                    #if key.keys() == ['l3extRsEctx']:
+                        VRF_DN = key['l3extRsEctx']['attributes']['tDn']
+                        VRF_SEARCH_RESPONSE = VRF_SEARCH(BASE_URL, APIC_COOKIE, VRF_DN, HEADERS)
+                        for vrf_l3o in VRF_SEARCH_RESPONSE['imdata']:
+                            # For Python 3+
+                            if 'fvRtEctx' in vrf_l3o:
+                            # For Python 2.7
+                            #if vrf_l3o.keys() == ['fvRtEctx']:
+                                L3OUT_DN = vrf_l3o['fvRtEctx']['attributes']['tDn']
+                                SUBNET_SEARCH_RESPONSE = SUBNET_SEARCH(BASE_URL, APIC_COOKIE, L3OUT_DN, HEADERS)
+                                for subnets in SUBNET_SEARCH_RESPONSE['imdata']:
+                                    L3OUT_SUBNETS.append(subnets['l3extSubnet']['attributes']['ip'])
+                                    EXISTING_SUBNET = subnets['l3extSubnet']['attributes']['ip']
+                                    EXISTING_L3OUT = subnets['l3extSubnet']['attributes']['dn'].split('/')[2][4:]
+                                    EXISTING_EPG = subnets['l3extSubnet']['attributes']['dn'].split('/')[3][6:]
+                                    SCOPE = subnets['l3extSubnet']['attributes']['scope'].split(',')
+                                    if EXISTING_SUBNET in rules['PROVIDER_IP']:
+                                        if 'import-security' in SCOPE:
+                                            if EXISTING_EPG == rules['PROVIDER_EPG']:
+                                                rules['PROVIDER_IP'].remove(EXISTING_SUBNET)
+
+                                            else:
+                                                OUTPUT_LOG.append({'Errors': EXISTING_SUBNET + ' already exists within ' + EXISTING_L3OUT + ' under EPG ' + EXISTING_EPG + ' no subnet configuration for this epg will be pushed.'})
+                                                ERROR = True
+                                                rules['PROVIDER_IP'].remove(EXISTING_SUBNET)
+
+                                    else:
+                                        for rule_subnet in rules['PROVIDER_IP']:
+                                            if IPNetwork(rule_subnet) in IPNetwork(EXISTING_SUBNET):
+                                                if int(EXISTING_SUBNET.split('/')[1]) >= 20 and 'import-security' in SCOPE:
+                                                    OUTPUT_LOG.append({'Errors': rule_subnet + ' already exists within ' + EXISTING_L3OUT + ' under EPG ' + EXISTING_EPG + ' inside ' + EXISTING_SUBNET})
+                                                    ERROR = True
+                                                    rules['PROVIDER_IP'].remove(rule_subnet)
 
 
-                elif ipaddress.ip_address(subnet).is_private:
-                    OUTPUT_LOG.append({'Notifications': rules['PROVIDER_EPG'] + ' contains a private address.'})
-                    OUTPUT_LOG.append({'Notifications': subnets + ' will be imported under the DCI L3Out'})
+                if len(rules['PROVIDER_IP']) >= 1:
+                    OUTPUT_LOG.append({'Notifications': 'The Following subnets will be added to the EPG: ' + rules['PROVIDER_EPG']})
+                    OUTPUT_LOG.append({'Notifications': str(rules['PROVIDER_IP'])})
+
+                else:
+                    OUTPUT_LOG.append({'Notifications': 'No subnets will be added to EPG: ' + rules['PROVIDER_EPG']})
+
+        # Search for VIPs
+        OUTPUT_LOG.append({'Headers': 'Checking if any EPGs are for VIPS'})
+
+        for rules in RULE_LIST:
+            if rules['PROVIDER_EPG'].split('_')[0].endswith('VS') and rules['PROVIDER_L3OUT'].endswith('DCI_L3O'):
+                for subnets in rules['PROVIDER_IP']:
+                    if len(subnets.split('/')) != 0:
+                        subnet = subnets.split('/')[0]
+                    else:
+                        subnet = subnets
+                    if not ipaddress.ip_address(subnet).is_private:
+                        OUTPUT_LOG.append({'Notifications': rules['PROVIDER_EPG'] + ' contains a public address.'})
+                        OUTPUT_LOG.append({'Notifications': subnets + ' will be imported under the DCI and exported under the INET L3Outs'})
+
+
+                    elif ipaddress.ip_address(subnet).is_private:
+                        OUTPUT_LOG.append({'Notifications': rules['PROVIDER_EPG'] + ' contains a private address.'})
+                        OUTPUT_LOG.append({'Notifications': subnets + ' will be imported under the DCI L3Out'})
+
+    else:
+        OUTPUT_LOG.append({'Errors': 'Unable to connect to APIC.'})
 
     if not ERROR:
         OUTPUT_LOG.append({'ValidationSuccess': 'APIC Configuration validated successfully'})
@@ -471,107 +472,109 @@ def EXTERNAL_EPG_DEPLOYMENT(RULE_LIST, location, url_dict, APIC_USERNAME, APIC_P
     APIC_COOKIE = APIC_LOGIN(BASE_URL, APIC_USERNAME, APIC_PASSWORD)
     if APIC_COOKIE:
         OUTPUT_LOG.append({'Notifications': 'Successfully generated authentication cookie'})
-    else:
-        OUTPUT_LOG.append({'Errors': 'Unable to connect to APIC. Please check your credentials'})
-    check_i = 0
-    for rules in RULE_LIST:
-        check_i = check_i + 1
-        L3OUT_CONSUME_EPG_CREATED = False
-        L3OUT_PROVIDE_EPG_CREATED = False
-        OUTPUT_LOG.append({'Headers2': 'Adding EPGs & Subnets for line: ' + str(rules['LINE'])})
-        if rules['CONSUMER_L3OUT'] != 'INTERNAL' and rules['CONSUMER_EPG'] != 'BLANK':
-            EPG_NAME = rules['CONSUMER_EPG']
-            L3OUT_NAME = rules['CONSUMER_L3OUT']
-            EXTERNAL_EPG_SEARCH_RESPONSE = EXTERNAL_EPG_SEARCH(BASE_URL, APIC_COOKIE, TENANT, L3OUT_NAME, EPG_NAME, HEADERS)
-            if int(EXTERNAL_EPG_SEARCH_RESPONSE['totalCount']) == 1:
-                OUTPUT_LOG.append({'NotificationsWarning': 'EPG: ' + EPG_NAME + ' already exists under ' + L3OUT_NAME + ' and wont be created'})
-                L3OUT_CONSUME_EPG_CREATED = True
-            if not L3OUT_CONSUME_EPG_CREATED:
-                OUTPUT_LOG.append({'Notifications': 'Adding External EPG: ' + EPG_NAME + ' TO L3Out: ' + L3OUT_NAME})
-                EXTERNAL_EPG_ADD(BASE_URL, APIC_COOKIE, TENANT, L3OUT_NAME, EPG_NAME, HEADERS, OUTPUT_LOG)
-            # Add subnets to external EPG
-            if len(rules['CONSUMER_IP']) != 0:
-                OUTPUT_LOG.append({'Notifications': 'Adding Subnets to External EPG: '})
-                for IP in rules['CONSUMER_IP']:
-                    # SEARCH TO SEE IF SUBNET ALREADY EXISTS IN EPG:
-                    L3OUT_DN = 'uni/tn-common/out-' + L3OUT_NAME + '/instP-' + EPG_NAME + '/extsubnet-[' + IP + ']'
-                    SUBNET_SEARCH_RESPONSE = SUBNET_SEARCH_EXACT(BASE_URL, APIC_COOKIE, L3OUT_DN, HEADERS)
-                    if int(SUBNET_SEARCH_RESPONSE['totalCount']) == 1:
-                        for subnets in SUBNET_SEARCH_RESPONSE['imdata']:
-                            EXISTING_SUBNET = subnets['l3extSubnet']['attributes']['ip']
-                            SCOPE = subnets['l3extSubnet']['attributes']['scope'].split(',')
-                            if EXISTING_SUBNET == IP:
-                                #IP Already Configured under EPG
-                                pass
 
-                    else:
-                        SCOPE = 'import-security'
-                        EXTERNAL_EPG_SUBNET_ADD(BASE_URL, APIC_COOKIE, TENANT, L3OUT_NAME, EPG_NAME, HEADERS, IP, SCOPE, OUTPUT_LOG)
-
-        if rules['PROVIDER_L3OUT'] != 'INTERNAL' and rules['PROVIDER_EPG'] != 'BLANK':
-            EPG_NAME = rules['PROVIDER_EPG']
-            L3OUT_NAME = rules['PROVIDER_L3OUT']
-            EXTERNAL_EPG_SEARCH_RESPONSE = EXTERNAL_EPG_SEARCH(BASE_URL, APIC_COOKIE, TENANT, L3OUT_NAME, EPG_NAME, HEADERS)
-            if int(EXTERNAL_EPG_SEARCH_RESPONSE['totalCount']) == 1:
-                OUTPUT_LOG.append({'NotificationsWarning': 'EPG: ' + EPG_NAME + ' already exists under ' + L3OUT_NAME + ' and wont be created'})
-                L3OUT_PROVIDE_EPG_CREATED = True
-            if not L3OUT_PROVIDE_EPG_CREATED:
-                OUTPUT_LOG.append({'Notifications': 'Adding External EPG: ' + EPG_NAME + ' TO L3Out: ' + L3OUT_NAME})
-                EXTERNAL_EPG_ADD(BASE_URL, APIC_COOKIE, TENANT, L3OUT_NAME, EPG_NAME, HEADERS, OUTPUT_LOG)
-            # Add subnets to external EPG
-            if len(rules['PROVIDER_IP']) != 0:
-                OUTPUT_LOG.append({'Notifications': 'Adding Subnets to External EPG: '})
-                for IP in rules['PROVIDER_IP']:
-                    # SEARCH TO SEE IF SUBNET ALREADY EXISTS IN EPG:
-                    L3OUT_DN = 'uni/tn-common/out-' + L3OUT_NAME + '/instP-' + EPG_NAME + '/extsubnet-[' + IP + ']'
-                    SUBNET_SEARCH_RESPONSE = SUBNET_SEARCH_EXACT(BASE_URL, APIC_COOKIE, L3OUT_DN, HEADERS)
-                    if int(SUBNET_SEARCH_RESPONSE['totalCount']) == 1:
-                        for subnets in SUBNET_SEARCH_RESPONSE['imdata']:
-                            EXISTING_SUBNET = subnets['l3extSubnet']['attributes']['ip']
-                            SCOPE = subnets['l3extSubnet']['attributes']['scope'].split(',')
-                            if EXISTING_SUBNET == IP:
-                                #IP Already Configured under EPG
-                                pass
-
-                    else:
-                        if len(IP.split('/')) != 0:
-                            subnet = IP.split('/')[0]
-                        else:
-                            subnet = IP
-                        # Check for VS EPGs
-                        if rules['PROVIDER_EPG'].split('_')[0].endswith('VS') and rules['PROVIDER_L3OUT'].endswith('DCI_L3O'):
-
-                            if not ipaddress.ip_address(subnet).is_private:
-                                # Import Under DCI
-                                SCOPE = 'import-rtctrl,import-security'
-                                L3OUT_NAME = rules['PROVIDER_L3OUT']
-                                EPG_NAME = rules['PROVIDER_EPG']
-                                EXTERNAL_EPG_SUBNET_ADD(BASE_URL, APIC_COOKIE, TENANT, L3OUT_NAME, EPG_NAME, HEADERS, IP, SCOPE, OUTPUT_LOG)
-
-                                # Export Under Inet
-                                SCOPE = 'export-rtctrl'
-                                # Build L3out name for Inet L3Out
-                                # Temp fix for BLUE INET
-                                if rules['PROVIDER_L3OUT'].split('-')[0] == 'BLUE':
-                                    L3OUT_NAME = rules['PROVIDER_L3OUT'].split('-')[0] + '-' + DC + '-INET_L3O'
-                                else:
-                                    L3OUT_NAME = rules['PROVIDER_L3OUT'].split('-')[0] + '-INET_L3O'
-
-                                EPG_NAME = rules['PROVIDER_L3OUT'].split('_')[0] + '-ROUTING_EPG'
-                                EXTERNAL_EPG_SUBNET_ADD(BASE_URL, APIC_COOKIE, TENANT, L3OUT_NAME, EPG_NAME, HEADERS, IP, SCOPE, OUTPUT_LOG)
-
-                            if ipaddress.ip_address(subnet).is_private:
-                                # Import Under DCI
-                                L3OUT_NAME = rules['PROVIDER_L3OUT']
-                                EPG_NAME = rules['PROVIDER_EPG']
-                                SCOPE = 'import-rtctrl,import-security'
-                                EXTERNAL_EPG_SUBNET_ADD(BASE_URL, APIC_COOKIE, TENANT, L3OUT_NAME, EPG_NAME, HEADERS, IP, SCOPE, OUTPUT_LOG)
+        check_i = 0
+        for rules in RULE_LIST:
+            check_i = check_i + 1
+            L3OUT_CONSUME_EPG_CREATED = False
+            L3OUT_PROVIDE_EPG_CREATED = False
+            OUTPUT_LOG.append({'Headers2': 'Adding EPGs & Subnets for line: ' + str(rules['LINE'])})
+            if rules['CONSUMER_L3OUT'] != 'INTERNAL' and rules['CONSUMER_EPG'] != 'BLANK':
+                EPG_NAME = rules['CONSUMER_EPG']
+                L3OUT_NAME = rules['CONSUMER_L3OUT']
+                EXTERNAL_EPG_SEARCH_RESPONSE = EXTERNAL_EPG_SEARCH(BASE_URL, APIC_COOKIE, TENANT, L3OUT_NAME, EPG_NAME, HEADERS)
+                if int(EXTERNAL_EPG_SEARCH_RESPONSE['totalCount']) == 1:
+                    OUTPUT_LOG.append({'NotificationsWarning': 'EPG: ' + EPG_NAME + ' already exists under ' + L3OUT_NAME + ' and wont be created'})
+                    L3OUT_CONSUME_EPG_CREATED = True
+                if not L3OUT_CONSUME_EPG_CREATED:
+                    OUTPUT_LOG.append({'Notifications': 'Adding External EPG: ' + EPG_NAME + ' TO L3Out: ' + L3OUT_NAME})
+                    EXTERNAL_EPG_ADD(BASE_URL, APIC_COOKIE, TENANT, L3OUT_NAME, EPG_NAME, HEADERS, OUTPUT_LOG)
+                # Add subnets to external EPG
+                if len(rules['CONSUMER_IP']) != 0:
+                    OUTPUT_LOG.append({'Notifications': 'Adding Subnets to External EPG: '})
+                    for IP in rules['CONSUMER_IP']:
+                        # SEARCH TO SEE IF SUBNET ALREADY EXISTS IN EPG:
+                        L3OUT_DN = 'uni/tn-common/out-' + L3OUT_NAME + '/instP-' + EPG_NAME + '/extsubnet-[' + IP + ']'
+                        SUBNET_SEARCH_RESPONSE = SUBNET_SEARCH_EXACT(BASE_URL, APIC_COOKIE, L3OUT_DN, HEADERS)
+                        if int(SUBNET_SEARCH_RESPONSE['totalCount']) == 1:
+                            for subnets in SUBNET_SEARCH_RESPONSE['imdata']:
+                                EXISTING_SUBNET = subnets['l3extSubnet']['attributes']['ip']
+                                SCOPE = subnets['l3extSubnet']['attributes']['scope'].split(',')
+                                if EXISTING_SUBNET == IP:
+                                    #IP Already Configured under EPG
+                                    pass
 
                         else:
-                            L3OUT_NAME = rules['PROVIDER_L3OUT']
-                            EPG_NAME = rules['PROVIDER_EPG']
                             SCOPE = 'import-security'
                             EXTERNAL_EPG_SUBNET_ADD(BASE_URL, APIC_COOKIE, TENANT, L3OUT_NAME, EPG_NAME, HEADERS, IP, SCOPE, OUTPUT_LOG)
+
+            if rules['PROVIDER_L3OUT'] != 'INTERNAL' and rules['PROVIDER_EPG'] != 'BLANK':
+                EPG_NAME = rules['PROVIDER_EPG']
+                L3OUT_NAME = rules['PROVIDER_L3OUT']
+                EXTERNAL_EPG_SEARCH_RESPONSE = EXTERNAL_EPG_SEARCH(BASE_URL, APIC_COOKIE, TENANT, L3OUT_NAME, EPG_NAME, HEADERS)
+                if int(EXTERNAL_EPG_SEARCH_RESPONSE['totalCount']) == 1:
+                    OUTPUT_LOG.append({'NotificationsWarning': 'EPG: ' + EPG_NAME + ' already exists under ' + L3OUT_NAME + ' and wont be created'})
+                    L3OUT_PROVIDE_EPG_CREATED = True
+                if not L3OUT_PROVIDE_EPG_CREATED:
+                    OUTPUT_LOG.append({'Notifications': 'Adding External EPG: ' + EPG_NAME + ' TO L3Out: ' + L3OUT_NAME})
+                    EXTERNAL_EPG_ADD(BASE_URL, APIC_COOKIE, TENANT, L3OUT_NAME, EPG_NAME, HEADERS, OUTPUT_LOG)
+                # Add subnets to external EPG
+                if len(rules['PROVIDER_IP']) != 0:
+                    OUTPUT_LOG.append({'Notifications': 'Adding Subnets to External EPG: '})
+                    for IP in rules['PROVIDER_IP']:
+                        # SEARCH TO SEE IF SUBNET ALREADY EXISTS IN EPG:
+                        L3OUT_DN = 'uni/tn-common/out-' + L3OUT_NAME + '/instP-' + EPG_NAME + '/extsubnet-[' + IP + ']'
+                        SUBNET_SEARCH_RESPONSE = SUBNET_SEARCH_EXACT(BASE_URL, APIC_COOKIE, L3OUT_DN, HEADERS)
+                        if int(SUBNET_SEARCH_RESPONSE['totalCount']) == 1:
+                            for subnets in SUBNET_SEARCH_RESPONSE['imdata']:
+                                EXISTING_SUBNET = subnets['l3extSubnet']['attributes']['ip']
+                                SCOPE = subnets['l3extSubnet']['attributes']['scope'].split(',')
+                                if EXISTING_SUBNET == IP:
+                                    #IP Already Configured under EPG
+                                    pass
+
+                        else:
+                            if len(IP.split('/')) != 0:
+                                subnet = IP.split('/')[0]
+                            else:
+                                subnet = IP
+                            # Check for VS EPGs
+                            if rules['PROVIDER_EPG'].split('_')[0].endswith('VS') and rules['PROVIDER_L3OUT'].endswith('DCI_L3O'):
+
+                                if not ipaddress.ip_address(subnet).is_private:
+                                    # Import Under DCI
+                                    SCOPE = 'import-rtctrl,import-security'
+                                    L3OUT_NAME = rules['PROVIDER_L3OUT']
+                                    EPG_NAME = rules['PROVIDER_EPG']
+                                    EXTERNAL_EPG_SUBNET_ADD(BASE_URL, APIC_COOKIE, TENANT, L3OUT_NAME, EPG_NAME, HEADERS, IP, SCOPE, OUTPUT_LOG)
+
+                                    # Export Under Inet
+                                    SCOPE = 'export-rtctrl'
+                                    # Build L3out name for Inet L3Out
+                                    # Temp fix for BLUE INET
+                                    if rules['PROVIDER_L3OUT'].split('-')[0] == 'BLUE':
+                                        L3OUT_NAME = rules['PROVIDER_L3OUT'].split('-')[0] + '-' + DC + '-INET_L3O'
+                                    else:
+                                        L3OUT_NAME = rules['PROVIDER_L3OUT'].split('-')[0] + '-INET_L3O'
+
+                                    EPG_NAME = rules['PROVIDER_L3OUT'].split('_')[0] + '-ROUTING_EPG'
+                                    EXTERNAL_EPG_SUBNET_ADD(BASE_URL, APIC_COOKIE, TENANT, L3OUT_NAME, EPG_NAME, HEADERS, IP, SCOPE, OUTPUT_LOG)
+
+                                if ipaddress.ip_address(subnet).is_private:
+                                    # Import Under DCI
+                                    L3OUT_NAME = rules['PROVIDER_L3OUT']
+                                    EPG_NAME = rules['PROVIDER_EPG']
+                                    SCOPE = 'import-rtctrl,import-security'
+                                    EXTERNAL_EPG_SUBNET_ADD(BASE_URL, APIC_COOKIE, TENANT, L3OUT_NAME, EPG_NAME, HEADERS, IP, SCOPE, OUTPUT_LOG)
+
+                            else:
+                                L3OUT_NAME = rules['PROVIDER_L3OUT']
+                                EPG_NAME = rules['PROVIDER_EPG']
+                                SCOPE = 'import-security'
+                                EXTERNAL_EPG_SUBNET_ADD(BASE_URL, APIC_COOKIE, TENANT, L3OUT_NAME, EPG_NAME, HEADERS, IP, SCOPE, OUTPUT_LOG)
+
+    else:
+        OUTPUT_LOG.append({'Errors': 'Unable to connect to APIC.'})
 
     return OUTPUT_LOG
 
@@ -956,104 +959,105 @@ def CONTRACT_DEPLOYMENT(RULE_LIST, location, url_dict, APIC_USERNAME, APIC_PASSW
     APIC_COOKIE = APIC_LOGIN(BASE_URL, APIC_USERNAME, APIC_PASSWORD)
     if APIC_COOKIE:
         OUTPUT_LOG.append({'Notifications': 'Successfully generated authentication cookie'})
-    else:
-        OUTPUT_LOG.append({'Errors': 'Unable to connect to APIC. Please check your credentials'})
 
-    OUTPUT_LOG.append({'Headers': 'Creating Filters.'})
-    # Create Filters in Filter SET
-    for rules in RULE_LIST:
-        for services in rules['SERVICE']:
-            FILTER_NAME = services
-            FILTER_SEARCH_RESPONSE = FILTER_SEARCH(BASE_URL, APIC_COOKIE, FILTER_NAME, HEADERS)
-            if int(FILTER_SEARCH_RESPONSE['totalCount']) == 1:
-                pass
-            else:
-                FILTER_LIST.append(FILTER_NAME)
+        OUTPUT_LOG.append({'Headers': 'Creating Filters.'})
+        # Create Filters in Filter SET
+        for rules in RULE_LIST:
+            for services in rules['SERVICE']:
+                FILTER_NAME = services
+                FILTER_SEARCH_RESPONSE = FILTER_SEARCH(BASE_URL, APIC_COOKIE, FILTER_NAME, HEADERS)
+                if int(FILTER_SEARCH_RESPONSE['totalCount']) == 1:
+                    pass
+                else:
+                    FILTER_LIST.append(FILTER_NAME)
 
-    FILTER_SET = set(FILTER_LIST)
-    if len(FILTER_SET) > 0:
-        OUTPUT_LOG = FILTER_CREATE(FILTER_SET, BASE_URL, APIC_COOKIE, HEADERS, OUTPUT_LOG)
-    else:
-        pass
-
-    OUTPUT_LOG.append({'Headers': 'Creating Contract & Subjects.'})
-    # Create Contracts and Subjects in Contract SET
-    for rules in RULE_LIST:
-        CONTRACT_NAME = rules['NAME']
-        CONTRACT_SEARCH_RESPONSE = CONTRACT_SEARCH(BASE_URL, APIC_COOKIE, CONTRACT_NAME, HEADERS)
-        if int(CONTRACT_SEARCH_RESPONSE['totalCount']) == 1:
-            pass
-        else:
-            CONTRACT_LIST.append(CONTRACT_NAME)
-
-    CONTRACT_SET = set(CONTRACT_LIST)
-    if len(CONTRACT_SET) > 0:
-        OUTPUT_LOG = CONTRACT_CREATE(CONTRACT_SET, BASE_URL, APIC_COOKIE, HEADERS, OUTPUT_LOG)
-    else:
-        pass
-
-    # Add filters to subjects
-    for rules in RULE_LIST:
-        # Use the contract search to locate subject
-        CONTRACT_NAME = rules['NAME']
-        CONTRACT_SEARCH_RESPONSE = CONTRACT_SEARCH(BASE_URL, APIC_COOKIE, CONTRACT_NAME, HEADERS)
-        # Validate that a contract can be located
-        if int(CONTRACT_SEARCH_RESPONSE['totalCount']) == 1:
-            TENANT = CONTRACT_SEARCH_RESPONSE['imdata'][0]['vzBrCP']['attributes']['dn'].split('/')[1][3:]
-            CONTRACT_SUBJECT = \
-            CONTRACT_SEARCH_RESPONSE['imdata'][0]['vzBrCP']['attributes']['dn'].split('/')[2][4:].split('_')[0] + '_SBJ'
-            SUBJECT_SEARCH_RESPONSE = SUBJECT_SEARCH(BASE_URL, APIC_COOKIE, CONTRACT_NAME, TENANT, CONTRACT_SUBJECT,
-                                                     HEADERS)
-
-            # Add all filters for a subject to a list to be used for comparison.
-            SUBJECT_FILTERS = []
-            for filters in SUBJECT_SEARCH_RESPONSE['imdata']:
-                SUBJECT_FILTERS.append(filters['vzRsSubjFiltAtt']['attributes']['tnVzFilterName'])
-
-            # compare list of filters to those already in subject
-            NEW_FILTERS = rules['SERVICE']
-            FILTER_COMPARE = LIST_COMPARE(NEW_FILTERS, SUBJECT_FILTERS)
-            if len(FILTER_COMPARE[0]) == 0:
-                pass
-
-            elif len(FILTER_COMPARE[0]) > 0:
-                for FILTERS in FILTER_COMPARE[0]:
-                    OUTPUT_LOG = FILTER_ATTACH(BASE_URL, APIC_COOKIE, CONTRACT_NAME, CONTRACT_SUBJECT, FILTERS, HEADERS,
-                                               OUTPUT_LOG)
-
-            else:
-                OUTPUT_LOG.append({'Errors': 'Error adding Filters to subject!'})
-
-            NEW_FILTERS = ''
-
+        FILTER_SET = set(FILTER_LIST)
+        if len(FILTER_SET) > 0:
+            OUTPUT_LOG = FILTER_CREATE(FILTER_SET, BASE_URL, APIC_COOKIE, HEADERS, OUTPUT_LOG)
         else:
             pass
 
-    OUTPUT_LOG.append({'Headers': 'Consuming & Providing Contracts.'})
-
-    for rules in RULE_LIST:
-        LINE = rules['LINE']
-        CONTRACT_NAME = rules['NAME']
-        # Consuming contract
-        EPG_NAME = rules['CONSUMER_EPG']
-        OUTPUT_LOG.append({'Headers2': 'Deploying Contracts for Line: ' + str(LINE)})
-
-        if EPG_NAME != 'BLANK':
-            if rules['CONSUMER_L3OUT'] == 'INTERNAL':
-                INTERNL_EPG_CONTRACT_CONSUME(BASE_URL, EPG_NAME, CONTRACT_NAME, APIC_COOKIE, HEADERS, OUTPUT_LOG)
+        OUTPUT_LOG.append({'Headers': 'Creating Contract & Subjects.'})
+        # Create Contracts and Subjects in Contract SET
+        for rules in RULE_LIST:
+            CONTRACT_NAME = rules['NAME']
+            CONTRACT_SEARCH_RESPONSE = CONTRACT_SEARCH(BASE_URL, APIC_COOKIE, CONTRACT_NAME, HEADERS)
+            if int(CONTRACT_SEARCH_RESPONSE['totalCount']) == 1:
+                pass
             else:
-                L3OUT_NAME = rules['CONSUMER_L3OUT']
-                EXTERNAL_EPG_CONTRACT_CONSUME(L3OUT_NAME, EPG_NAME, CONTRACT_NAME, BASE_URL, APIC_COOKIE, HEADERS,
-                                              OUTPUT_LOG)
+                CONTRACT_LIST.append(CONTRACT_NAME)
 
-        # Providing contract
-        EPG_NAME = rules['PROVIDER_EPG']
-        if EPG_NAME != 'BLANK':
-            if rules['PROVIDER_L3OUT'] == 'INTERNAL':
-                INTERNL_EPG_CONTRACT_PROVIDE(BASE_URL, EPG_NAME, CONTRACT_NAME, APIC_COOKIE, HEADERS, OUTPUT_LOG)
+        CONTRACT_SET = set(CONTRACT_LIST)
+        if len(CONTRACT_SET) > 0:
+            OUTPUT_LOG = CONTRACT_CREATE(CONTRACT_SET, BASE_URL, APIC_COOKIE, HEADERS, OUTPUT_LOG)
+        else:
+            pass
+
+        # Add filters to subjects
+        for rules in RULE_LIST:
+            # Use the contract search to locate subject
+            CONTRACT_NAME = rules['NAME']
+            CONTRACT_SEARCH_RESPONSE = CONTRACT_SEARCH(BASE_URL, APIC_COOKIE, CONTRACT_NAME, HEADERS)
+            # Validate that a contract can be located
+            if int(CONTRACT_SEARCH_RESPONSE['totalCount']) == 1:
+                TENANT = CONTRACT_SEARCH_RESPONSE['imdata'][0]['vzBrCP']['attributes']['dn'].split('/')[1][3:]
+                CONTRACT_SUBJECT = \
+                CONTRACT_SEARCH_RESPONSE['imdata'][0]['vzBrCP']['attributes']['dn'].split('/')[2][4:].split('_')[0] + '_SBJ'
+                SUBJECT_SEARCH_RESPONSE = SUBJECT_SEARCH(BASE_URL, APIC_COOKIE, CONTRACT_NAME, TENANT, CONTRACT_SUBJECT,
+                                                         HEADERS)
+
+                # Add all filters for a subject to a list to be used for comparison.
+                SUBJECT_FILTERS = []
+                for filters in SUBJECT_SEARCH_RESPONSE['imdata']:
+                    SUBJECT_FILTERS.append(filters['vzRsSubjFiltAtt']['attributes']['tnVzFilterName'])
+
+                # compare list of filters to those already in subject
+                NEW_FILTERS = rules['SERVICE']
+                FILTER_COMPARE = LIST_COMPARE(NEW_FILTERS, SUBJECT_FILTERS)
+                if len(FILTER_COMPARE[0]) == 0:
+                    pass
+
+                elif len(FILTER_COMPARE[0]) > 0:
+                    for FILTERS in FILTER_COMPARE[0]:
+                        OUTPUT_LOG = FILTER_ATTACH(BASE_URL, APIC_COOKIE, CONTRACT_NAME, CONTRACT_SUBJECT, FILTERS, HEADERS,
+                                                   OUTPUT_LOG)
+
+                else:
+                    OUTPUT_LOG.append({'Errors': 'Error adding Filters to subject!'})
+
+                NEW_FILTERS = ''
+
             else:
-                L3OUT_NAME = rules['PROVIDER_L3OUT']
-                EXTERNAL_EPG_CONTRACT_PROVIDE(L3OUT_NAME, EPG_NAME, CONTRACT_NAME, BASE_URL, APIC_COOKIE, HEADERS,
-                                              OUTPUT_LOG)
+                pass
+
+        OUTPUT_LOG.append({'Headers': 'Consuming & Providing Contracts.'})
+
+        for rules in RULE_LIST:
+            LINE = rules['LINE']
+            CONTRACT_NAME = rules['NAME']
+            # Consuming contract
+            EPG_NAME = rules['CONSUMER_EPG']
+            OUTPUT_LOG.append({'Headers2': 'Deploying Contracts for Line: ' + str(LINE)})
+
+            if EPG_NAME != 'BLANK':
+                if rules['CONSUMER_L3OUT'] == 'INTERNAL':
+                    INTERNL_EPG_CONTRACT_CONSUME(BASE_URL, EPG_NAME, CONTRACT_NAME, APIC_COOKIE, HEADERS, OUTPUT_LOG)
+                else:
+                    L3OUT_NAME = rules['CONSUMER_L3OUT']
+                    EXTERNAL_EPG_CONTRACT_CONSUME(L3OUT_NAME, EPG_NAME, CONTRACT_NAME, BASE_URL, APIC_COOKIE, HEADERS,
+                                                  OUTPUT_LOG)
+
+            # Providing contract
+            EPG_NAME = rules['PROVIDER_EPG']
+            if EPG_NAME != 'BLANK':
+                if rules['PROVIDER_L3OUT'] == 'INTERNAL':
+                    INTERNL_EPG_CONTRACT_PROVIDE(BASE_URL, EPG_NAME, CONTRACT_NAME, APIC_COOKIE, HEADERS, OUTPUT_LOG)
+                else:
+                    L3OUT_NAME = rules['PROVIDER_L3OUT']
+                    EXTERNAL_EPG_CONTRACT_PROVIDE(L3OUT_NAME, EPG_NAME, CONTRACT_NAME, BASE_URL, APIC_COOKIE, HEADERS,
+                                                  OUTPUT_LOG)
+
+    else:
+        OUTPUT_LOG.append({'Errors': 'Unable to connect to APIC.'})
 
     return OUTPUT_LOG
