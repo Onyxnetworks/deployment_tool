@@ -31,6 +31,7 @@ ALLOWED_HOSTS = ['*']
 INSTALLED_APPS = [
     'index',
     'aci_deployment',
+    'f5_deployment',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
