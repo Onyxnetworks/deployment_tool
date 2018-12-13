@@ -612,6 +612,7 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, APIC_USERNAME,
 
     except:
         OUTPUT_LOG.append({'Errors': 'Errors validating Contract names'})
+        ERROR = True
 
     if not ERROR:
         OUTPUT_LOG.append({'NotificationsSuccess': 'Contract formatting validated successfully'})
