@@ -117,6 +117,6 @@ def vs_deployment_validation(vs_dict, location, url_dict, username, password):
         node_list_result = compare_ltm_nodes(vs_dict, bigip_url_base, bigip, output_log)
         output_log = node_list_result[0]
         error = node_list_result[1]
-        node_list = node_list_result[3]
+        node_list = node_list_result[2]
         
     return output_log

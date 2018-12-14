@@ -401,4 +401,4 @@ def compare_ltm_nodes(vs_dict, bigip_url_base, bigip, output_log):
         output_log.append({'Notifications': 'No nodes will be created.'})
         'no nodes will be created.'
             
-    return output_log, error, node_list 
+    return output_log, error, node_list
