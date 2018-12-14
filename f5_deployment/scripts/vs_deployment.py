@@ -10,9 +10,7 @@ def create_connection_bigip(base_url, username, password, output_log):
     bigip.auth = (username, password)
     bigip.verify = False
     bigip.headers.update({'Content-Type': 'application/json'})
-    print(username)
-    print(password)
-    print(base_url)
+
     payload = {}
     payload['username'] = username
     payload['password'] = password
