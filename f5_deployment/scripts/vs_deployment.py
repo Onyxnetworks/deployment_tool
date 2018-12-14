@@ -354,10 +354,10 @@ def compare_ltm_nodes(vs_dict, bigip_url_base, bigip, output_log):
         excel_node_ip = excel_node_pair[1]
 
 
-        for dict in nodes_on_ltm_dict:
+        for new_dict in nodes_on_ltm_dict:
             try:
-                node_name = nodes_on_ltm_dict[dict]['name']
-                node_ip = nodes_on_ltm_dict[dict]['address']
+                node_name = nodes_on_ltm_dict[new_dict]['name']
+                node_ip = nodes_on_ltm_dict[new_dict]['address']
             except:
                 output_log.append({'Notifications': 'No Nodes configured on LTM'})
                 return output_log, error, node_list
@@ -377,9 +377,9 @@ def compare_ltm_nodes(vs_dict, bigip_url_base, bigip, output_log):
         excel_node_name = excel_node_pair[0]
         excel_node_ip = excel_node_pair[1]
 
-        for dict in nodes_on_ltm_dict:
-            node_name = nodes_on_ltm_dict[dict]['name']
-            node_ip = nodes_on_ltm_dict[dict]['address']
+        for new_dict in nodes_on_ltm_dict:
+            node_name = nodes_on_ltm_dict[new_dict]['name']
+            node_ip = nodes_on_ltm_dict[new_dict]['address']
 
             if node_name == excel_node_name:
                 output_log.append({'Errors': 'Node name/*ip mismatch: {}:{}'.format(node_name, node_ip)})
