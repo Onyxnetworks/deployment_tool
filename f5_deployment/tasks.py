@@ -134,4 +134,8 @@ def vs_deployment_validation(vs_dict, location, url_dict, username, password):
         output_log = compare_vs_results[0]
         error = compare_vs_results[1]
 
+    if not error:
+        output_log.append({'NotificationsSuccess': 'Virtual Server configuration validated successfully.'})
+        output_log.append({'ValidationSuccess': 'APIC Configuration validated successfully'})
+
     return output_log
