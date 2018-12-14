@@ -382,11 +382,11 @@ def compare_ltm_nodes(vs_dict, bigip_url_base, bigip, output_log):
             node_ip = nodes_on_ltm_dict[new_dict]['address']
 
             if node_name == excel_node_name:
-                output_log.append({'Errors': 'Node name/*ip mismatch: {}:{}'.format(node_name, node_ip)})
+                output_log.append({'Errors': 'Node Name/IP mismatch for: {}:{}'.format(node_name, node_ip)})
                 error = True
 
             if node_ip == excel_node_ip:
-                output_log.append({'Errors': 'Node ip/*name mismatch: {}:{}'.format(node_ip, node_name)})
+                output_log.append({'Errors': 'Node IP/Name mismatch for: {}:{}'.format(node_ip, node_name)})
                 error = True
 
     if node_list:
