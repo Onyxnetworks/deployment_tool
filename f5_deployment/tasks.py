@@ -85,8 +85,7 @@ def vs_deployment_validation(vs_dict, location, url_dict, username, password):
         error = check_httpprofile_result[1]
        
     if not error:
-            output_log.append({'NotificationsSuccess': 'HTTP Profiles validated successfully.'})
-    if not error:
+        output_log.append({'NotificationsSuccess': 'HTTP Profiles validated successfully.'})
         ssl = vs_dict['vs']['D2']
         if ssl in ['https', 'HTTPS']:
                 output_log.append({'Headers': 'Checking SSL Profiles.'})
@@ -100,12 +99,13 @@ def vs_deployment_validation(vs_dict, location, url_dict, username, password):
                     error = check_cert_result[1]
     
     if not error:
-        output_log.append({'Headers': 'Checking HTTP/S Monitors.'})
+        output_log.append({'Headers': 'Checking HTTP(S) Monitors.'})
         check_http_mon_result = check_http_mon(vs_dict, bigip_url_base, bigip, output_log)
         output_log = check_http_mon_result[0]
         error = check_http_mon_result[1]
     
     if not error:
+        output_log.append({'NotificationsSuccess': 'Monitor configuration validated successfully'})
         output_log.append({'Headers': 'Checking SNAT Pools.'})
         snat_pool_present = compare_snat_on_ltm_excel(vs_dict, bigip_url_base, bigip, output_log)
         output_log = snat_pool_present[0]
@@ -113,10 +113,14 @@ def vs_deployment_validation(vs_dict, location, url_dict, username, password):
         snat_pool_present = snat_pool_present[2]
         
     if not error:
+        output_log.append({'NotificationsSuccess': 'SNAT configuration validated successfully'})
         output_log.append({'Headers': 'Checking Nodes.'})
         node_list_result = compare_ltm_nodes(vs_dict, bigip_url_base, bigip, output_log)
         output_log = node_list_result[0]
         error = node_list_result[1]
         node_list = node_list_result[2]
-        
+
+    if not error:
+        output_log.append({'NotificationsSuccess': 'Node configuration validated successfully'})
+
     return output_log

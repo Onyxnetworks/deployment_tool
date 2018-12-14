@@ -90,7 +90,7 @@ def check_httpprofile(vs_dict, bigip_url_base, bigip, output_log):
         for key, value in httpprofile_dict.items():
             if http_default_profile == value:
                 counter = counter + 1
-                output_log.append({'Notifications': 'Default HTTP/S Profile {} present on LTM.'
+                output_log.append({'Notifications': 'Default HTTP(S) Profile {} present on LTM.'
                                   .format(http_default_profile)})
 
                 for httpprofile_dict in httpptofiles_on_ltm:
@@ -98,12 +98,12 @@ def check_httpprofile(vs_dict, bigip_url_base, bigip, output_log):
                         # check if http profile name is preset on ltm
                         if http_profile == value:
                             error = True
-                            output_log.append({'Errors': 'HTTP/S profile name {} already present on LTM'
+                            output_log.append({'Errors': 'HTTP(S) profile name {} already present on LTM'
                                               .format(http_profile)})
 
     if counter == 0:
         error = True
-        output_log.append({'Errors': 'Default HTTP/S Profile {}, not present, please create default profile.'
+        output_log.append({'Errors': 'Default HTTP(S) Profile {}, not present, please create default profile.'
                           .format(http_default_profile)})
         
     if error:
@@ -111,7 +111,7 @@ def check_httpprofile(vs_dict, bigip_url_base, bigip, output_log):
         return output_log, error    
     
     if not error:
-        output_log.append({'Notifications': 'HTTP/S Profile {} will be created.'.format(http_profile)})
+        output_log.append({'Notifications': 'HTTP(S) Profile {} will be created.'.format(http_profile)})
         return output_log, error
 
 def check_ssl_profile(vs_dict, bigip_url_base, bigip, output_log):
@@ -255,7 +255,7 @@ def check_http_mon(vs_dict, bigip_url_base, bigip, output_log):
                 error = True
 
     if marker == 0:
-        output_log.append({'Notifications': 'HTTP/S monitor {} will be created'.format(http_mon_name)})
+        output_log.append({'Notifications': 'HTTP(S) monitor {} will be created'.format(http_mon_name)})
         
     return output_log, error
 
@@ -389,7 +389,6 @@ def compare_ltm_nodes(vs_dict, bigip_url_base, bigip, output_log):
                 output_log.append({'Errors': 'Node ip/*name mismatch: {}:{}'.format(node_ip, node_name)})
                 error = True
 
-    
     if node_list:
         output_log.append({'Headers2': 'The following nodes will be created.'})
         node_list_c = iter(node_list)
