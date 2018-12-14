@@ -401,3 +401,32 @@ def compare_ltm_nodes(vs_dict, bigip_url_base, bigip, output_log):
         'no nodes will be created.'
             
     return output_log, error, node_list
+
+
+def compare_pool(vs_dict, bigip_url_base, bigip, output_log):
+    error = False
+    pool_name = str(vs_dict['P2'])
+
+    # Get pool from ltm
+    pool_on_ltm = bigip.get('%s/ltm/pool' % bigip_url_base)
+    pool_on_ltm = json.loads(pool_on_ltm.content)
+
+    # CATCH EXCEPTION IF NO POOL ON LTM
+    try:
+        pool_on_ltm = pool_on_ltm['items']
+
+    except:
+        pool_on_ltm = [{u'kind': 'tm:ltm:pool:poolstate'}]
+
+    for dict_pool in pool_on_ltm:
+        pool_name_value_ltm = str((dict_pool.get('name')))
+        pool_description = str((dict_pool.get('description')))
+
+        if pool_name == pool_name_value_ltm:
+            output_log.append({'Errors': '{}:POOL name present on LTM.{}\n'.format(pool_name, pool_description)})
+            error = True
+
+    if not error:
+        output_log.append({'Notifications': 'Pool: {} not present on LTM, POOL will be created.'.format(pool_name)})
+
+    return output_log, error

@@ -122,5 +122,9 @@ def vs_deployment_validation(vs_dict, location, url_dict, username, password):
 
     if not error:
         output_log.append({'NotificationsSuccess': 'Node configuration validated successfully'})
+        output_log.append({'Headers': 'Checking Pools.'})
+        compare_pool_results = compare_pool(vs_dict, bigip_url_base, bigip, output_log)
+        output_log = compare_pool_results[0]
+        error = compare_pool_results[1]
 
     return output_log
