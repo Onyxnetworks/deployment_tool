@@ -430,3 +430,35 @@ def compare_pool(vs_dict, bigip_url_base, bigip, output_log):
         output_log.append({'Notifications': 'Pool: {} not present on LTM, POOL will be created.'.format(pool_name)})
 
     return output_log, error
+
+
+def compare_vs(vs_dict, bigip_url_base, bigip, output_log):
+    error = False
+    s = ':'
+    vs_ip = str(vs_dict['vs']['B2'])
+    vs_port = str(vs_dict['vs']['C2'])
+    vs_destination = vs_ip + s + vs_port
+
+    # Get vs from ltm
+    vs_on_ltm = bigip.get('%s/ltm/virtual' % bigip_url_base)
+    vs_on_ltm = json.loads(vs_on_ltm.content)
+
+    # Catch exception if no vs on ltm
+    try:
+        vs_on_ltm = vs_on_ltm['items']
+
+    except:
+        vs_on_ltm = [{u'kind': 'tm:ltm:virtual:virtualstate'}]
+
+    for dict_vs in vs_on_ltm:
+        vs_destination_value = str((dict_vs.get('destination')))
+        vs_destination_value = vs_destination_value.strip('/Common/')
+
+        if vs_destination == vs_destination_value:
+            output_log.append({'Errors': '{}:Virtual Server name present on LTM.\n'.format(vs_destination)})
+            error = True
+
+    if not error:
+        output_log.append({'Notifications': 'VS:{} not present on LTM, VS will be created.'.format(vs_destination)})
+
+    return output_log, error

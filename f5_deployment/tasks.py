@@ -105,7 +105,7 @@ def vs_deployment_validation(vs_dict, location, url_dict, username, password):
         error = check_http_mon_result[1]
     
     if not error:
-        output_log.append({'NotificationsSuccess': 'Monitor configuration validated successfully'})
+        output_log.append({'NotificationsSuccess': 'Monitor configuration validated successfully.'})
         output_log.append({'Headers': 'Checking SNAT Pools.'})
         snat_pool_present = compare_snat_on_ltm_excel(vs_dict, bigip_url_base, bigip, output_log)
         output_log = snat_pool_present[0]
@@ -113,7 +113,7 @@ def vs_deployment_validation(vs_dict, location, url_dict, username, password):
         snat_pool_present = snat_pool_present[2]
         
     if not error:
-        output_log.append({'NotificationsSuccess': 'SNAT configuration validated successfully'})
+        output_log.append({'NotificationsSuccess': 'SNAT configuration validated successfully.'})
         output_log.append({'Headers': 'Checking Nodes.'})
         node_list_result = compare_ltm_nodes(vs_dict, bigip_url_base, bigip, output_log)
         output_log = node_list_result[0]
@@ -121,10 +121,17 @@ def vs_deployment_validation(vs_dict, location, url_dict, username, password):
         node_list = node_list_result[2]
 
     if not error:
-        output_log.append({'NotificationsSuccess': 'Node configuration validated successfully'})
+        output_log.append({'NotificationsSuccess': 'Node configuration validated successfully.'})
         output_log.append({'Headers': 'Checking Pools.'})
         compare_pool_results = compare_pool(vs_dict, bigip_url_base, bigip, output_log)
         output_log = compare_pool_results[0]
         error = compare_pool_results[1]
+
+    if not error:
+        output_log.append({'NotificationsSuccess': 'Pool configuration validated successfully.'})
+        output_log.append({'Headers': 'Checking Virtual Server.'})
+        compare_vs_results = compare_vs(vs_dict, bigip_url_base, bigip, output_log)
+        output_log = compare_vs_results[0]
+        error = compare_vs_results[1]
 
     return output_log
