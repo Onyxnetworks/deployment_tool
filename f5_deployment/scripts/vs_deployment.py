@@ -391,7 +391,7 @@ def compare_ltm_nodes(vs_dict, bigip_url_base, bigip, output_log):
 
     
     if node_list:
-        output_log.append({'Notifications': 'The following nodes will be created.'})
+        output_log.append({'Headers2': 'The following nodes will be created.'})
         node_list_c = iter(node_list)
         for x in node_list_c:
             a = (x, next(node_list_c))
