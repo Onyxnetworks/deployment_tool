@@ -423,7 +423,7 @@ def compare_pool(vs_dict, bigip_url_base, bigip, output_log):
         pool_description = str((dict_pool.get('description')))
 
         if pool_name == pool_name_value_ltm:
-            output_log.append({'Errors': '{}:POOL name present on LTM.{}\n'.format(pool_name, pool_description)})
+            output_log.append({'Errors': '{} - Pool name present on LTM.{}\n'.format(pool_name, pool_description)})
             error = True
 
     if not error:
@@ -459,6 +459,6 @@ def compare_vs(vs_dict, bigip_url_base, bigip, output_log):
             error = True
 
     if not error:
-        output_log.append({'Notifications': 'VS:{} not present on LTM, VS will be created.'.format(vs_destination)})
+        output_log.append({'Notifications': 'Virtual Server: {} not present on LTM, It will be created.'.format(vs_destination)})
 
     return output_log, error
