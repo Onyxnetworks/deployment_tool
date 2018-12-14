@@ -73,7 +73,6 @@ def check_sync(bigip_url_base, bigip, output_log):
         return output_log, error    
     
     else:
-        error = False
         return output_log, error
         
 def check_httpprofile(vs_dict, bigip_url_base, bigip, output_log):
@@ -343,7 +342,7 @@ def compare_ltm_nodes(vs_dict, bigip_url_base, bigip, output_log):
         nodes_on_ltm_ip_address = [{u'kind': 'tm:ltm:node:nodestate'}]
         nodes_on_ltm_name = [{u'kind': 'tm:ltm:node:nodestate'}]
 
-
+    print(nodes_on_ltm_ip_address)
     nodes_on_ltm_dict = dict(enumerate(nodes_on_ltm_ip_address))
     node_list_a = iter(node_list)
     node_list_b = list(node_list)
