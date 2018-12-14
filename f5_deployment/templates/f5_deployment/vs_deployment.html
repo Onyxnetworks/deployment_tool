@@ -65,7 +65,7 @@ $.ajax({
     contentType: false,
     success: function (data) {
         if (data.task_id != null) {
-            get_validation_task_info(data.task_id, data.location, data.rule_list);
+            get_validation_task_info(data.task_id, data.location, data.vs_dict);
         }
         },
     error: function (data) {
@@ -75,7 +75,7 @@ $.ajax({
 });
 return false;
 });
-function get_validation_task_info(task_id, location, rule_list) {
+function get_validation_task_info(task_id, location, vs_dict) {
     $.ajax({
         type: 'get',
         url: '/get_task_info/',
@@ -167,12 +167,12 @@ function get_validation_task_info(task_id, location, rule_list) {
                     document.getElementById("upload_btn").style.visibility = "hidden";
                     document.getElementById("location").disabled = true;
                     document.getElementById("file").disabled = true;
-                    deploy_configuration(location, rule_list);
+                    deploy_configuration(location, vs_dict);
                 }
             }
             if (data.state != 'SUCCESS') {
                 setTimeout(function () {
-                    get_validation_task_info(task_id, location, rule_list)
+                    get_validation_task_info(task_id, location, vs_dict)
                 }, 1000);
             }},
         error: function (data) {
@@ -181,12 +181,12 @@ function get_validation_task_info(task_id, location, rule_list) {
         }
     });
 }
-function deploy_configuration(location, rule_list) {
+function deploy_configuration(location, vs_dict) {
     $("#deploy_btn").click(function(){
-        post_data = JSON.stringify({'location': location, 'rule_list': rule_list});
+        post_data = JSON.stringify({'location': location, 'vs_dict': vs_dict});
         $.ajax({
             type: 'post',
-            url: '/aci/external_epg_deployment_push/',
+            url: '/f5/vs_deployment_push/',
             data: post_data,
             dataType: 'json',
             contentType: 'application/json',
@@ -208,7 +208,7 @@ function get_deployment_task_info(task_id) {$.ajax({
     success: function (data) {
         rslt.html('');
         if (data.state == 'PENDING') {
-            rslt.html('Pushing configuration to APIC...');
+            rslt.html('Pushing configuration to BigIP...');
             document.getElementById("resultdiv").style.visibility = "hidden";
             document.getElementById("vs_deployment_results").innerHTML = "";
         }

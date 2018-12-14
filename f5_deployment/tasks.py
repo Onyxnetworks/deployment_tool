@@ -29,8 +29,7 @@ def vs_deployment_excel_open_workbook(file):
             cell = str(cell.value)
             if not cell == 'None':        
                 vs_dict['node_priority'].append(cell)        
-    
-    print(vs_dict)
+
     return vs_dict
     
 @shared_task
@@ -137,5 +136,16 @@ def vs_deployment_validation(vs_dict, location, url_dict, username, password):
     if not error:
         output_log.append({'NotificationsSuccess': 'Virtual Server configuration validated successfully.'})
         output_log.append({'ValidationSuccess': 'LTM Configuration validated successfully'})
+
+
+    vs_dict['node_list'] = node_list
+    vs_dict['snat_pool_present'] = snat_pool_present
+
+    return output_log, vs_dict
+
+
+@shared_task
+def vs_deployment(vs_dict, location, url_dict, username, password):
+    output_log = []
 
     return output_log
