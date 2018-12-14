@@ -364,7 +364,7 @@ def compare_ltm_nodes(vs_dict, bigip_url_base, bigip, output_log):
 
 
             if node_name == excel_node_name and node_ip == excel_node_ip:
-                output_log.append({'Notifications': 'Node already present on LTM: {} : {}'.format(node_name, node_ip)})
+                output_log.append({'Notifications': 'Node already present on LTM: {} - {}'.format(node_name, node_ip)})
 
                 node_list_b.remove(excel_node_name)
                 node_list_b.remove(excel_node_ip)
@@ -382,11 +382,11 @@ def compare_ltm_nodes(vs_dict, bigip_url_base, bigip, output_log):
             node_ip = nodes_on_ltm_dict[new_dict]['address']
 
             if node_name == excel_node_name:
-                output_log.append({'Errors': 'Node Name/IP mismatch for: {}:{}'.format(node_name, node_ip)})
+                output_log.append({'Errors': 'Node Name/IP mismatch for: {} - {}'.format(node_name, node_ip)})
                 error = True
 
             if node_ip == excel_node_ip:
-                output_log.append({'Errors': 'Node IP/Name mismatch for: {}:{}'.format(node_ip, node_name)})
+                output_log.append({'Errors': 'Node IP/Name mismatch for: {} - {}'.format(node_ip, node_name)})
                 error = True
 
     if node_list:
@@ -395,7 +395,7 @@ def compare_ltm_nodes(vs_dict, bigip_url_base, bigip, output_log):
             node_list_c = iter(node_list)
             for x in node_list_c:
                 a = (x, next(node_list_c))
-                output_log.append({'Notifications': '{} : {}' .format(a[0], a[1])})
+                output_log.append({'Notifications': '{} - {}' .format(a[0], a[1])})
 
     else:
         output_log.append({'Notifications': 'No nodes will be created.'})
@@ -428,7 +428,7 @@ def compare_pool(vs_dict, bigip_url_base, bigip, output_log):
             error = True
 
     if not error:
-        output_log.append({'Notifications': 'Pool: {} not present on LTM, POOL will be created.'.format(pool_name)})
+        output_log.append({'NotificationsWarning': 'Pool: {} not present on LTM, POOL will be created.'.format(pool_name)})
 
     return output_log, error
 
