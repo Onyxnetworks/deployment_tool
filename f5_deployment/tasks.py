@@ -64,8 +64,6 @@ def vs_deployment_validation(vs_dict, location, url_dict, username, password):
    
     if not error:   
         output_log.append({'Headers': 'Creating connection to BigIP.'})
-        username = 'admin'
-        password = 'Handba11'
         bigip_connection = create_connection_bigip(base_url, username, password, output_log)
         output_log = bigip_connection[0]
         error = bigip_connection[1]
