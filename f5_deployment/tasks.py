@@ -147,5 +147,7 @@ def vs_deployment_validation(vs_dict, location, url_dict, username, password):
 @shared_task
 def vs_deployment(vs_dict, location, url_dict, username, password):
     output_log = []
+    output_log.append({'Headers': 'Starting Virtual Server deployment.'})
+    output_log.append({'Headers': 'Connecting to BigIP'})
 
     return output_log
