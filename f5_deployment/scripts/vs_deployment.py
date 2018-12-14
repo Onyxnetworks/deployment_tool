@@ -3,6 +3,7 @@ import requests, json
 # Ignore SSL Errors
 requests.packages.urllib3.disable_warnings()
 
+
 def create_connection_bigip(base_url, username, password, output_log):
     error = False
     bigip = requests.session()
@@ -28,7 +29,6 @@ def create_connection_bigip(base_url, username, password, output_log):
         output_log.append({'Errors': 'Unable to communicate with F5.'})
         error = True
         return output_log, error
-
     
     if credentials.__contains__('200'):
         output_log.append({'NotificationsSuccess': 'Successfully connected to BigIP.'})
@@ -61,10 +61,10 @@ def check_sync(bigip_url_base, bigip, output_log):
         'https://localhost/mgmt/tm/cm/syncstatus/0/details']['nestedstats']['entries'][
         'https://localhost/mgmt/tm/cm/syncstatus/0/details/3']['nestedstats']['entries']['details']['description']
 
-    OUTPUT_LOG.append({'Notifications': sync_on_ltm_0})
-    OUTPUT_LOG.append({'Notifications': sync_on_ltm_1}) 
-    OUTPUT_LOG.append({'Notifications': sync_on_ltm_2})
-    OUTPUT_LOG.append({'Notifications': sync_on_ltm_3})
+    output_log.append({'Notifications': sync_on_ltm_0})
+    output_log.append({'Notifications': sync_on_ltm_1})
+    output_log.append({'Notifications': sync_on_ltm_2})
+    output_log.append({'Notifications': sync_on_ltm_3})
     
     
     if 'Changes Pending' in sync_on_ltm_3:
@@ -91,18 +91,21 @@ def check_httpprofile(vs_dict, bigip_url_base, bigip, output_log):
         for key, value in httpprofile_dict.items():
             if http_default_profile == value:
                 counter = counter + 1
-                output_log.append({'Notifications': 'Default HTTP/S Profile {} present on LTM.'.format(http_default_profile)})
+                output_log.append({'Notifications': 'Default HTTP/S Profile {} present on LTM.'
+                                  .format(http_default_profile)})
 
                 for httpprofile_dict in httpptofiles_on_ltm:
                     for key, value in httpprofile_dict.items():
                         # check if http profile name is preset on ltm
                         if http_profile == value:
                             error = True
-                            output_log.append({'Errors': 'HTTP/S profile name {} already present on LTM'.format(http_profile)})
+                            output_log.append({'Errors': 'HTTP/S profile name {} already present on LTM'
+                                              .format(http_profile)})
 
     if counter == 0:
         error = True
-        output_log.append({'Errors': 'Default HTTP/S Profile {}, not present, please create default profile.'.format(http_default_profile)})
+        output_log.append({'Errors': 'Default HTTP/S Profile {}, not present, please create default profile.'
+                          .format(http_default_profile)})
         
     if error:
         output_log.append({'Errors': 'Errors found, please review.'})
@@ -117,7 +120,6 @@ def check_ssl_profile(vs_dict, bigip_url_base, bigip, output_log):
     counter = 0
     marker_c = 0
     marker_s = 0    
-    http_default_profile = vs_dict['vs']['O2']
     ssl_default_profile = vs_dict['vs']['N2']
     ssl_profile_client = vs_dict['vs']['L2']
     ssl_profile_server = vs_dict['vs']['M2']
@@ -130,7 +132,8 @@ def check_ssl_profile(vs_dict, bigip_url_base, bigip, output_log):
         for key, value in sslprofile_dict.items():
             if ssl_default_profile == value:
                 counter = counter + 1
-                output_log.append({'Notifications': 'Default SSL Profile {} present on LTM.'.format(ssl_default_profile)})
+                output_log.append({'Notifications': 'Default SSL Profile {} present on LTM.'
+                                  .format(ssl_default_profile)})
 
                 for sslprofile_dict in sslprofiles_on_ltm:
                     for key, value in sslprofile_dict.items():
@@ -148,7 +151,8 @@ def check_ssl_profile(vs_dict, bigip_url_base, bigip, output_log):
                             error = True
 
     if counter == 0:
-        output_log.append({'Errors': 'Default SSL Profile {}, not present, please create default profile.'.format(ssl_default_profile)})
+        output_log.append({'Errors': 'Default SSL Profile {}, not present, please create default profile.'
+                          .format(ssl_default_profile)})
         error = True
 
     if marker_c == 0:
@@ -214,12 +218,12 @@ def check_cert(vs_dict, bigip_url_base, bigip, output_log):
         output_log.append({'Errors': 'SSL Chain NOT present on LTM.'})      
         counter = counter + 1
 
-    if key== 1:
+    if key == 1:
         output_log.append({'NotificationsSuccess': 'SSL Cert Key : {} present.'.format(vs_hostname_key)})
 
     else:
         error = True
-        output_log.append({'Errors': 'SSL Cert Key NOT present on LTM.'})       
+        output_log.append({'Errors': 'SSL Cert Key NOT present on LTM.'})
         counter = counter + 1
 
     return output_log, error 
@@ -280,19 +284,22 @@ def compare_snat_on_ltm_excel(vs_dict, bigip_url_base, bigip, output_log):
         if snat_ip == key_address_value:
 
             if snat_pool_name == key_name_value:
-                output_log.append({'NotificationsWarning': 'SNAT IP and SNAT Pool name already present on LTM. {}:{}'.format(snat_pool_name, snat_ip)})
+                output_log.append({'NotificationsWarning': 'SNAT IP and SNAT Pool name already present on LTM. {}:{}'
+                                  .format(snat_pool_name, snat_ip)})
                 snat_pool_present = 1
                 return output_log, error, snat_pool_present
                     
             else:
-                output_log.append({'Errors': 'SNAT IP is already configured on LTM but SNAT Pool name on does not match name on Excel.'})   
+                output_log.append({'Errors': 'SNAT IP is already configured on LTM but SNAT Pool name on does '
+                                             'not match name on Excel.'})
                 output_log.append({'Errors': 'SNAT IP : {}'.format(snat_ip)})   
                 output_log.append({'Errors': 'Pool name on LTM : {}'.format(key_name_value)})   
                 output_log.append({'Errors': 'SNAT Pool name on Excel : {}'.format(snat_pool_name)})    
                 error = True
 
         if snat_pool_name == key_name_value:
-            output_log.append({'Errors': 'SNAT Pool name is already configured on LTM but SNAT IP does not match name on Excel.'})  
+            output_log.append({'Errors': 'SNAT Pool name is already configured on LTM but SNAT IP does '
+                                         'not match name on Excel.'})
             output_log.append({'Errors': 'SNAT IP on Excel : {}'.format(snat_ip)})  
             output_log.append({'Errors': 'SNAT IP on LTM : {}'.format(key_address_value)})  
             output_log.append({'Errors': 'SNAT Pool name : {}'.format(snat_pool_name)})         
@@ -304,7 +311,6 @@ def compare_snat_on_ltm_excel(vs_dict, bigip_url_base, bigip, output_log):
     if snat_pool_present == 0:
         output_log.append({'Notifications': 'SNAT pool {} : {} will be created.'.format(snat_pool_name, snat_ip)})
 
-    
     else:
         output_log.append({'Notifications': ' SNAT pool will not be created.'})
 
@@ -320,7 +326,8 @@ def compare_ltm_nodes(vs_dict, bigip_url_base, bigip, output_log):
     
     for node_name, node_pg in zip(node_list_priority[0::2], node_list_priority[1::2]):
         node_name_port = str(node_name) + ':' + str(node_port)
-        nodes_list_pool.extend([{'kind': 'ltm:pool:nodes', 'name': '{}'.format(node_name_port),'prioritygroup': '{}'.format(node_pg)}])
+        nodes_list_pool.extend([{'kind': 'ltm:pool:nodes', 'name': '{}'.format(node_name_port),'prioritygroup': '{}'
+                               .format(node_pg)}])
         
     
     # check if nodes already exist on ltm
@@ -340,7 +347,6 @@ def compare_ltm_nodes(vs_dict, bigip_url_base, bigip, output_log):
     nodes_on_ltm_dict = dict(enumerate(nodes_on_ltm_ip_address))
     node_list_a = iter(node_list)
     node_list_b = list(node_list)
-    print_nodes = []
 
     for item in node_list_a:
 
