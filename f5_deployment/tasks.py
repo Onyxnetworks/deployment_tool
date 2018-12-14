@@ -118,6 +118,7 @@ def vs_deployment_validation(vs_dict, location, url_dict, username, password):
         output_log = node_list_result[0]
         error = node_list_result[1]
         node_list = node_list_result[2]
+        node_list_pool = node_list_result[3]
 
     if not error:
         output_log.append({'NotificationsSuccess': 'Node configuration validated successfully.'})
@@ -140,6 +141,7 @@ def vs_deployment_validation(vs_dict, location, url_dict, username, password):
 
     vs_dict['node_list'] = node_list
     vs_dict['snat_pool_present'] = snat_pool_present
+    vs_dict['node_list_pool'] = node_list_pool
 
     return output_log, vs_dict
 
@@ -147,9 +149,89 @@ def vs_deployment_validation(vs_dict, location, url_dict, username, password):
 @shared_task
 def virtual_server_deployment(vs_dict, location, url_dict, username, password):
 
-    print(vs_dict)
+    error = False
     output_log = []
     output_log.append({'Headers': 'Starting Virtual Server deployment.'})
-    output_log.append({'Headers': 'Connecting to BigIP'})
+
+    vs_name = vs_dict['vs']['A2']
+
+    if location == 'UKDC1':
+        device_group = vs_name.rsplit('-', 10)[0]
+        base_url = url_dict[location][device_group]
+
+    elif location == 'UKDC2':
+        device_group = vs_name.rsplit('-', 10)[0]
+        base_url = url_dict[location][device_group]
+
+    elif location == 'LAB':
+        device_group = 'LAB'
+        base_url = url_dict[location][device_group]
+
+    else:
+        error = True
+        output_log.append(
+            {'Errors': 'Unable to identify F5 Device group, please check index/baseline.py configuration.'})
+
+    if not error:
+        output_log.append({'Headers': 'Creating connection to BigIP.'})
+        bigip_connection = create_connection_bigip(base_url, username, password, output_log)
+        output_log = bigip_connection[0]
+        error = bigip_connection[1]
+
+    if not error:
+        bigip_url_base = bigip_connection[2]
+        bigip = bigip_connection[3]
+
+        if (vs_dict['vs']['Y2']) and (vs_dict['vs']['L2']):
+            create_vs_ssl_profiles_result = create_vs_ssl_profiles(vs_dict, bigip_url_base, bigip, output_log)
+            output_log = create_vs_ssl_profiles_result[0]
+            error = create_vs_ssl_profiles_result[1]
+
+        if not error:
+            create_pool_monitor_result = create_pool_monitor(vs_dict, bigip_url_base, bigip, output_log)
+            output_log = create_pool_monitor_result[0]
+            error = create_pool_monitor_result[1]
+
+        if not error:
+            create_vs_profiles_http_result = create_vs_profiles_http(vs_dict, bigip_url_base, bigip, output_log)
+            output_log = create_vs_profiles_http_result[0]
+            error = create_vs_profiles_http_result[1]
+
+        if not error:
+            if vs_dict['snat_pool_present'] == 0:
+                create_snat_result = create_snat(vs_dict, bigip_url_base, bigip, output_log)
+                output_log = create_snat_result[0]
+                error = create_snat_result[1]
+
+            else:
+                output_log.append({'Notifications': 'SNAT already present.'})
+                error = False
+
+        if not error:
+            if vs_dict['node_list']:
+                node_list = vs_dict['node_list']
+                create_nodes_result = create_nodes(node_list, bigip_url_base, bigip, output_log)
+                output_log = create_nodes_result[0]
+                error = create_nodes_result[1]
+            else:
+                output_log.append({'Notifications': 'No nodes to create.'})
+                error = False
+
+        if not error:
+            nodes_list_pool = vs_dict['nodes_list_pool']
+            create_pool_result = create_pool(vs_dict, bigip_url_base, bigip, output_log)
+            output_log = create_pool_result[0]
+            error = create_pool_result[1]
+
+        if not error:
+
+            create_vs_result = create_vs(vs_dict, bigip_url_base, bigip, output_log)
+            output_log = create_vs_result[0]
+            error = create_vs_result[1]
+
+
+        if not error:
+            output_log.append({'NotificationsSuccess': 'Virtual Server deployed successfully.'})
+
 
     return output_log
