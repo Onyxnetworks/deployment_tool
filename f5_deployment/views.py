@@ -31,7 +31,7 @@ def vs_deployment(request):
         url_dict = base_urls['F5']
 
         # Open workbook and build jason data structure.
-        rule_list = vs_deployment_excel_open_workbook(file, location)
+        rule_list = vs_deployment_excel_open_workbook(file)
 
         # Validate Request names and format
         task = vs_deployment_validation.delay(rule_list, location, url_dict, username, password)
@@ -39,5 +39,6 @@ def vs_deployment(request):
         # Return task id.
         return HttpResponse(json.dumps({'task_id': task.id, 'rule_list': rule_list, 'location': location}),
                             content_type='application/json')
+
     content = {}
     return render(request, 'f5_deployment/vs_deployment.html', content)
