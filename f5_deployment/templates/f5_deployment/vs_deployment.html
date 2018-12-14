@@ -89,7 +89,9 @@ function get_validation_task_info(task_id, location, vs_dict) {
                 <!-- Clear Old  Data -->
                 document.getElementById("vs_deployment_results").innerHTML = "";
                 document.getElementById("resultdiv").style.visibility = "visible";
-                var results = data.result;
+                var results = data.result[0];
+                var vs_dict = data.result[1];
+                alert(data.result)
                 var result_location = document.getElementById("vs_deployment_results")
                 var validation_error = false;
                 for (i = 0, len = results.length, text = ""; i < len; i++) {
