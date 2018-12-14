@@ -72,7 +72,7 @@ def vs_deployment_push(request):
         url_dict = base_urls['F5']
 
         # Deploy APIC configuration
-        task = vs_deployment_push.delay(vs_dict, location, url_dict, username, password)
+        task = virtual_server_deployment.delay(vs_dict, location, url_dict, username, password)
 
         # Return task id back to client for ajax use.
         return HttpResponse(json.dumps({'task_id': task.id}), content_type='application/json')
