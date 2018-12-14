@@ -50,7 +50,9 @@ def vs_deployment_push(request):
         response_json = request.body
         data = json.loads(response_json)
         location = data['location']
-        vs_dict = data['vs_dict'][1]
+        vs_dict = data['vs_dict']
+        print(type(vs_dict))
+        print(vs_dict)
 
         environment = request.session.get('environment')
         if environment == 'Production':
