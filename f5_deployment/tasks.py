@@ -11,10 +11,26 @@ def vs_deployment_excel_open_workbook(file):
     wb = openpyxl.load_workbook(file, data_only=True)
     py_ws = wb.get_sheet_by_name('Tab_Python')
     vs_dict = {}
-    for col in py_ws.iter_cols(min_row=2, max_row=2):
+    vs_dict['vs'] = {}
+    vs_dict['node_list'] = []
+    vs_dict['node_priority'] = []
+    for col in py_ws.iter_cols(min_row=2, max_row=2, max_col=27):
         for cell in col:
-            vs_dict[cell.coordinate] = cell.value
+            vs_dict['vs'][cell.coordinate] = cell.value
 
+    for col in py_ws.iter_cols(min_row=2, max_row=2, min_col=28, max_col=47):
+        for cell in col:
+            cell = str(cell.value)
+            if not cell == 'None':
+                vs_dict['node_list'].append(cell)
+            
+    for col in py_ws.iter_cols(min_row=2, max_row=2, min_col=49, max_col=68):
+        for cell in col:
+            cell = str(cell.value)
+            if not cell == 'None':        
+                vs_dict['node_priority'].append(cell)        
+    
+    print(vs_dict)
     return vs_dict
     
 @shared_task
@@ -24,7 +40,7 @@ def vs_deployment_validation(vs_dict, location, url_dict, username, password):
     error = False
     output_log.append({'Headers': 'Identifying F5 Device group.'})  
     # Get Virtual Server Name
-    vs_name = vs_dict['A2']
+    vs_name = vs_dict['vs']['A2']
     
     if location == 'UKDC1':
         device_group = vs_name.rsplit('-', 10)[0]
@@ -48,18 +64,20 @@ def vs_deployment_validation(vs_dict, location, url_dict, username, password):
    
     if not error:   
         output_log.append({'Headers': 'Creating connection to BigIP.'})
+        username = 'admin'
+        password = 'Handba11'
         bigip_connection = create_connection_bigip(base_url, username, password, output_log)
         output_log = bigip_connection[0]
         error = bigip_connection[1]
   
     if not error:
-        bigip_url_base = bigip_connection[3]
-        bigip = bigip_connection[4]
+        bigip_url_base = bigip_connection[2]
+        bigip = bigip_connection[3]
         
         output_log.append({'Headers': 'Checking Sync status of F5.'})   
-        check_sync_result  = check_sync(bigip_url_base, bigip, output_log)
-        output_log = check_sync_result[0]
-        error = check_sync_result[1]
+        #check_sync_result  = check_sync(bigip_url_base, bigip, output_log)
+        #output_log = check_sync_result[0]
+        #error = check_sync_result[1]
      
     if not error:
         output_log.append({'Headers': 'Checking for HTTP Profiles.'})   
@@ -71,7 +89,7 @@ def vs_deployment_validation(vs_dict, location, url_dict, username, password):
     if not error:
             output_log.append({'NotificationsSuccess': 'HTTP Profiles validated successfully.'})
     if not error:
-        ssl = vs_dict['D2']
+        ssl = vs_dict['vs']['D2']
         if ssl in ['https', 'HTTPS']:
                 output_log.append({'Headers': 'Checking SSL Profiles.'})
                 check_ssl_profile_result = check_ssl_profile(vs_dict, bigip_url_base, bigip, output_log)
@@ -94,10 +112,13 @@ def vs_deployment_validation(vs_dict, location, url_dict, username, password):
         snat_pool_present = compare_snat_on_ltm_excel(vs_dict, bigip_url_base, bigip, output_log)
         output_log = snat_pool_present[0]
         error = snat_pool_present[1]
-        snat_pool_present = snat_pool_present[3]
+        snat_pool_present = snat_pool_present[2]
         
-    #if not error:
-    #   output_log.append({'Headers': 'Checking Nodes.'})
-    #   node_list_excel = create_list_of_nodes_on_excel(vs_dict, output_log)
-    
+    if not error:
+        output_log.append({'Headers': 'Checking Nodes.'})
+        node_list_result = compare_ltm_nodes(vs_dict, bigip_url_base, bigip, output_log)
+        output_log = node_list_result[0]
+        error = node_list_result[1]
+        node_list = node_list_result[3]
+        
     return output_log

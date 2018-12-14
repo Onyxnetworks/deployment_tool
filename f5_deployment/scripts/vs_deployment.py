@@ -16,7 +16,6 @@ def create_connection_bigip(base_url, username, password, output_log):
     payload['loginProviderName'] = 'tmos'   
     
     bigip_url_base = 'https://{}/mgmt/tm'.format(base_url)
-    print(base_url)
     
     try:
         bigip_url_base_token = 'https://{}/mgmt/shared/authn/login'.format(base_url)
@@ -42,6 +41,7 @@ def create_connection_bigip(base_url, username, password, output_log):
 
         
 def check_sync(bigip_url_base, bigip, output_log):
+    error = False
     sync_on_ltm = bigip.get('%s/cm/sync-status' % bigip_url_base)
     sync_on_ltm = json.loads(sync_on_ltm.content)
 
@@ -80,8 +80,8 @@ def check_httpprofile(vs_dict, bigip_url_base, bigip, output_log):
     error = False
     counter = 0
     httpptofiles_on_ltm = bigip.get('%s/ltm/profile/http' % bigip_url_base)
-    http_default_profile = vs_dict['O2']
-    http_profile = vs_dict['K2']
+    http_default_profile = vs_dict['vs']['O2']
+    http_profile = vs_dict['vs']['K2']
 
     httpptofiles_on_ltm = json.loads(httpptofiles_on_ltm.content)
     httpptofiles_on_ltm = httpptofiles_on_ltm['items']
@@ -117,11 +117,11 @@ def check_ssl_profile(vs_dict, bigip_url_base, bigip, output_log):
     counter = 0
     marker_c = 0
     marker_s = 0    
-    http_default_profile = vs_dict['O2']
-    ssl_default_profile = vs_dict['N2']
-    ssl_profile_client = vs_dict['L2']
-    ssl_profile_server = vs_dict['M2']
-    sslprofiles_on_ltm = BIGIP.get('%s/ltm/profile/client-ssl' % bigip_url_base)
+    http_default_profile = vs_dict['vs']['O2']
+    ssl_default_profile = vs_dict['vs']['N2']
+    ssl_profile_client = vs_dict['vs']['L2']
+    ssl_profile_server = vs_dict['vs']['M2']
+    sslprofiles_on_ltm = bigip.get('%s/ltm/profile/client-ssl' % bigip_url_base)
     sslprofiles_on_ltm = json.loads(sslprofiles_on_ltm.content)
     sslprofiles_on_ltm = sslprofiles_on_ltm['items']
     
@@ -148,7 +148,7 @@ def check_ssl_profile(vs_dict, bigip_url_base, bigip, output_log):
                             error = True
 
     if counter == 0:
-        output_log.append({'Errors': 'Default SSL Profile {}, not present, please create default profile.'.format(http_default_profile)})
+        output_log.append({'Errors': 'Default SSL Profile {}, not present, please create default profile.'.format(ssl_default_profile)})
         error = True
 
     if marker_c == 0:
@@ -164,6 +164,8 @@ def check_ssl_profile(vs_dict, bigip_url_base, bigip, output_log):
     
     
 def check_cert(vs_dict, bigip_url_base, bigip, output_log):
+
+    error = False
     counter = 0
     cert = 0
     chain = 0
@@ -177,9 +179,9 @@ def check_cert(vs_dict, bigip_url_base, bigip, output_log):
     ssl_cert_key_on_ltm = json.loads(ssl_cert_key_on_ltm.content)
     ssl_cert_key_on_ltm = ssl_cert_key_on_ltm['items']
 
-    vs_hostname_crt = str(vs_dict['Y2']) + '.crt'
-    vs_hostname_key = str(vs_dict['Y2']) + '.key'
-    vs_hostname_chain = str(vs_dict['Z2']) + '.crt'
+    vs_hostname_crt = str(vs_dict['vs']['Y2']) + '.crt'
+    vs_hostname_key = str(vs_dict['vs']['Y2']) + '.key'
+    vs_hostname_chain = str(vs_dict['vs']['Z2']) + '.crt'
 
     for ssl_cert_dict in ssl_cert_chain_on_ltm:
         for key, value in ssl_cert_dict.items():
@@ -223,9 +225,10 @@ def check_cert(vs_dict, bigip_url_base, bigip, output_log):
     return output_log, error 
     
 def check_http_mon(vs_dict, bigip_url_base, bigip, output_log):
-
+    
+    error = False
     marker = 0
-    http_mon_name = vs_dict['Q2']
+    http_mon_name = vs_dict['vs']['Q2']
     http_mon_on_ltm = bigip.get('%s/ltm/monitor/http' % bigip_url_base, )
     http_mon_on_ltm = json.loads(http_mon_on_ltm.content)
     http_mon_on_ltm = http_mon_on_ltm['items']
@@ -256,8 +259,8 @@ def check_http_mon(vs_dict, bigip_url_base, bigip, output_log):
     
 def compare_snat_on_ltm_excel(vs_dict, bigip_url_base, bigip, output_log):
     error = False
-    snat_ip = (vs_dict['B2'])
-    snat_pool_name = vs_dict['X2']
+    snat_ip = (vs_dict['vs']['B2'])
+    snat_pool_name = vs_dict['vs']['X2']
 
     snat_on_ltm = bigip.get('%s/ltm/snatpool' % bigip_url_base)
     snat_on_ltm = json.loads(snat_on_ltm.content)
@@ -299,10 +302,98 @@ def compare_snat_on_ltm_excel(vs_dict, bigip_url_base, bigip, output_log):
             snat_pool_present = 0
 
     if snat_pool_present == 0:
-        output_log.append({'Notifications': 'SNAT pool {}:{} will be created.'.format(snat_pool_name, snat_ip)})
+        output_log.append({'Notifications': 'SNAT pool {} : {} will be created.'.format(snat_pool_name, snat_ip)})
 
     
     else:
         output_log.append({'Notifications': ' SNAT pool will not be created.'})
 
     return  output_log, error, snat_pool_present
+    
+ 
+def compare_ltm_nodes(vs_dict, bigip_url_base, bigip, output_log):
+    error = False
+    node_list = vs_dict['node_list']
+    node_list_priority = vs_dict['node_priority']
+    nodes_list_pool = []
+    node_port = vs_dict['vs']['V2']
+    
+    for node_name, node_pg in zip(node_list_priority[0::2], node_list_priority[1::2]):
+        node_name_port = str(node_name) + ':' + str(node_port)
+        nodes_list_pool.extend([{'kind': 'ltm:pool:nodes', 'name': '{}'.format(node_name_port),'prioritygroup': '{}'.format(node_pg)}])
+        
+    
+    # check if nodes already exist on ltm
+    nodes_on_ltm = bigip.get('%s/ltm/node' % bigip_url_base)
+    nodes_on_ltm = json.loads(nodes_on_ltm.content)
+
+    # catch exception if no nodes on ltm
+    try:
+        nodes_on_ltm_ip_address = nodes_on_ltm['items']
+        nodes_on_ltm_name = nodes_on_ltm['items']
+
+    except:
+        nodes_on_ltm_ip_address = [{u'kind': 'tm:ltm:node:nodestate'}]
+        nodes_on_ltm_name = [{u'kind': 'tm:ltm:node:nodestate'}]
+
+
+    nodes_on_ltm_dict = dict(enumerate(nodes_on_ltm_ip_address))
+    node_list_a = iter(node_list)
+    node_list_b = list(node_list)
+    print_nodes = []
+
+    for item in node_list_a:
+
+        excel_node_pair = (item, next(node_list_a))
+        excel_node_name = excel_node_pair[0]
+        excel_node_ip = excel_node_pair[1]
+
+
+        for dict in nodes_on_ltm_dict:
+            try:
+                node_name = nodes_on_ltm_dict[dict]['name']
+                node_ip = nodes_on_ltm_dict[dict]['address']
+            except:
+                output_log.append({'Notifications': 'No Nodes configured on LTM'})
+                return output_log, error, node_list
+
+
+            if node_name == excel_node_name and node_ip == excel_node_ip:
+                output_log.append({'Notifications': 'Node already present on LTM: {} : {}'.format(node_name, node_ip)})
+
+                node_list_b.remove(excel_node_name)
+                node_list_b.remove(excel_node_ip)
+
+    node_list = node_list_b
+    node_list_a = iter(node_list)
+
+    for item in node_list_a:
+        excel_node_pair = [item, next(node_list_a)]
+        excel_node_name = excel_node_pair[0]
+        excel_node_ip = excel_node_pair[1]
+
+        for dict in nodes_on_ltm_dict:
+            node_name = nodes_on_ltm_dict[dict]['name']
+            node_ip = nodes_on_ltm_dict[dict]['address']
+
+            if node_name == excel_node_name:
+                output_log.append({'Errors': 'Node name/*ip mismatch: {}:{}'.format(node_name, node_ip)})
+                error = True
+
+            if node_ip == excel_node_ip:
+                output_log.append({'Errors': 'Node ip/*name mismatch: {}:{}'.format(node_ip, node_name)})
+                error = True
+
+    
+    if node_list:
+        output_log.append({'Notifications': 'The following nodes will be created.'})
+        node_list_c = iter(node_list)
+        for x in node_list_c:
+            a = (x, next(node_list_c))
+            output_log.append({'Notifications': '{} : {}' .format(a[0], a[1])})
+
+    else:
+        output_log.append({'Notifications': 'No nodes will be created.'})
+        'no nodes will be created.'
+            
+    return output_log, error, node_list 
