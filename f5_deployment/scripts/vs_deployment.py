@@ -405,7 +405,7 @@ def compare_ltm_nodes(vs_dict, bigip_url_base, bigip, output_log):
 
 def compare_pool(vs_dict, bigip_url_base, bigip, output_log):
     error = False
-    pool_name = str(vs_dict['P2'])
+    pool_name = str(vs_dict['vs']['P2'])
 
     # Get pool from ltm
     pool_on_ltm = bigip.get('%s/ltm/pool' % bigip_url_base)
