@@ -107,8 +107,7 @@ def check_httpprofile(vs_dict, bigip_url_base, bigip, output_log):
                           .format(http_default_profile)})
         
     if error:
-        output_log.append({'Errors': 'Errors found, please review.'})
-        return output_log, error    
+        return output_log, error
     
     if not error:
         output_log.append({'Notifications': 'HTTP(S) Profile {} will be created.'.format(http_profile)})
