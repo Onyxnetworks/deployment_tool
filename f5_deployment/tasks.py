@@ -221,7 +221,6 @@ def virtual_server_deployment(vs_dict, location, url_dict, username, password):
                 error = False
 
         if not error:
-            nodes_list_pool = vs_dict['nodes_list_pool']
             create_pool_result = create_pool(vs_dict, bigip_url_base, bigip, output_log)
             output_log = create_pool_result[0]
             error = create_pool_result[1]
