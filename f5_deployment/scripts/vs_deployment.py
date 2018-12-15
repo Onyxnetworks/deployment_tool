@@ -523,6 +523,7 @@ def create_vs_ssl_profiles(vs_dict, bigip_url_base, bigip, output_log):
 def create_pool_monitor(vs_dict, bigip_url_base, bigip, output_log):
     error = False
     pool_mon_info = {}
+    print(vs_dict['vs']['R2'])
     try:
         traffic_type = vs_dict['vs']['R2']
         traffic_type = (traffic_type.lower())
