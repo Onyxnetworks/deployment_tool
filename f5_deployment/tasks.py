@@ -110,6 +110,7 @@ def vs_deployment_validation(vs_dict, location, url_dict, username, password):
         output_log = snat_pool_present[0]
         error = snat_pool_present[1]
         snat_pool_present = snat_pool_present[2]
+        vs_dict['snat_pool_present'] = snat_pool_present
         
     if not error:
         output_log.append({'NotificationsSuccess': 'SNAT configuration validated successfully.'})
@@ -119,6 +120,8 @@ def vs_deployment_validation(vs_dict, location, url_dict, username, password):
         error = node_list_result[1]
         node_list = node_list_result[2]
         node_list_pool = node_list_result[3]
+        vs_dict['node_list'] = node_list
+        vs_dict['node_list_pool'] = node_list_pool
 
     if not error:
         output_log.append({'NotificationsSuccess': 'Node configuration validated successfully.'})
@@ -139,9 +142,9 @@ def vs_deployment_validation(vs_dict, location, url_dict, username, password):
         output_log.append({'ValidationSuccess': 'LTM Configuration validated successfully'})
 
 
-    vs_dict['node_list'] = node_list
-    vs_dict['snat_pool_present'] = snat_pool_present
-    vs_dict['node_list_pool'] = node_list_pool
+
+
+
 
     return output_log, vs_dict
 

@@ -551,10 +551,10 @@ def create_pool_monitor(vs_dict, bigip_url_base, bigip, output_log):
                                         data=json.dumps(pool_mon_info)))
 
         if https_mon_sent.__contains__('200'):
-            output_log.append({'NotificationsInfo': '{} : Monitor Created'.format(vs_dict['vs']['Q2'])})
+            output_log.append({'NotificationsInfo': '{} - Monitor Created'.format(vs_dict['vs']['Q2'])})
 
         elif https_mon_sent.__contains__('409'):
-            output_log.append({'NotificationsInfo': '{} : *Monitor Modified*'.format(vs_dict['vs']['Q2'])})
+            output_log.append({'NotificationsInfo': '{} - Monitor Modified'.format(vs_dict['vs']['Q2'])})
 
     return output_log, error
 
