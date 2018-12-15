@@ -14,7 +14,7 @@ def vs_deployment_excel_open_workbook(file):
     vs_dict['vs'] = {}
     vs_dict['node_list'] = []
     vs_dict['node_priority'] = []
-    for col in py_ws.iter_cols(min_row=2, max_row=2, max_col=27):
+    for col in py_ws.iter_cols(min_row=2, max_row=2):
         for cell in col:
             vs_dict['vs'][cell.coordinate] = cell.value
 
