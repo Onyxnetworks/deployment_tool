@@ -206,19 +206,12 @@ def virtual_server_deployment(vs_dict, location, url_dict, username, password):
                 output_log = create_snat_result[0]
                 error = create_snat_result[1]
 
-            else:
-                output_log.append({'Notifications': 'SNAT already present.'})
-                error = False
-
         if not error:
             if vs_dict['node_list']:
                 node_list = vs_dict['node_list']
                 create_nodes_result = create_nodes(node_list, bigip_url_base, bigip, output_log)
                 output_log = create_nodes_result[0]
                 error = create_nodes_result[1]
-            else:
-                output_log.append({'Notifications': 'No nodes to create.'})
-                error = False
 
         if not error:
             create_pool_result = create_pool(vs_dict, bigip_url_base, bigip, output_log)
@@ -233,7 +226,7 @@ def virtual_server_deployment(vs_dict, location, url_dict, username, password):
 
 
         if not error:
-            output_log.append({'NotificationsSuccess': 'Virtual Server deployed successfully.'})
+            output_log.append({'ValidationSuccess': 'Virtual Server deployed successfully.'})
 
 
     return output_log
