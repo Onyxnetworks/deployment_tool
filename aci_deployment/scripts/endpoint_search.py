@@ -9,10 +9,9 @@ HEADERS = {'content-type': 'application/json'}
 def GET_ENDPOINTS(url_list, APIC_USERNAME, APIC_PASSWORD):
     ENDPOINT_LIST = []
     HEADERS = {'content-type': 'application/json'}
-
     # Loop through URL list and Get Endpoints
-    for BASE_URL in url_list:
-        print(BASE_URL)
+    for url in url_list:
+        BASE_URL = url
         LOCATION = BASE_URL.split('-')[0][8:]
         # Login to fabric
         APIC_COOKIE = APIC_LOGIN(BASE_URL, APIC_USERNAME, APIC_PASSWORD)
@@ -22,6 +21,10 @@ def GET_ENDPOINTS(url_list, APIC_USERNAME, APIC_PASSWORD):
         ENDPOINT_INTERNAL_RESPONSE = GET_ENDPOINT_INTERNAL(BASE_URL, APIC_COOKIE, HEADERS)
         # Loop over endpoints and build endpoint lists.
         for i in ENDPOINT_EXTERNAL_RESPONSE['imdata']:
+            Tenant = i['l3extSubnet']['attributes']['dn'].split('/')[1][3:]
+            L3O = i['l3extSubnet']['attributes']['dn'].split('/')[2][4:]
+            if Tenant.startswith(('PRD', 'PPE', 'DC1-SBS', 'DC2-SBS', 'DC1-STS', 'DC2-STS', 'DC1-REP', 'DC2-REP', 'DC1-OTV', 'DC2-OTV')) and L3O.endswith('L3O'):
+                continue
             IMPORT = ''
             EXPORT = ''
             SECURITY = ''
@@ -46,7 +49,7 @@ def GET_ENDPOINTS(url_list, APIC_USERNAME, APIC_PASSWORD):
                                            'EPG': i['fvCEp']['attributes']['dn'].split('/')[3][4:],
                                            'Subnet': i['fvCEp']['attributes']['ip'], 'Scope': '', 'Locality': 'Internal'})
 
-        return ENDPOINT_LIST
+    return ENDPOINT_LIST
 
 def GET_ENDPOINT_INTERNAL(BASE_URL, APIC_COOKIE, HEADERS):
     try:
