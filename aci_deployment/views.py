@@ -34,7 +34,8 @@ def endpoint_search(request):
         # Return task id back to client for ajax use.
         return HttpResponse(json.dumps({'task_id': task.id}), content_type='application/json')        
 
-    content = {}
+    environment = request.session.get('environment')
+    content = {'environment': environment}
     return render(request, 'aci_deployment/aci_endpoint_search.html', content)
 
 
@@ -73,7 +74,8 @@ def external_epg_deployment(request):
         return HttpResponse(json.dumps({'task_id': task.id, 'rule_list': rule_list, 'location': location}),
                             content_type='application/json')
 
-    content = {}
+    environment = request.session.get('environment')
+    content = {'environment': environment}
     return render(request, 'aci_deployment/aci_external_epg_deployment.html', content)
 
 
@@ -147,7 +149,9 @@ def contract_deployment(request):
         # Return task id.
         return HttpResponse(json.dumps({'task_id': task.id, 'rule_list': rule_list, 'location': location}),
                             content_type='application/json')
-    content = {}
+
+    environment = request.session.get('environment')
+    content = {'environment': environment}
     return render(request, 'aci_deployment/aci_contract_deployment.html', content)
 
 

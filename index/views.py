@@ -66,7 +66,10 @@ def login(request):
 
 
 def index(request):
-    return render(request, 'index/home.html')
+
+    environment = request.session.get('environment')
+    content = {'environment': environment}
+    return render(request, 'index/home.html', content)
 
 
 def logout(request):

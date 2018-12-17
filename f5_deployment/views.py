@@ -40,7 +40,9 @@ def vs_deployment(request):
         return HttpResponse(json.dumps({'task_id': task.id, 'location': location}),
                             content_type='application/json')
 
-    content = {}
+
+    environment = request.session.get('environment')
+    content = {'environment': environment}
     return render(request, 'f5_deployment/vs_deployment.html', content)
 
 
