@@ -245,9 +245,9 @@ def f5_generic_search(base_urls, request_type, search_string, username, password
     if request_type == 'Virtual Server Name':
         # Get virtual server name
         results = []
-        virtial_server_name = get_virtual_server(url_list, username, password)
-        if isinstance(virtial_server_name, list):
-            print(virtial_server_name)
+        virtual_server_dashboard = virtual_server_dashboard(url_list, username, password)
+        if isinstance(virtual_server_dashboard, list):
+            print(virtual_server_dashboard)
             return results
 
     if request_type == 'Virtual Server IP':

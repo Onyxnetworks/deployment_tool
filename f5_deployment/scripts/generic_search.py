@@ -5,12 +5,39 @@ requests.packages.urllib3.disable_warnings()
 
 from f5_deployment.scripts.baseline import bigip_login
 
+def get_vs_stats(base_url, vs_name, auth_token):
+    headers = {'content-type': 'application/json', 'X-F5-Auth-Token': auth_token}
+    get_url = base_url +  '/mgmt/tm/ltm/virtual/{0}/stats'.format(vs_name)
 
-def get_virtual_server(url_list, username, password):
-    results = []
-    for base_url in url_list:
-        # Authenticate against bigip
-        auth_token = bigip_login(base_url, username, password)
+    try:
+        get_response = requests.get(get_url, headers=headers, timeout=5, verify=False)
+        payload_response = json.loads(get_response.text)
+
+        if get_response.status_code == 200:
+            return payload_response
+
+    except requests.exceptions.RequestException as error:
+        #  Return Errors
+        return error
+
+
+def get_pool_stats(base_url, pool_name, auth_token):
+    headers = {'content-type': 'application/json', 'X-F5-Auth-Token': auth_token}
+    get_url = base_url +  '/mgmt/tm/ltm/pool/{0}/stats'.format(pool_name)
+
+    try:
+        get_response = requests.get(get_url, headers=headers, timeout=5, verify=False)
+        payload_response = json.loads(get_response.text)
+
+        if get_response.status_code == 200:
+            return payload_response
+
+    except requests.exceptions.RequestException as error:
+        #  Return Errors
+        return error
+
+
+def get_all_vs(base_url, auth_token):
         # Build auth token header
         headers = {'content-type': 'application/json', 'X-F5-Auth-Token': auth_token}
 
@@ -18,12 +45,10 @@ def get_virtual_server(url_list, username, password):
         try:
             get_response = requests.get(get_url, headers=headers, timeout=5, verify=False)
             payload_response = json.loads(get_response.text)
-            
+
             if get_response.status_code == 200:
-                for vs_items in payload_response['items']:
-                    vs_name = vs_items['name']
-                    results.append({'vs_name': vs_name})
-                
+                return payload_response
+
 
         except requests.exceptions.HTTPError as errh:
             error_code = "Http Error:" + str(errh)
@@ -37,4 +62,38 @@ def get_virtual_server(url_list, username, password):
         except requests.exceptions.RequestException as err:
             error_code = "Error:" + str(err)
             return error_code
+
+
+def virtual_server_dashboard(url_list, username, password):
+    results = []
+    for base_url in url_list:
+        # Authenticate against bigip
+        auth_token = bigip_login(base_url, username, password)
+
+        # Get all Virtual Servers
+        all_vs = get_all_vs(base_url, auth_token)
+
+        for vs in all_vs['items']:
+            vs_name = vs['name']
+            vs_stats = get_vs_stats(base_url, vs_name, auth_token)
+            vs_state_dict = vs_stats['entries'].values()
+            for vs_values in vs_state_dict:
+                vs_state = vs_values['nestedStats']['entries']['status.availabilityState']['description']
+
+            try:
+                pool_name = vs['pool'].split('/')[-1]
+                pool_stats = get_pool_stats(base_url, pool_name, auth_token)
+                pool_state_dict = pool_stats['entries'].values()
+                for pool_values in pool_state_dict:
+                    pool_state = pool_values['nestedStats']['entries']['status.availabilityState']['description']
+
+                    results.append({'vs_name': vs_name, 'vs_state': vs_state,
+                                      'vs_pool': {'pool_name': pool_name, 'pool_state': pool_state}})
+
+
+            except:
+                results.append({'vs_name': vs_name, 'vs_state': vs_state,
+                                  'vs_pool': {'pool_name': 'none', 'pool_state': 'unknown'}})
+
     return results
+
