@@ -32,6 +32,7 @@ def get_pool_stats(base_url, poolLink, auth_token):
 
     except requests.exceptions.RequestException as error:
         #  Return Errors
+        print(error)
         return error
 
 
