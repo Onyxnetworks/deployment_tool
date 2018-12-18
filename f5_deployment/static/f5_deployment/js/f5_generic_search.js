@@ -62,6 +62,15 @@ function get_task_info(task_id) {
                     var tr = document.createElement("TR");
                     var TABLE_TR = 'TABLE_TR' + i
                     tr.setAttribute("id", TABLE_TR);
+                    if (vs_status.includes(available)){
+                        tr.setAttribute("class", "success");
+                    }
+                    if (vs_status.includes(offline)){
+                        tr.setAttribute("class", "danger");
+                    }
+                    if (vs_status.includes(unknown)){
+                        tr.setAttribute("class", "info");
+                    }
                     document.getElementById("result_table").appendChild(tr);
                     var search_results = [f5_location, vs_name, 'asdasd', vs_status_img, pool_name, pool_status_img]
                     search_results.forEach(function(items) {
