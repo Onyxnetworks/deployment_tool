@@ -41,18 +41,15 @@
                         <!-- /.panel-heading -->
                         <div class="panel-body">
                             <div class="table-responsive">
-                            <table width="100%" class="table table-striped table-bordered table-hover" id="endpoint_table">
+                            <table width="100%" class="table table-striped table-bordered table-hover" id="result_table_header">
                                 <thead>
                                     <tr>
                                         <th class="text-center">Location</th>
-                                        <th class="text-center">Tenant</th>
-                                        <th class="text-center">App Prof / L3Out</th>
-                                        <th class="text-center">EPG Name</th>
-                                        <th class="text-center">Subnet</th>
-                                        <th class="text-center">Security</th>
-                                        <th class="text-center">Import</th>
-                                        <th class="text-center">Export</th>
-                                        <th class="text-center">Internal / External</th>
+                                        <th class="text-center">VIP Name</th>
+                                        <th class="text-center">VIP IP</th>
+                                        <th class="text-center">VIP Status</th>
+                                        <th class="text-center">Pool name</th>
+                                        <th class="text-center">Pool Status</th>
                                     </tr>
                                 </thead>
                                 <tbody id="result_table">
@@ -75,6 +72,8 @@
     <script src="{% static 'index/vendor/datatables/js/jquery.dataTables.min.js' %}"></script>
     <script src="{% static 'index/vendor/datatables-plugins/dataTables.bootstrap.min.js' %}"></script>
     <script src="{% static 'index/vendor/datatables-responsive/dataTables.responsive.js' %}"></script>
+    <script src="{% static 'f5_deployment/js/f5_generic_search.js' %}"></script>
+
 <!--
 <script>
     $(document).ready(function() {
