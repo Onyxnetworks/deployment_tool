@@ -38,9 +38,9 @@ function get_task_info(task_id) {
                 for (i = 0, len = results.length, text = ""; i < len; i++) {
                     f5_location = results[i].location;
                     vs_name = results[i].vs_name;
-                    vs_status = results[i].vs_status;
-                    pool_name = results[i].pool_name;
-                    pool_status = results[i].pool_status;
+                    vs_status = results[i].vs_state;
+                    pool_name = results[i].vs_pool.pool_name;
+                    pool_status = results[i].vs_pool.pool_state;
                     console.log(f5_location, vs_name, vs_status, pool_name, pool_status );
 
                     //if (vs_status.includes('available')) {
