@@ -260,9 +260,15 @@ def f5_generic_search(base_urls, request_type, search_string, username, password
         virtual_server_dashboard_result = virtual_server_dashboard(url_list, username, password)
         if isinstance(virtual_server_dashboard_result, list):
             for vs in virtual_server_dashboard_result:
-                if IPNetwork(search_string) in IPNetwork(vs['vs_ip']) or IPNetwork(vs['vs_ip']) in IPNetwork(search_string):
-                    print(vs['vs_ip'])
-                    results.append(vs)
+                try:
+                    network = ipaddress.IPv4Network(vs['vs_ip'])
+                    if IPNetwork(search_string) in IPNetwork(vs['vs_ip']) or IPNetwork(vs['vs_ip']) in IPNetwork(
+                            search_string):
+                        print(vs['vs_ip'])
+                        results.append(vs)
+
+                except ValueError:
+                    pass
 
         return results
 
