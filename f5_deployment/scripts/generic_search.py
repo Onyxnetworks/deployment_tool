@@ -104,7 +104,7 @@ def virtual_server_dashboard(url_list, username, password):
 
 
             except:
-                results.append({'vs_name': vs_name, 'vs_state': vs_state, 'vs_pool': {'pool_name': 'none', 'pool_state': 'unknown'}})
+                results.append({'location': location, 'vs_name': vs_name, 'vs_state': vs_state, 'vs_pool': {'pool_name': 'none', 'pool_state': 'unknown'}})
 
         return results
 
