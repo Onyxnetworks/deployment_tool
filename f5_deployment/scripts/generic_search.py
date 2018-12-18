@@ -7,7 +7,7 @@ from f5_deployment.scripts.baseline import bigip_login
 
 def get_vs_stats(base_url, selfLink, auth_token):
     headers = {'content-type': 'application/json', 'X-F5-Auth-Token': auth_token}
-    get_url = base_url +  '/{0}/stats?$select=status.availabilityState,status.enabledState,status.statusReason'.format(selfLink)
+    get_url = base_url + '/{0}/stats?$select=status.availabilityState,status.enabledState,status.statusReason'.format(selfLink)
     try:
         get_response = requests.get(get_url, headers=headers, timeout=5, verify=False)
         payload_response = json.loads(get_response.text)
@@ -19,9 +19,9 @@ def get_vs_stats(base_url, selfLink, auth_token):
         return error
 
 
-def get_pool_stats(base_url, pool_name, auth_token):
+def get_pool_stats(base_url, poolLink, auth_token):
     headers = {'content-type': 'application/json', 'X-F5-Auth-Token': auth_token}
-    get_url = base_url +  '/mgmt/tm/ltm/pool/{0}/stats?$select=status.availabilityState,'.format(pool_name)
+    get_url = base_url + '/{0}//stats?$select=status.availabilityState,status.enabledState,status.statusReason'.format(poolLink)
 
     try:
         get_response = requests.get(get_url, headers=headers, timeout=5, verify=False)
@@ -69,7 +69,6 @@ def virtual_server_dashboard(url_list, username, password):
         auth_token = bigip_login(base_url, username, password)
         # Get all Virtual Servers
         all_vs = get_all_vs(base_url, auth_token)
-        print(all_vs)
         for vs in all_vs['items']:
             vs_name = vs['name']
             selfLink_ver = vs['selfLink'].split('/localhost/')[1]
@@ -78,18 +77,22 @@ def virtual_server_dashboard(url_list, username, password):
             vs_state_dict = vs_stats['entries'].values()
             for vs_values in vs_state_dict:
                 vs_state = vs_values['nestedStats']['entries']['status.availabilityState']['description']
-                results.append({'location': location, 'vs_name': vs_name, 'vs_state': vs_state})
-            #try:
-            #    pool_name = vs['pool'].split('/')[-1]
-            #    pool_stats = get_pool_stats(base_url, pool_name, auth_token)
-            #    pool_state_dict = pool_stats['entries'].values()
-            #    for pool_values in pool_state_dict:
-            #        pool_state = pool_values['nestedStats']['entries']['status.availabilityState']['description']
 
-            #        
+            try:
+                poolLink_ver = vs['poolReference']
+                poolLink = poolLink_ver.split('?ver=')[0]
+                pool_name = vs['pool'].split('/')[-1]
+                pool_stats = get_pool_stats(base_url, poolLink, auth_token)
+                pool_state_dict = pool_stats['entries'].values()
+                for pool_values in pool_state_dict:
+                    pool_state = pool_values['nestedStats']['entries']['status.availabilityState']['description']
+                    results.append({'location': location, 'vs_name': vs_name, 'vs_state': vs_state, 'vs_pool': {'pool_name': pool_name, 'pool_state': pool_state}})
 
 
-            #except:
-            #    results.append({'vs_name': vs_name, 'vs_state': vs_state, 'vs_pool': {'pool_name': 'none', 'pool_state': 'unknown'}})
-    return results
+
+
+            except:
+                results.append({'vs_name': vs_name, 'vs_state': vs_state, 'vs_pool': {'pool_name': 'none', 'pool_state': 'unknown'}})
+
+        return results
 
