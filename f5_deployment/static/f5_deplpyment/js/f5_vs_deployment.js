@@ -1,56 +1,3 @@
-{% extends "index/header.html" %}
-{% load static %}
-{% block head %}
-
-{% endblock %}
-{% block content %}
-        <div id="page-wrapper">
-            <div class="row">
-                <div class="col-lg-12"><div class="col-md-8">
-                    <h1 class="page-header">F5 Virtual Server Deployment</h1>
-                    <form method="post" id="vs_deployment" class="form-inline" enctype="multipart/form-data">{% csrf_token %}
-                      <div class="form-group">
-                        <select class="form-control-sm" name="location" id="location" required="required" >
-                              <option>UKDC1</option>
-                              <option>UKDC2</option>
-                              <option>LAB</option>
-                        </select>
-                      </div>
-                      <div class="form-group">
-                        <div class="custom-file">
-                          <input type="file" class="custom-file-input" name="file" id="file" accept=".xlsx" required="required">
-                    </div>
-                  </div>
-                  <button type="submit" id="upload_btn" class="btn btn-default">Upload <span class="glyphicon glyphicon-upload"></span></button>
-                </form>
-                <button type="submit" id="deploy_btn" style="visibility: hidden;" class="btn btn-primary">Deploy <span class="glyphicon glyphicon-play-circle"></span></button>
-                <a href="/f5/vs_deployment/"><button type="submit" id="new_file_btn" style="visibility: hidden;" class="btn btn-default navbar-btn"><span class="glyphicon glyphicon-new-window"></span> New File</button></a>
-                </div>
-                <!-- /.col-lg-12 -->
-            </div>
-			</div>
-               <p id="vs_deployment_result"></p>
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="panel panel-default" style="visibility: hidden;" id="resultdiv">
-                        <!-- /.panel-heading -->
-                        <div class="panel-body">
-                            <dl id="vs_deployment_results">
-                                <!-- Data goes here -->
-                            </dl>
-                            <!-- /.table-responsive -->
-                        </div>
-                        <!-- /.panel-body -->
-                    </div>
-                    <!-- /.panel -->
-                </div>
-                <!-- /.col-lg-12 -->
-            </div>
-		</div>
-{% endblock %}
-
-{% block scripts %}
-<script>
 var frm = $('#vs_deployment');
 var rslt = $('#vs_deployment_result');
 frm.submit(function(e) {e.preventDefault();
@@ -293,6 +240,3 @@ function get_deployment_task_info(task_id) {$.ajax({
     }
 })
 }
-
-</script>
-{% endblock %}

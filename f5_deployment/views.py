@@ -43,7 +43,7 @@ def vs_deployment(request):
 
     environment = request.session.get('environment')
     content = {'environment': environment}
-    return render(request, 'f5_deployment/vs_deployment.html', content)
+    return render(request, 'f5_deployment/f5_vs_deployment.html', content)
 
 
 def vs_deployment_push(request):
@@ -81,3 +81,10 @@ def vs_deployment_push(request):
         return HttpResponse(json.dumps({'task_id': task.id}), content_type='application/json')
 
     return redirect('/vs_deployment/')
+
+
+def generic_search(request):
+
+    environment = request.session.get('environment')
+    content = {'environment': environment}
+    return render(request, 'f5_deployment/generic_search.html', content)
