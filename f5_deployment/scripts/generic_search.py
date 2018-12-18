@@ -21,7 +21,7 @@ def get_vs_stats(base_url, selfLink, auth_token):
 
 def get_pool_stats(base_url, poolLink, auth_token):
     headers = {'content-type': 'application/json', 'X-F5-Auth-Token': auth_token}
-    get_url = base_url + '/{0}/stats?$select=status.availabilityState,status.enabledState,status.statusReason'.format(poolLink)
+    get_url = base_url + '/{0}/stats'.format(poolLink)
     print(get_url)
     try:
         get_response = requests.get(get_url, headers=headers, timeout=5, verify=False)
@@ -44,7 +44,6 @@ def get_all_vs(base_url, auth_token):
         try:
             get_response = requests.get(get_url, headers=headers, timeout=5, verify=False)
             payload_response = json.loads(get_response.text)
-            print(payload_response)
 
             if get_response.status_code == 200:
                 return payload_response
@@ -89,8 +88,6 @@ def virtual_server_dashboard(url_list, username, password):
                 print(poolLink)
                 pool_name = vs['pool'].split('/')[-1]
                 pool_stats = get_pool_stats(base_url, poolLink, auth_token)
-                print(pool_name)
-                print(pool_stats)
                 pool_state_dict = pool_stats['entries'].values()
                 for pool_values in pool_state_dict:
                     pool_state = pool_values['nestedStats']['entries']['status.availabilityState']['description']
