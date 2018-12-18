@@ -30,10 +30,21 @@ def get_pool_stats(base_url, poolLink, auth_token):
         if get_response.status_code == 200:
             return payload_response
 
-    except requests.exceptions.RequestException as error:
-        #  Return Errors
-        print(error)
-        return error
+    except requests.exceptions.HTTPError as errh:
+        error_code = "Http Error:" + str(errh)
+        return error_code
+
+    except requests.exceptions.ConnectionError as errc:
+        error_code = "Error Connecting:" + str(errc)
+        return error_code
+
+    except requests.exceptions.Timeout as errt:
+        error_code = "Timeout Error:" + str(errt)
+        return error_code
+
+    except requests.exceptions.RequestException as err:
+        error_code = "Error:" + str(err)
+        return error_code
 
 
 def get_all_vs(base_url, auth_token):
@@ -88,6 +99,7 @@ def virtual_server_dashboard(url_list, username, password):
                 print(poolLink)
                 pool_name = vs['pool'].split('/')[-1]
                 pool_stats = get_pool_stats(base_url, poolLink, auth_token)
+                print(pool_stats)
                 pool_state_dict = pool_stats['entries'].values()
                 for pool_values in pool_state_dict:
                     pool_state = pool_values['nestedStats']['entries']['status.availabilityState']['description']
