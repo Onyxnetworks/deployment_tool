@@ -30,6 +30,7 @@ function get_task_info(task_id) {
                 rslt.html('Searching BigIP...');
             }
             else if (data.state == 'SUCCESS') {
+                alert(data.result);
                 <!-- Clear Old table Data -->
                 document.getElementById("result_table").innerHTML = "";
                 document.getElementById("tablediv").style.visibility = "visible";
