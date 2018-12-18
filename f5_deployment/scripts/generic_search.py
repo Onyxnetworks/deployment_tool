@@ -11,7 +11,6 @@ def get_vs_stats(base_url, selfLink, auth_token):
     try:
         get_response = requests.get(get_url, headers=headers, timeout=5, verify=False)
         payload_response = json.loads(get_response.text)
-        print(payload_response)
         if get_response.status_code == 200:
             return payload_response
 
@@ -45,6 +44,8 @@ def get_all_vs(base_url, auth_token):
         try:
             get_response = requests.get(get_url, headers=headers, timeout=5, verify=False)
             payload_response = json.loads(get_response.text)
+            print(payload_response)
+
             if get_response.status_code == 200:
                 return payload_response
 
