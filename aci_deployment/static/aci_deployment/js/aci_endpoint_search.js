@@ -71,7 +71,7 @@ function get_task_info(task_id) {
                         document.body.appendChild(td);
                         document.getElementById(TABLE_TR).appendChild(td);
                     });}
-
+                initdatatable();
             }
 
             if (data.state != 'SUCCESS') {
@@ -84,4 +84,13 @@ function get_task_info(task_id) {
             rslt.html("Something went wrong!");success()
         }
     });
+}
+
+function initdatatable() {
+    $('#endpoint_table').DataTable({
+            responsive: true,
+            "language": {
+                "search": "Filter records:"
+            },
+        } );
 }
