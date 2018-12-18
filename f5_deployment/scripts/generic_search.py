@@ -39,7 +39,7 @@ def get_all_vs(base_url, auth_token):
         # Build auth token header
         headers = {'content-type': 'application/json', 'X-F5-Auth-Token': auth_token}
 
-        get_url = base_url + '/mgmt/tm/ltm/virtual/?$select=name,selfLink,'
+        get_url = base_url + '/mgmt/tm/ltm/virtual/?$select=name,selfLink,pool'
         try:
             get_response = requests.get(get_url, headers=headers, timeout=5, verify=False)
             payload_response = json.loads(get_response.text)
@@ -65,6 +65,7 @@ def virtual_server_dashboard(url_list, username, password):
     results = []
     for base_url in url_list:
         # Authenticate against bigip
+        location = base_url.split('.')[0][:8]
         auth_token = bigip_login(base_url, username, password)
         # Get all Virtual Servers
         all_vs = get_all_vs(base_url, auth_token)
@@ -77,7 +78,7 @@ def virtual_server_dashboard(url_list, username, password):
             vs_state_dict = vs_stats['entries'].values()
             for vs_values in vs_state_dict:
                 vs_state = vs_values['nestedStats']['entries']['status.availabilityState']['description']
-                results.append({'location': base_url, 'vs_name': vs_name, 'vs_state': vs_state})
+                results.append({'location': location, 'vs_name': vs_name, 'vs_state': vs_state})
             #try:
             #    pool_name = vs['pool'].split('/')[-1]
             #    pool_stats = get_pool_stats(base_url, pool_name, auth_token)
