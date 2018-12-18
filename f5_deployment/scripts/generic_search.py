@@ -84,7 +84,7 @@ def virtual_server_dashboard(url_list, username, password):
             try:
                 vs['poolReference']
                 print('test-1')
-                poolLink_ver = vs['poolReference']
+                poolLink_ver = vs['poolReference']['link']
                 poolLink = poolLink_ver.split('?ver=')[0]
                 print(poolLink)
                 pool_name = vs['pool'].split('/')[-1]
