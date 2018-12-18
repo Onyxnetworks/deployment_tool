@@ -11,7 +11,6 @@ def get_vs_stats(base_url, selfLink, auth_token):
     try:
         get_response = requests.get(get_url, headers=headers, timeout=5, verify=False)
         payload_response = json.loads(get_response.text)
-        print(payload_response)
         if get_response.status_code == 200:
             return payload_response
 
@@ -44,7 +43,6 @@ def get_all_vs(base_url, auth_token):
         try:
             get_response = requests.get(get_url, headers=headers, timeout=5, verify=False)
             payload_response = json.loads(get_response.text)
-            print(payload_response)
             if get_response.status_code == 200:
                 return payload_response
 
@@ -68,8 +66,6 @@ def virtual_server_dashboard(url_list, username, password):
     for base_url in url_list:
         # Authenticate against bigip
         auth_token = bigip_login(base_url, username, password)
-        print(auth_token)
-        print(base_url)
         # Get all Virtual Servers
         all_vs = get_all_vs(base_url, auth_token)
         for vs in all_vs['items']:
@@ -93,6 +89,5 @@ def virtual_server_dashboard(url_list, username, password):
 
             #except:
             #    results.append({'vs_name': vs_name, 'vs_state': vs_state, 'vs_pool': {'pool_name': 'none', 'pool_state': 'unknown'}})
-
     return results
 
