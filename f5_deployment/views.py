@@ -85,6 +85,33 @@ def vs_deployment_push(request):
 
 def generic_search(request):
 
+    # Get data to use for search task.
+    if request.method == 'POST' and 'f5_search' in request.POST:
+        search_string = request.POST['f5_search']
+        request_type = request.POST['request_type']
+
+        environment = request.session.get('environment')
+        if environment == 'Production':
+            username = request.session.get('prod_username')
+            password = request.session.get('prod_password')
+
+        if environment == 'Pre-Production':
+            # Need to put in an error as PPE search wont work!
+            username = request.session.get('ppe_username')
+            password = request.session.get('ppe_password')
+
+        if environment == 'Lab':
+            username = request.session.get('lab_username')
+            password = request.session.get('lab_password')
+
+        # Get base url to use
+        base_urls = get_base_url(environment)
+
+        task = f5_generic_search.delay(base_urls, request_type, search_string, username, password)
+
+        # Return task id back to client for ajax use.
+        return HttpResponse(json.dumps({'task_id': task.id}), content_type='application/json')
+
     environment = request.session.get('environment')
     content = {'environment': environment}
     return render(request, 'f5_deployment/f5_generic_search.html', content)

@@ -6,6 +6,7 @@ from celery import shared_task
 
 # Custom Functions
 from f5_deployment.scripts.vs_deployment import *
+from f5_deployment.script.generic_search import *
 
 def vs_deployment_excel_open_workbook(file):
     wb = openpyxl.load_workbook(file, data_only=True)
@@ -230,3 +231,35 @@ def virtual_server_deployment(vs_dict, location, url_dict, username, password):
 
 
     return output_log
+
+
+@shared_task
+def f5_generic_search(base_urls, request_type, search_string, username, password):
+    # Build URL List to search.
+    url_list = []
+    for url in base_urls['F5']:
+        url_list.append(base_urls['F5'][url])
+
+    if request_type == 'Virtual Server Name':
+        # Get virtual server name
+        results = []
+        virtial_server_name = virtial_server_name_search(url_list, search_string, username, password)
+
+        return  results
+
+    if request_type == 'Virtual Server IP':
+        # Get virtual server IP
+        results = []
+        return results
+
+    if request_type == 'Pool':
+        # Get Pool name
+        results = []
+        return results
+
+    if request_type == 'Node':
+        # Get Node name
+        results = []
+        return results
+
+
