@@ -247,7 +247,11 @@ def f5_generic_search(base_urls, request_type, search_string, username, password
         results = []
         virtual_server_dashboard_result = virtual_server_dashboard(url_list, username, password)
         if isinstance(virtual_server_dashboard_result, list):
-            return virtual_server_dashboard_result
+            for vs in virtual_server_dashboard_result:
+                if search_string.upper() in vs['vs_name'].upper():
+                    results.append(vs)
+
+            return results
 
 
     if request_type == 'Virtual Server IP':
