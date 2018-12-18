@@ -12,20 +12,31 @@
         <div id="page-wrapper">
             <div class="row">
                 <div class="col-lg-12"><div class="col-md-3">
-                    <h1 class="page-header">Endpoint Search</h1>
-					<form role="form" id="endpoint_search" method="post" enctype="multipart/form-data">{% csrf_token %}
-					<div class="form-group input-group">
-						<input type="text" placeholder="Enter Subnet" required="required" name="endpoint_search" class="form-control">
-						<span class="input-group-btn">
-							<button class="btn btn-default" type="submit"><i class="fa fa-search"></i></button>
-						</span>
-					</div>
-					</form>
+                    <h1 class="page-header">F5 Search</h1>
+					<form role="form" id="f5_search" method="post" enctype="multipart/form-data">{% csrf_token %}
+                        <div class="form-group">
+                            <select class="form-control-sm" name="type" id="type" required="required" >
+                                <option value="" hidden selected disabled>Select Type</option>
+                                <option>Virtual Server Name</option>
+                                <option>Virtual Server IP</option>
+                                <option>Pool</option>
+                                <option>Node</option>
+                        </select>
+                        </div>
+                        <div class="form-group">
+                            <div class="form-group input-group">
+                                <input type="text" placeholder="" required="required" name="f5_search" class="form-control">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default" type="submit"><i class="fa fa-search"></i></button>
+                                </span>
+                            </div>
+                        </div>
+                    </form>
                 </div>
                 <!-- /.col-lg-12 -->
-            </div>
+                </div>
 			</div>
-               <p id="endpoint_results"></p>
+               <p id="f5_results"></p>
             <div class="row">
 		<div class="col-lg-12">
                     <div class="panel panel-default" style="visibility: hidden;" id="tablediv">
