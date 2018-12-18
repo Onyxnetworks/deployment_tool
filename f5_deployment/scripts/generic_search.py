@@ -1,4 +1,4 @@
-import json, requests
+import json, requests, re
 
 # Ignore SSL Errors
 requests.packages.urllib3.disable_warnings()
@@ -82,7 +82,7 @@ def virtual_server_dashboard(url_list, username, password):
         all_vs = get_all_vs(base_url, auth_token)
         for vs in all_vs['items']:
             vs_name = vs['name']
-            vs_ip = vs['destination'].split('/')[-1]
+            vs_ip = re.split(':|/',vs['destination'])[-2]
             selfLink_ver = vs['selfLink'].split('/localhost/')[1]
             selfLink = selfLink_ver.split('?ver=')[0]
             vs_stats = get_vs_stats(base_url, selfLink, auth_token)
