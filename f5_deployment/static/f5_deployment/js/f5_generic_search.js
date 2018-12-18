@@ -30,7 +30,7 @@ function get_task_info(task_id) {
                 rslt.html('Searching BigIP...');
             }
             else if (data.state == 'SUCCESS') {
-                <!-- Clear Old table Data -->
+//                <!-- Clear Old table Data -->
                 document.getElementById("result_table").innerHTML = "";
                 document.getElementById("tablediv").style.visibility = "visible";
                 var results = data.result;
@@ -41,29 +41,29 @@ function get_task_info(task_id) {
                     vs_status = results[i].vs_status;
                     pool_name = results[i].pool_name;
                     pool_status = results[i].pool_status;
-                    if (vs_status.includes('available')) {
-                        var vs_status_img = "<img src='{% static 'f5_deployment/img/status_circle_green.png' %}' class='img-responsive' alt='Responsive image'>"
-                    }
-                    if (vs_status.includes('offline')) {
-                        var vs_status_img = "<img src='{% static 'f5_deployment/img/status_diamond_red.png' %}' class='img-responsive' alt='Responsive image'>"
-                    }
-                    if (vs_status.includes('unknown')) {
-                        var vs_status_img = "<img src='{% static 'f5_deployment/img/status_square_blue.png' %}' class='img-responsive' alt='Responsive image'>"
-                    }
-                    if (pool_status.includes('available')) {
-                        var pool_status_img = "<img src='{% static 'f5_deployment/img/status_circle_green.png' %}' class='img-responsive' alt='Responsive image'>"
-                    }
-                    if (pool_status.includes('offline')) {
-                        var pool_status_img = "<img src='{% static 'f5_deployment/img/status_diamond_red.png' %}' class='img-responsive' alt='Responsive image'>"
-                    }
-                    if (pool_status.includes('unknown')) {
-                        var pool_status_img = "<img src='{% static 'f5_deployment/img/status_square_blue.png' %}' class='img-responsive' alt='Responsive image'>"
-                    }
+                    //if (vs_status.includes('available')) {
+                    //    var vs_status_img = "<img src='{% static 'f5_deployment/img/status_circle_green.png' %}' class='img-responsive' alt='Responsive image'>"
+                    //}
+                    //if (vs_status.includes('offline')) {
+                    //    var vs_status_img = "<img src='{% static 'f5_deployment/img/status_diamond_red.png' %}' class='img-responsive' alt='Responsive image'>"
+                    //}
+                    //if (vs_status.includes('unknown')) {
+                    //    var vs_status_img = "<img src='{% static 'f5_deployment/img/status_square_blue.png' %}' class='img-responsive' alt='Responsive image'>"
+                    //}
+                    //if (pool_status.includes('available')) {
+                    //    var pool_status_img = "<img src='{% static 'f5_deployment/img/status_circle_green.png' %}' class='img-responsive' alt='Responsive image'>"
+                    //}
+                    //if (pool_status.includes('offline')) {
+                    //    var pool_status_img = "<img src='{% static 'f5_deployment/img/status_diamond_red.png' %}' class='img-responsive' alt='Responsive image'>"
+                    //}
+                    //if (pool_status.includes('unknown')) {
+                    //    var pool_status_img = "<img src='{% static 'f5_deployment/img/status_square_blue.png' %}' class='img-responsive' alt='Responsive image'>"
+                    //}
                     var tr = document.createElement("TR");
                     var TABLE_TR = 'TABLE_TR' + i
                     tr.setAttribute("id", TABLE_TR);
                     document.getElementById("result_table").appendChild(tr);
-                    var search_results = [location, vs_name, test, vs_status_img, pool_name, pool_status_img]
+                    var search_results = [location, vs_name, 'asdasd', 'asdasd', pool_name, 'asdasdåå']
                     search_results.forEach(function(items) {
                         var td = document.createElement("TD");
                         td.setAttribute("style", "text-align: center; vertical-align: middle;");
