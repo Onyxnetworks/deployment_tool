@@ -1,6 +1,6 @@
 # Base Functions
-import openpyxl
-
+import openpyxl, ipaddress, netaddr
+from netaddr import IPNetwork, IPAddress
 # Celery Functions
 from celery import shared_task
 
@@ -257,6 +257,12 @@ def f5_generic_search(base_urls, request_type, search_string, username, password
     if request_type == 'Virtual Server IP':
         # Get virtual server IP
         results = []
+        virtual_server_dashboard_result = virtual_server_dashboard(url_list, username, password)
+        if isinstance(virtual_server_dashboard_result, list):
+            for vs in virtual_server_dashboard_result:
+                if IPNetwork(search_string) in IPNetwork(vs['vs_ip']) or IPNetwork(vs['vs_ip']) in IPNetwork(search_string):
+                    results.append(vs)
+
         return results
 
     if request_type == 'Pool':
