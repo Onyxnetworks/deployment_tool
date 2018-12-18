@@ -11,6 +11,7 @@ def get_vs_stats(base_url, selfLink, auth_token):
     try:
         get_response = requests.get(get_url, headers=headers, timeout=5, verify=False)
         payload_response = json.loads(get_response.text)
+        print(payload_response)
         if get_response.status_code == 200:
             return payload_response
 
@@ -80,8 +81,11 @@ def virtual_server_dashboard(url_list, username, password):
                 vs_state = vs_values['nestedStats']['entries']['status.availabilityState']['description']
 
             try:
+                vs['poolReference']
+                print('test-1')
                 poolLink_ver = vs['poolReference']
                 poolLink = poolLink_ver.split('?ver=')[0]
+                print(poolLink)
                 pool_name = vs['pool'].split('/')[-1]
                 pool_stats = get_pool_stats(base_url, poolLink, auth_token)
                 print(pool_name)
@@ -95,6 +99,7 @@ def virtual_server_dashboard(url_list, username, password):
 
 
             except:
+                print('test-2')
                 results.append({'vs_name': vs_name, 'vs_state': vs_state, 'vs_pool': {'pool_name': 'none', 'pool_state': 'unknown'}})
 
         return results
