@@ -16,7 +16,7 @@ def create_connection_bigip(base_url, username, password, output_log):
     payload['password'] = password
     payload['loginProviderName'] = 'tmos'   
     
-    bigip_url_base = 'https://{}/mgmt/tm'.format(base_url)
+    bigip_url_base = '{}/mgmt/tm'.format(base_url)
     
     try:
         bigip_url_base_token = 'https://{}/mgmt/shared/authn/login'.format(base_url)
