@@ -38,6 +38,7 @@ function get_task_info(task_id) {
                 for (i = 0, len = results.length, text = ""; i < len; i++) {
                     f5_location = results[i].location;
                     vs_name = results[i].vs_name;
+                    vs_ip = results[i].vs_ip;
                     vs_status = results[i].vs_state;
                     pool_name = results[i].vs_pool.pool_name;
                     pool_status = results[i].vs_pool.pool_state;
@@ -72,7 +73,7 @@ function get_task_info(task_id) {
                         tr.setAttribute("class", "info");
                     }
                     document.getElementById("result_table").appendChild(tr);
-                    var search_results = [f5_location, vs_name, 'asdasd', vs_status_img, pool_name, pool_status_img]
+                    var search_results = [f5_location, vs_name, vs_ip, vs_status_img, pool_name, pool_status_img]
                     search_results.forEach(function(items) {
                         var td = document.createElement("TD");
                         td.setAttribute("style", "text-align: center; vertical-align: middle;");

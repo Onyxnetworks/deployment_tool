@@ -49,7 +49,7 @@ def get_all_vs(base_url, auth_token):
         # Build auth token header
         headers = {'content-type': 'application/json', 'X-F5-Auth-Token': auth_token}
 
-        get_url = base_url + '/mgmt/tm/ltm/virtual/?$select=name,selfLink,pool'
+        get_url = base_url + '/mgmt/tm/ltm/virtual/?$select=name,selfLink,pool,destination'
         try:
             get_response = requests.get(get_url, headers=headers, timeout=5, verify=False)
             payload_response = json.loads(get_response.text)
@@ -82,6 +82,7 @@ def virtual_server_dashboard(url_list, username, password):
         all_vs = get_all_vs(base_url, auth_token)
         for vs in all_vs['items']:
             vs_name = vs['name']
+            vs_ip = vs['destination'].split('/')[-1]
             selfLink_ver = vs['selfLink'].split('/localhost/')[1]
             selfLink = selfLink_ver.split('?ver=')[0]
             vs_stats = get_vs_stats(base_url, selfLink, auth_token)
@@ -98,7 +99,7 @@ def virtual_server_dashboard(url_list, username, password):
                 pool_state_dict = pool_stats['entries'].values()
                 for pool_values in pool_state_dict:
                     pool_state = pool_values['nestedStats']['entries']['status.availabilityState']['description']
-                    results.append({'location': location, 'vs_name': vs_name, 'vs_state': vs_state, 'vs_pool': {'pool_name': pool_name, 'pool_state': pool_state}})
+                    results.append({'location': location, 'vs_name': vs_name, 'vs_state': vs_state, 'vs_ip': vs_ip, 'vs_pool': {'pool_name': pool_name, 'pool_state': pool_state}})
 
 
 
