@@ -237,16 +237,17 @@ def virtual_server_deployment(vs_dict, location, url_dict, username, password):
 def f5_generic_search(base_urls, request_type, search_string, username, password):
     # Build URL List to search.
     url_list = []
-    for url in base_urls['F5']:
-        url_list.append(base_urls['F5'][url])
-
+    base_urls = list(base_urls['F5'].values())
+    for urls in base_urls:
+        for url in urls.values():
+            url_list.append(url)
+    
     if request_type == 'Virtual Server Name':
         # Get virtual server name
         results = []
-        virtial_server_name = virtual_server_name_search(url_list, search_string, username, password)
-
-        if type(virtial_server_name) == 'list':
-            print(results)
+        virtial_server_name = get_virtual_server(url_list, username, password)
+        if isinstance(virtial_server_name, list):
+            print(virtial_server_name)
             return results
 
     if request_type == 'Virtual Server IP':
