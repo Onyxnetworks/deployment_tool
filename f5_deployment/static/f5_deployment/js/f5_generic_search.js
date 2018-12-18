@@ -62,13 +62,13 @@ function get_task_info(task_id) {
                     var tr = document.createElement("TR");
                     var TABLE_TR = 'TABLE_TR' + i
                     tr.setAttribute("id", TABLE_TR);
-                    if (vs_status.includes(available)){
+                    if (vs_status.includes('available')){
                         tr.setAttribute("class", "success");
                     }
-                    if (vs_status.includes(offline)){
+                    if (vs_status.includes('offline')){
                         tr.setAttribute("class", "danger");
                     }
-                    if (vs_status.includes(unknown)){
+                    if (vs_status.includes('unknown')){
                         tr.setAttribute("class", "info");
                     }
                     document.getElementById("result_table").appendChild(tr);
