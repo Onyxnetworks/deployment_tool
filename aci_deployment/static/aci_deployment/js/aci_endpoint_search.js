@@ -9,7 +9,6 @@ frm.submit(function () {
         success: function (data) {
             if (data.task_id != null) {
                 get_task_info(data.task_id);
-                console.log("geting task status!");
             }},
         error: function (data) {
             document.getElementById("tablediv").style.visibility = "hidden";
@@ -29,10 +28,8 @@ function get_task_info(task_id) {
             rslt.html('');
             if (data.state == 'PENDING') {
                 rslt.html('Searching Endpoints...');
-                console.log("waiting for success!");
             }
             else if (data.state == 'SUCCESS') {
-                console.log("success!");
                 <!-- Clear Old table Data -->
                 document.getElementById("result_table").innerHTML = "";
                 document.getElementById("tablediv").style.visibility = "visible";
@@ -79,12 +76,10 @@ function get_task_info(task_id) {
 
             if (data.state != 'SUCCESS') {
                 setTimeout(function () {
-                    console.log("script to get task status");
                     get_task_info(task_id)
                 }, 1000);
             }},
         error: function (data) {
-            console.log("script error");
             document.getElementById("tablediv").style.visibility = "hidden";
             rslt.html("Something went wrong!");success()
         }
