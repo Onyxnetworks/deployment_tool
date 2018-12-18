@@ -22,11 +22,11 @@ def get_vs_stats(base_url, selfLink, auth_token):
 def get_pool_stats(base_url, poolLink, auth_token):
     headers = {'content-type': 'application/json', 'X-F5-Auth-Token': auth_token}
     get_url = base_url + '/{0}//stats?$select=status.availabilityState,status.enabledState,status.statusReason'.format(poolLink)
-
+    print(get_url)
     try:
         get_response = requests.get(get_url, headers=headers, timeout=5, verify=False)
         payload_response = json.loads(get_response.text)
-
+        print(payload_response)
         if get_response.status_code == 200:
             return payload_response
 
