@@ -243,7 +243,7 @@ def f5_generic_search(base_urls, request_type, search_string, username, password
     if request_type == 'Virtual Server Name':
         # Get virtual server name
         results = []
-        virtial_server_name = virtial_server_name_search(url_list, search_string, username, password)
+        virtial_server_name = virtual_server_name_search(url_list, search_string, username, password)
 
         return  results
 
