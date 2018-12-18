@@ -87,4 +87,4 @@ def generic_search(request):
 
     environment = request.session.get('environment')
     content = {'environment': environment}
-    return render(request, 'f5_deployment/generic_search.html', content)
+    return render(request, 'f5_deployment/f5_generic_search.html', content)
