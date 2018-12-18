@@ -83,6 +83,7 @@ def virtual_server_dashboard(url_list, username, password):
                 poolLink = poolLink_ver.split('?ver=')[0]
                 pool_name = vs['pool'].split('/')[-1]
                 pool_stats = get_pool_stats(base_url, poolLink, auth_token)
+                print(pool_stats)
                 pool_state_dict = pool_stats['entries'].values()
                 for pool_values in pool_state_dict:
                     pool_state = pool_values['nestedStats']['entries']['status.availabilityState']['description']
