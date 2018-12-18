@@ -68,6 +68,7 @@ def virtual_server_dashboard(url_list, username, password):
         auth_token = bigip_login(base_url, username, password)
         # Get all Virtual Servers
         all_vs = get_all_vs(base_url, auth_token)
+        print(all_vs)
         for vs in all_vs['items']:
             vs_name = vs['name']
             selfLink_ver = vs['selfLink'].split('/localhost/')[1]
@@ -76,7 +77,7 @@ def virtual_server_dashboard(url_list, username, password):
             vs_state_dict = vs_stats['entries'].values()
             for vs_values in vs_state_dict:
                 vs_state = vs_values['nestedStats']['entries']['status.availabilityState']['description']
-                results.append({'vs_name': vs_name, 'vs_state': vs_state})
+                results.append({'location': base_url, 'vs_name': vs_name, 'vs_state': vs_state})
             #try:
             #    pool_name = vs['pool'].split('/')[-1]
             #    pool_stats = get_pool_stats(base_url, pool_name, auth_token)
