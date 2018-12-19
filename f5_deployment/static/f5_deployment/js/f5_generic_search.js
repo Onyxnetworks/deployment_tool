@@ -86,20 +86,19 @@ function get_task_info(task_id) {
                     var tr = document.createElement("TR");
                     var TABLE_TR = 'TABLE_TR' + i
                     tr.setAttribute("id", TABLE_TR);
-                    tr.setAttribute("class", 'clickable-row');
                     tr.setAttribute("data-href", `url://${vs_name}`);
                     if (vs_admin_state.includes('disabled')){
-                        tr.setAttribute("class", "muted");
+                        tr.setAttribute("class", "muted clickable-row");
                     }
                     else {
                         if (vs_status.includes('available')){
-                            tr.setAttribute("class", "success");
+                            tr.setAttribute("class", "success clickable-row");
                         }
                         if (vs_status.includes('offline')){
-                            tr.setAttribute("class", "danger");
+                            tr.setAttribute("class", "danger clickable-row");
                         }
                         if (vs_status.includes('unknown')){
-                            tr.setAttribute("class", "info");
+                            tr.setAttribute("class", "info clickable-row");
                         }
                     }
                     document.getElementById("result_table").appendChild(tr);
