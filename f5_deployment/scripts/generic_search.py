@@ -91,6 +91,7 @@ def virtual_server_dashboard(url_list, username, password):
                 vs_state = vs_values['nestedStats']['entries']['status.availabilityState']['description']
                 vs_admin_state = vs_values['nestedStats']['entries']['status.enabledState']['description']
                 vs_state_reason = vs_values['nestedStats']['entries']['status.statusReason']['description']
+                vs_state_reason = vs_state_reason.replace("'", "")
 
             try:
                 vs['poolReference']

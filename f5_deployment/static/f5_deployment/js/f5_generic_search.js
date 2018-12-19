@@ -46,7 +46,7 @@ function get_task_info(task_id) {
                     pool_status = results[i].vs_pool.pool_state;
                     if (vs_admin_state.includes('disabled')){
                         if (vs_status.includes('available')) {
-                            var vs_status_img = `<img src='/static/f5_deployment/img/status_circle_black.png' class='img-responsive center-block' alt='vs_available' title="${vs_state_reason}">`
+                            var vs_status_img = `<img src='/static/f5_deployment/img/status_circle_black.png' class='img-responsive center-block' alt='vs_available' title=${vs_state_reason}">`
                         }
                         if (vs_status.includes('offline')) {
                             var vs_status_img = `<img src='/static/f5_deployment/img/status_diamond_black.png' class='img-responsive center-block' alt='vs_offline' title="${vs_state_reason}">`
