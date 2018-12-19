@@ -89,6 +89,8 @@ def virtual_server_dashboard(url_list, username, password):
             vs_state_dict = vs_stats['entries'].values()
             for vs_values in vs_state_dict:
                 vs_state = vs_values['nestedStats']['entries']['status.availabilityState']['description']
+                vs_admin_state = vs_values['nestedStats']['entries']['status.enabledState']['description']
+                vs_state_reason = vs_values['nestedStats']['entries']['status.statusReason']['description']
 
             try:
                 vs['poolReference']
@@ -99,13 +101,13 @@ def virtual_server_dashboard(url_list, username, password):
                 pool_state_dict = pool_stats['entries'].values()
                 for pool_values in pool_state_dict:
                     pool_state = pool_values['nestedStats']['entries']['status.availabilityState']['description']
-                    results.append({'location': location, 'vs_name': vs_name, 'vs_state': vs_state, 'vs_ip': vs_ip, 'vs_pool': {'pool_name': pool_name, 'pool_state': pool_state}})
+                    results.append({'location': location, 'vs_name': vs_name, 'vs_state': vs_state, 'vs_admin_state': vs_admin_state, 'vs_state_reason': vs_state_reason, 'vs_ip': vs_ip, 'vs_pool': {'pool_name': pool_name, 'pool_state': pool_state}})
 
 
 
 
             except:
-                results.append({'location': location, 'vs_name': vs_name, 'vs_state': vs_state, 'vs_ip': 'none', 'vs_pool': {'pool_name': 'none', 'pool_state': 'unknown'}})
+                results.append({'location': location, 'vs_name': vs_name, 'vs_state': vs_state, 'vs_admin_state': vs_admin_state, 'vs_state_reason': vs_state_reason, 'vs_ip': 'none', 'vs_pool': {'pool_name': 'none', 'pool_state': 'unknown'}})
 
         return results
 
