@@ -21,7 +21,7 @@ def get_vs_stats(base_url, selfLink, auth_token):
 
 def get_pool_stats(base_url, poolLink, auth_token):
     headers = {'content-type': 'application/json', 'X-F5-Auth-Token': auth_token}
-    get_url = base_url + '/{0}/stats'.format(poolLink)
+    get_url = base_url + '/{0}/stats?$select=status.availabilityState,status.statusReason'.format(poolLink)
     try:
         get_response = requests.get(get_url, headers=headers, timeout=5, verify=False)
         payload_response = json.loads(get_response.text)
@@ -102,13 +102,15 @@ def virtual_server_dashboard(url_list, username, password):
                 pool_state_dict = pool_stats['entries'].values()
                 for pool_values in pool_state_dict:
                     pool_state = pool_values['nestedStats']['entries']['status.availabilityState']['description']
-                    results.append({'location': location, 'vs_name': vs_name, 'vs_state': vs_state, 'vs_admin_state': vs_admin_state, 'vs_state_reason': vs_state_reason, 'vs_ip': vs_ip, 'vs_pool': {'pool_name': pool_name, 'pool_state': pool_state}})
+                    pool_state_reason = pool_values['nestedStats']['entries']['status.statusReason']['description']
+                    pool_state_reason = pool_state_reason.replace("'", "")
+                    results.append({'location': location, 'vs_name': vs_name, 'vs_state': vs_state, 'vs_admin_state': vs_admin_state, 'vs_state_reason': vs_state_reason, 'vs_ip': vs_ip, 'vs_pool': {'pool_name': pool_name, 'pool_state': pool_state, 'pool_state_reason': pool_state_reason}})
 
 
 
 
             except:
-                results.append({'location': location, 'vs_name': vs_name, 'vs_state': vs_state, 'vs_admin_state': vs_admin_state, 'vs_state_reason': vs_state_reason, 'vs_ip': vs_ip, 'vs_pool': {'pool_name': 'none', 'pool_state': 'unknown'}})
+                results.append({'location': location, 'vs_name': vs_name, 'vs_state': vs_state, 'vs_admin_state': vs_admin_state, 'vs_state_reason': vs_state_reason, 'vs_ip': vs_ip, 'vs_pool': {'pool_name': 'none', 'pool_state': 'unknown', 'pool_state_reason': 'unknown'}})
 
         return results
 
