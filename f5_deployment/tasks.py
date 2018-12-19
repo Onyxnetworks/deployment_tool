@@ -263,7 +263,6 @@ def f5_generic_search(base_urls, request_type, search_string, username, password
                     network = ipaddress.IPv4Network(vs['vs_ip'])
                     if IPNetwork(search_string) in IPNetwork(vs['vs_ip']) or IPNetwork(vs['vs_ip']) in IPNetwork(
                             search_string):
-                        print(vs['vs_ip'])
                         results.append(vs)
 
                 except ValueError:
