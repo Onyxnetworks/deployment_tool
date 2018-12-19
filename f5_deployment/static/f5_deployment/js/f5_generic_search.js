@@ -46,24 +46,24 @@ function get_task_info(task_id) {
                     pool_status = results[i].vs_pool.pool_state;
                     if (vs_admin_state.includes('disabled')){
                         if (vs_status.includes('available')) {
-                            var vs_status_img = "<img src='/static/f5_deployment/img/status_circle_black.png' class='img-responsive center-block' alt='vs_available' title='${vs_state_reason}'>"
+                            var vs_status_img = `<img src='/static/f5_deployment/img/status_circle_black.png' class='img-responsive center-block' alt='vs_available' title='${vs_state_reason}'>`
                         }
                         if (vs_status.includes('offline')) {
-                            var vs_status_img = "<img src='/static/f5_deployment/img/status_diamond_black.png' class='img-responsive center-block' alt='vs_offline' title='${vs_state_reason}'>"
+                            var vs_status_img = `<img src='/static/f5_deployment/img/status_diamond_black.png' class='img-responsive center-block' alt='vs_offline' title='${vs_state_reason}'>`
                         }
                         if (vs_status.includes('unknown')) {
-                            var vs_status_img = "<img src='/static/f5_deployment/img/status_square_black.png' class='img-responsive center-block' alt='vs_unknown' title='${vs_state_reason}'>"
+                            var vs_status_img = `<img src='/static/f5_deployment/img/status_square_black.png' class='img-responsive center-block' alt='vs_unknown' title='${vs_state_reason}'>`
                         }
                     }
                     if (vs_admin_state.includes('enabled')){
                         if (vs_status.includes('available')) {
-                            var vs_status_img = "<img src='/static/f5_deployment/img/status_circle_green.png' class='img-responsive center-block' alt='vs_available' title='${vs_state_reason}'>"
+                            var vs_status_img = `<img src='/static/f5_deployment/img/status_circle_green.png' class='img-responsive center-block' alt='vs_available' title='${vs_state_reason}'>`
                         }
                         if (vs_status.includes('offline')) {
-                            var vs_status_img = "<img src='/static/f5_deployment/img/status_diamond_red.png' class='img-responsive center-block' alt='vs_offline' title='${vs_state_reason}'>"
+                            var vs_status_img = `<img src='/static/f5_deployment/img/status_diamond_red.png' class='img-responsive center-block' alt='vs_offline' title='${vs_state_reason}'>`
                         }
                         if (vs_status.includes('unknown')) {
-                            var vs_status_img = "<img src='/static/f5_deployment/img/status_square_blue.png' class='img-responsive center-block' alt='vs_unknown' title='${vs_state_reason}'>"
+                            var vs_status_img = `<img src='/static/f5_deployment/img/status_square_blue.png' class='img-responsive center-block' alt='vs_unknown' title='${vs_state_reason}'>`
                         }
                     }
 
@@ -71,10 +71,10 @@ function get_task_info(task_id) {
                         var pool_status_img = "<img src='/static/f5_deployment/img/status_circle_green.png' class='img-responsive center-block' alt='pool_available'>"
                     }
                     if (pool_status.includes('offline')) {
-                        var pool_status_img = "<img src='/static/f5_deployment/img/status_diamond_red.png' class='img-responsive center-block' alt='pool_offline' title='{{ vs_state_reason }}'>"
+                        var pool_status_img = "<img src='/static/f5_deployment/img/status_diamond_red.png' class='img-responsive center-block' alt='pool_offline'>"
                     }
                     if (pool_status.includes('unknown')) {
-                        var pool_status_img = "<img src='/static/f5_deployment/img/status_square_blue.png' class='img-responsive center-block' alt='pool_unknown' title='{{ vs_state_reason }}'>"
+                        var pool_status_img = "<img src='/static/f5_deployment/img/status_square_blue.png' class='img-responsive center-block' alt='pool_unknown'>"
                     }
                     var tr = document.createElement("TR");
                     var TABLE_TR = 'TABLE_TR' + i
