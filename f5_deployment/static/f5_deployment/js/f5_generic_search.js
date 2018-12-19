@@ -79,6 +79,9 @@ function get_task_info(task_id) {
                             var pool_status_img = `<img src='/static/f5_deployment/img/status_square_blue.png' class='img-responsive center-block' alt='pool_unknown' title="${pool_state_reason}">`
                         }
                     }
+                    if (pool_name == 'none'){
+                        var pool_status_img = ''
+                    }
 
                     var tr = document.createElement("TR");
                     var TABLE_TR = 'TABLE_TR' + i
