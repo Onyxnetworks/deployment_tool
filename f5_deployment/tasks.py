@@ -282,9 +282,5 @@ def f5_generic_search(base_urls, request_type, search_string, username, password
 
             return results
 
-    if request_type == 'Node':
-        # Get Node name
-        results = []
-        return results
 
 
