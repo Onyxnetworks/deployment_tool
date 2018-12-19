@@ -56,7 +56,6 @@ def vs_deployment_validation(vs_dict, location, url_dict, username, password):
         device_group = 'LAB'
         base_url = url_dict[location][device_group]
         output_log.append({'Notifications': 'Device group ' + device_group + ' selected.'})
-        print(base_url)
     else:
         error = True
         output_log.append({'Errors': 'Unable to identify F5 Device group, please check index/baseline.py configuration.'})

@@ -17,11 +17,9 @@ def create_connection_bigip(base_url, username, password, output_log):
     payload['loginProviderName'] = 'tmos'   
     
     bigip_url_base = '{}/mgmt/tm'.format(base_url)
-    print(bigip_url_base)
     try:
-        bigip_url_base_token = 'https://{}/mgmt/shared/authn/login'.format(base_url)
+        bigip_url_base_token = '{}/mgmt/shared/authn/login'.format(base_url)
         token = bigip.post(bigip_url_base_token, json.dumps(payload)).json()['token']['token']
-        print(token)
         bigip.auth = ('')
         bigip.headers.update({'X-F5-Auth-Token': token})
         credentials = str(bigip.get('%s/ltm/virtual' % bigip_url_base, timeout=5.0))
