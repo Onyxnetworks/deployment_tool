@@ -31,7 +31,6 @@ function get_task_info(task_id) {
                 rslt.html('Searching BigIP...');
             }
             else if (data.state == 'SUCCESS') {
-                console.log("success");
 //                <!-- Clear Old table Data -->
                 document.getElementById("result_table").innerHTML = "";
                 document.getElementById("tablediv").style.visibility = "visible";
@@ -117,7 +116,6 @@ function get_task_info(task_id) {
 
             if (data.state != 'SUCCESS') {
                 setTimeout(function () {
-                    console.log("not success run task");
                     get_task_info(task_id)
                 }, 1000);
             }},
@@ -130,6 +128,7 @@ function get_task_info(task_id) {
 
 jQuery(document).ready(function($) {
     $(".clickable-row").click(function() {
+        console.log("row click");
         document.getElementById("vs_data_body").style.visibility = "visible";
         document.getElementById("vs_data_body").innerHTML = 'Test';
     });
