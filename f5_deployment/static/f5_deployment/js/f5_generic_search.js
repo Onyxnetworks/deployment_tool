@@ -114,11 +114,11 @@ function get_task_info(task_id) {
                         document.getElementById(TABLE_TR).appendChild(td);
                     });
             }
+            $("#collapse1").collapse('toggle');
             $(".clickable-row").click(function() {
                 console.log("row click");
                 document.getElementById("vs_data").style.visibility = "visible";
                 document.getElementById("vs_data_body").innerHTML = $(this).data('url');
-                $("#collapse1").collapse('toggle');
                 $("#collapse2").collapse('toggle');
                 });
             }
