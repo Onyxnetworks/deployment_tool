@@ -118,7 +118,8 @@ function get_task_info(task_id) {
                 console.log("row click");
                 document.getElementById("vs_data").style.visibility = "visible";
                 document.getElementById("vs_data_body").innerHTML = $(this).data('url');
-
+                $("#collapse1").collapse('toggle');
+                $("#collapse2").collapse('toggle');
                 });
             }
 
