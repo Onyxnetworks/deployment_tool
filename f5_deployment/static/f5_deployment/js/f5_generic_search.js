@@ -86,7 +86,7 @@ function get_task_info(task_id) {
                     var tr = document.createElement("TR");
                     var TABLE_TR = 'TABLE_TR' + i
                     tr.setAttribute("id", TABLE_TR);
-                    tr.setAttribute("data-href", `url://${vs_name}`);
+                    tr.setAttribute("data-href", `${vs_name}`);
                     if (vs_admin_state.includes('disabled')){
                         tr.setAttribute("class", "muted clickable-row");
                     }
@@ -111,7 +111,13 @@ function get_task_info(task_id) {
                         document.getElementById(TABLE_TR).appendChild(td);
                     });
             }
-
+            jQuery(document).ready(function($) {
+                $(".clickable-row").click(function() {
+                    console.log("row click");
+                    document.getElementById("vs_data_body").style.visibility = "visible";
+                    document.getElementById("vs_data_body").innerHTML = 'Test';
+    });
+});
             }
 
             if (data.state != 'SUCCESS') {
@@ -126,10 +132,3 @@ function get_task_info(task_id) {
     });
 }
 
-jQuery(document).ready(function($) {
-    $(".clickable-row").click(function() {
-        console.log("row click");
-        document.getElementById("vs_data_body").style.visibility = "visible";
-        document.getElementById("vs_data_body").innerHTML = 'Test';
-    });
-});
