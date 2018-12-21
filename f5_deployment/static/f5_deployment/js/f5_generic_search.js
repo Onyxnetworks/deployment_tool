@@ -89,7 +89,7 @@ function get_task_info(task_id) {
                     var tr = document.createElement("TR");
                     var TABLE_TR = 'TABLE_TR' + i
                     tr.setAttribute("id", TABLE_TR);
-                    tr.setAttribute("data-url", `${f5_location}-${vs_name}`);
+                    tr.setAttribute("data-url", `${f5_location},${vs_name}`);
                     if (vs_admin_state.includes('disabled')){
                         tr.setAttribute("class", "muted clickable-row");
                     }
