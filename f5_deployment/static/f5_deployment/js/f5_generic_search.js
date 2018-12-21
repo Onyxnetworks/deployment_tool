@@ -114,16 +114,14 @@ function get_task_info(task_id) {
                         document.getElementById(TABLE_TR).appendChild(td);
                     });
             }
-            jQuery(document).ready(function($) {
-                $(".clickable-row").click(function() {
-                    console.log("row click");
-                    document.getElementById("vs_data").style.visibility = "visible";
-                    document.getElementById("vs_data_body").innerHTML = 'Test';
-                    $("#collapse2").collapse('toggle');
-                    $("#collapse1").collapse('toggle');
+            $(".clickable-row").click(function() {
+                console.log("row click");
+                document.getElementById("vs_data").style.visibility = "visible";
+                document.getElementById("vs_data_body").innerHTML = 'Test';
+                $("#collapse2").collapse('toggle');
+                $("#collapse1").collapse('toggle');
 
                 });
-            });
             }
 
             if (data.state != 'SUCCESS') {
