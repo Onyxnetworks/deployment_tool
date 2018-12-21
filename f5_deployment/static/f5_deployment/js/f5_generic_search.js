@@ -37,7 +37,6 @@ function get_task_info(task_id) {
                 document.getElementById("result_table").innerHTML = "";
                 document.getElementById("tablediv").style.visibility = "visible";
                 document.getElementById("vs_data_body").innerHTML = "";
-                $("#search_result_collapse").collapse('show');
                 var results = data.result;
                 for (i = 0, len = results.length, text = ""; i < len; i++) {
                     f5_location = results[i].location;
