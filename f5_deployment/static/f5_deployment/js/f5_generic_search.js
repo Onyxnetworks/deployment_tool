@@ -114,7 +114,7 @@ function get_task_info(task_id) {
             jQuery(document).ready(function($) {
                 $(".clickable-row").click(function() {
                     console.log("row click");
-                    document.getElementById("vs_data_body").style.visibility = "visible";
+                    document.getElementById("vs_data").style.visibility = "visible";
                     document.getElementById("vs_data_body").innerHTML = 'Test';
     });
 });
