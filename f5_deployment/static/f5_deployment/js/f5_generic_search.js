@@ -119,8 +119,7 @@ function get_task_info(task_id) {
                     console.log("row click");
                     document.getElementById("vs_data").style.visibility = "visible";
                     document.getElementById("vs_data_body").innerHTML = 'Test';
-                    $("#search_result_collapse").collapse('hide');
-                    $("#vs_data_body_collapse").collapse('show');
+                    $("#collapse2").collapse('toggle');
                 });
             });
             }
