@@ -9,33 +9,33 @@
     <link href="{% static 'index/vendor/datatables-responsive/dataTables.responsive.css' %}" rel="stylesheet">
 {% endblock %}
 {% block content %}
-        <div id="page-wrapper">
-            <div class="row">
-                <div class="col-lg-12"><div class="col-md-8">
-                    <h1 class="page-header">F5 Search</h1>
-					<form role="form" class="form-inline" id="f5_search" method="post" enctype="multipart/form-data">{% csrf_token %}
-                        <div class="form-group">
-                            <select class="form-control" name="request_type" id="request_type" required="required" >
-                                <option value="" hidden selected disabled>Select Type</option>
-                                <option>Virtual Server Name</option>
-                                <option>Virtual Server IP</option>
-                                <option>Pool</option>
+    <div id="page-wrapper">
+        <div class="row">
+            <div class="col-lg-12"><div class="col-md-8">
+                <h1 class="page-header">F5 Search</h1>
+                <form role="form" class="form-inline" id="f5_search" method="post" enctype="multipart/form-data">{% csrf_token %}
+                    <div class="form-group">
+                        <select class="form-control" name="request_type" id="request_type" required="required" >
+                            <option value="" hidden selected disabled>Select Type</option>
+                            <option>Virtual Server Name</option>
+                            <option>Virtual Server IP</option>
+                            <option>Pool</option>
                         </select>
-                        </div>
-                            <div class="form-group input-group">
-                                <input type="text" placeholder="" required="required" name="f5_search" class="form-control">
-                                <span class="input-group-btn">
-                                    <button class="btn btn-default" type="submit"><i class="fa fa-search"></i></button>
-                                </span>
-                            </div>
-                    </form>
-                </div>
+                    </div>
+                    <div class="form-group input-group">
+                        <input type="text" placeholder="" required="required" name="f5_search" class="form-control">
+                        <span class="input-group-btn">
+                            <button class="btn btn-default" type="submit"><i class="fa fa-search"></i></button>
+                        </span>
+                    </div>
+                </form>
+            </div>
                 <!-- /.col-lg-12 -->
-                </div>
-			</div>
-               <p id="f5_results"></p>
-            <div class="row">
-		<div class="col-lg-12">
+            </div>
+        </div>
+        <p id="f5_results"></p>
+        <div class="row">
+            <div class="col-lg-12">
                 <div class="panel-group" id="accordion">
                     <div class="panel panel-default" style="visibility: hidden;" id="tablediv">
                         <div class="panel-heading">
@@ -46,8 +46,8 @@
                         <!-- /.panel-heading -->
                         <div id="collapse1" class="panel-collapse collapse in">
                             <div class="table-responsive">
-                            <table width="100%" class="table table-condensed table-striped table-hover" id="result_table_header">
-                                <thead>
+                                <table width="100%" class="table table-condensed table-striped table-hover" id="result_table_header">
+                                    <thead>
                                     <tr>
                                         <th class="text-center">Location</th>
                                         <th class="text-center">VIP Name</th>
@@ -56,54 +56,36 @@
                                         <th class="text-center">Pool name</th>
                                         <th class="text-center">Pool Status</th>
                                     </tr>
-                                </thead>
-                                <tbody id="result_table">
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody id="result_table">
+                                    </tbody>
+                                </table>
                             </div>
                             <!-- /.table-responsive -->
                         </div>
                         <!-- /.panel-body -->
                     </div>
                     <!-- /.panel -->
-
-    <div class="panel panel-default" style="visibility: hidden;" id="vs_data">
-      <div class="panel-heading">
-        <h4 class="panel-title">
-          <a data-toggle="collapse" data-parent="#accordion" href="#collapse2">Collapsible Group 2</a>
-        </h4>
-      </div>
-      <div id="collapse2" class="panel-collapse collapse">
-        <div class="panel-body">Lorem ipsum dolor sit amet, consectetur adipisicing elit,
-        sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-        quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</div>
-      </div>
-    </div>
-
+                    <div class="panel panel-default" style="visibility: hidden;" id="vs_data">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" data-parent="#accordion" href="#collapse2">Virtual Server Data</a>
+                            </h4>
+                        </div>
+                        <div id="collapse2" class="panel-collapse collapse">
+                            <div class="panel-body" id="vs_data_body"></div>
+                        </div>
+                    </div>
                 </div>
-                </div>
-                <!-- /.col-lg-12 -->
             </div>
-		</div>
+                <!-- /.col-lg-12 -->
+        </div>
+    </div>
 {% endblock %}
 
 {% block scripts %}
-
     <script src="{% static 'index/vendor/datatables/js/jquery.dataTables.min.js' %}"></script>
     <script src="{% static 'index/vendor/datatables-plugins/dataTables.bootstrap.min.js' %}"></script>
     <script src="{% static 'index/vendor/datatables-responsive/dataTables.responsive.js' %}"></script>
     <script src="{% static 'f5_deployment/js/f5_generic_search.js' %}"></script>
-
-<!--
-<script>
-    $(document).ready(function() {
-        $('#endpoint_table').DataTable({
-            responsive: true,
-            "language": {
-                "search": "Filter records:"
-            },
-        } );
-    } );
-</script>
--->
 {% endblock %}
