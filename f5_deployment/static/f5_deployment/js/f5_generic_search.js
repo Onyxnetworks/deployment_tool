@@ -19,6 +19,7 @@ frm.submit(function () {
 
 
 });
+
 function get_task_info(task_id) {
     $.ajax({
         type: 'get',
@@ -126,3 +127,10 @@ function get_task_info(task_id) {
         }
     });
 }
+
+jQuery(document).ready(function($) {
+    $(".clickable-row").click(function() {
+        document.getElementById("vs_data_body").style.visibility = "visible";
+        document.getElementById("vs_data_body").innerHTML = 'Test';
+    });
+});
