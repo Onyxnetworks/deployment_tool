@@ -89,7 +89,7 @@ function get_task_info(task_id) {
                     var tr = document.createElement("TR");
                     var TABLE_TR = 'TABLE_TR' + i
                     tr.setAttribute("id", TABLE_TR);
-                    tr.setAttribute("data-url", `${f5_location},${vs_name},${i}`);
+                    tr.setAttribute("data-url", `${i}`);
                     if (vs_admin_state.includes('disabled')){
                         tr.setAttribute("class", "muted clickable-row");
                     }
@@ -117,7 +117,8 @@ function get_task_info(task_id) {
             $(".clickable-row").click(function() {
                 console.log("row click");
                 document.getElementById("vs_data").style.visibility = "visible";
-                document.getElementById("vs_data_body").innerHTML = $(this).data('url');
+                var result_index = $(this).data('url');
+                document.getElementById("vs_data_body").innerHTML = data.result[result_index].vs_name;
                 });
             }
 
