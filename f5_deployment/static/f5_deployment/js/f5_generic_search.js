@@ -37,6 +37,8 @@ function get_task_info(task_id) {
                 document.getElementById("result_table").innerHTML = "";
                 document.getElementById("tablediv").style.visibility = "visible";
                 document.getElementById("vs_data_body").innerHTML = "";
+                $("#search_result_collapse").collapse('show');
+                $("#vs_data_body_collapse").collapse('hide');
                 var results = data.result;
                 for (i = 0, len = results.length, text = ""; i < len; i++) {
                     f5_location = results[i].location;
@@ -119,8 +121,8 @@ function get_task_info(task_id) {
                     console.log("row click");
                     document.getElementById("vs_data").style.visibility = "visible";
                     document.getElementById("vs_data_body").innerHTML = 'Test';
-                    $("#search_result_collapse").collapse('toggle');
-                    $("#vs_data_body_collapse").collapse('toggle');
+                    $("#search_result_collapse").collapse('hide');
+                    $("#vs_data_body_collapse").collapse('show');
                 });
             });
             }
