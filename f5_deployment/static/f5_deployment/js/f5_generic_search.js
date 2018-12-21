@@ -119,13 +119,10 @@ function get_task_info(task_id) {
                     console.log("row click");
                     document.getElementById("vs_data").style.visibility = "visible";
                     document.getElementById("vs_data_body").innerHTML = 'Test';
-                    document.getElementById("vs_data_body_collapse").setAttribute("class", "panel-collapse collapse in");
-                    document.getElementById("search_result_collapse").setAttribute("class", "panel-collapse collapse");
-
-
-
-    });
-});
+                    $(".search_result_collapse").collapse('toggle');
+                    $(".vs_data_body_collapse").collapse('toggle');
+                });
+            });
             }
 
             if (data.state != 'SUCCESS') {
