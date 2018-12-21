@@ -118,7 +118,8 @@ function get_task_info(task_id) {
                 console.log("row click");
                 document.getElementById("vs_data").style.visibility = "visible";
                 var result_index = $(this).data('url');
-                document.getElementById("vs_data_body").innerHTML = data.result[result_index].vs_name + '<br>' + data.result[result_index].vs_ip + '<br>' + data.result[result_index].vs_state + '<br>' + data.result[result_index].vs_admin_state + '<br>' + data.result[result_index].vs_state_reason + '<br>' + data.result[result_index].vs_pool.pool_name + '<br>' + data.result[result_index].vs_pool.pool_state + '<br>' + data.result[result_index].vs_pool.pool_state_reason;
+                //document.getElementById("vs_data_body").innerHTML
+                alert(data.result[result_index].vs_name + '\n' + data.result[result_index].vs_ip + '\n' + data.result[result_index].vs_state + '\n' + data.result[result_index].vs_admin_state + '\n' + data.result[result_index].vs_state_reason + '\n' + data.result[result_index].vs_pool.pool_name + '\n' + data.result[result_index].vs_pool.pool_state + '\n' + data.result[result_index].vs_pool.pool_state_reason);
                 });
             }
 
