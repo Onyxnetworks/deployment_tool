@@ -119,6 +119,7 @@ function get_task_info(task_id) {
                 var f5_location = results[result_index].location;
                 var vs_name = results[result_index].vs_name;
                 var vs_ip = results[result_index].vs_ip;
+                var vs_port = results[result_index].vs_port;
                 var vs_status = results[result_index].vs_state;
                 var vs_admin_state = results[result_index].vs_admin_state;
                 var vs_state_reason = results[result_index].vs_state_reason;
@@ -166,8 +167,7 @@ function get_task_info(task_id) {
                 document.getElementById("vs_detail_status").innerHTML = vs_status_img;
                 document.getElementById("vs_detail_name").innerHTML = vs_name;
                 document.getElementById("vs_detail_destination").innerHTML = vs_ip;
-
-
+                document.getElementById("vs_detail_port").innerHTML = vs_port;
                 });
             }
 

@@ -83,6 +83,7 @@ def virtual_server_dashboard(url_list, username, password):
         for vs in all_vs['items']:
             vs_name = vs['name']
             vs_ip = re.split(':|/',vs['destination'])[-2]
+            vs_port = re.split(':|/', vs['destination'])[-1]
             selfLink_ver = vs['selfLink'].split('/localhost/')[1]
             selfLink = selfLink_ver.split('?ver=')[0]
             vs_stats = get_vs_stats(base_url, selfLink, auth_token)
@@ -104,13 +105,13 @@ def virtual_server_dashboard(url_list, username, password):
                     pool_state = pool_values['nestedStats']['entries']['status.availabilityState']['description']
                     pool_state_reason = pool_values['nestedStats']['entries']['status.statusReason']['description']
                     pool_state_reason = pool_state_reason.replace("'", "")
-                    results.append({'location': location, 'vs_name': vs_name, 'vs_state': vs_state, 'vs_admin_state': vs_admin_state, 'vs_state_reason': vs_state_reason, 'vs_ip': vs_ip, 'vs_pool': {'pool_name': pool_name, 'pool_state': pool_state, 'pool_state_reason': pool_state_reason}})
+                    results.append({'location': location, 'vs_name': vs_name, 'vs_state': vs_state, 'vs_admin_state': vs_admin_state, 'vs_state_reason': vs_state_reason, 'vs_ip': vs_ip, 'vs_port': vs_port, 'vs_pool': {'pool_name': pool_name, 'pool_state': pool_state, 'pool_state_reason': pool_state_reason}})
 
 
 
 
             except:
-                results.append({'location': location, 'vs_name': vs_name, 'vs_state': vs_state, 'vs_admin_state': vs_admin_state, 'vs_state_reason': vs_state_reason, 'vs_ip': vs_ip, 'vs_pool': {'pool_name': 'none', 'pool_state': 'unknown', 'pool_state_reason': 'unknown'}})
+                results.append({'location': location, 'vs_name': vs_name, 'vs_state': vs_state, 'vs_admin_state': vs_admin_state, 'vs_state_reason': vs_state_reason, 'vs_ip': vs_ip, 'vs_port': vs_port, 'vs_pool': {'pool_name': 'none', 'pool_state': 'unknown', 'pool_state_reason': 'unknown'}})
 
         return results
 
