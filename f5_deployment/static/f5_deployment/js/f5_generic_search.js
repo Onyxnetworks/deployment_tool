@@ -36,7 +36,7 @@ function get_task_info(task_id) {
 //                <!-- Clear Old table Data -->
                 document.getElementById("result_table").innerHTML = "";
                 document.getElementById("tablediv").style.visibility = "visible";
-                document.getElementById("vs_data_body").innerHTML = "";
+                //document.getElementById("vs_data_body").innerHTML = "";
                 var results = data.result;
                 for (i = 0, len = results.length, text = ""; i < len; i++) {
                     f5_location = results[i].location;
