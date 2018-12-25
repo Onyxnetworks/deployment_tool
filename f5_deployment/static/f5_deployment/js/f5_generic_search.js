@@ -115,10 +115,59 @@ function get_task_info(task_id) {
                     });
             }
             $(".clickable-row").click(function() {
+                var result_index = $(this).data('url');
+                var f5_location = results[result_index].location;
+                var vs_name = results[result_index].vs_name;
+                var vs_ip = results[result_index].vs_ip;
+                var vs_status = results[result_index].vs_state;
+                var vs_admin_state = results[result_index].vs_admin_state;
+                var vs_state_reason = results[result_index].vs_state_reason;
+                var pool_name = results[result_index].vs_pool.pool_name;
+                var pool_status = results[result_index].vs_pool.pool_state;
+                var pool_state_reason = results[result_index].vs_pool.pool_state_reason;
+                if (vs_admin_state.includes('disabled')){
+                    if (vs_status.includes('available')) {
+                        var vs_status_img = `<img src='/static/f5_deployment/img/status_circle_black.png' class='img-responsive center-block' alt='vs_available' title=${vs_state_reason}">`
+                    }
+                    if (vs_status.includes('offline')) {
+                        var vs_status_img = `<img src='/static/f5_deployment/img/status_diamond_black.png' class='img-responsive center-block' alt='vs_offline' title="${vs_state_reason}">`
+                    }
+                    if (vs_status.includes('unknown')) {
+                        var vs_status_img = `<img src='/static/f5_deployment/img/status_square_black.png' class='img-responsive center-block' alt='vs_unknown' title="${vs_state_reason}">`
+                    }
+                }
+                if (vs_admin_state.includes('enabled')){
+                    if (vs_status.includes('available')) {
+                        var vs_status_img = `<img src='/static/f5_deployment/img/status_circle_green.png' class='img-responsive center-block' alt='vs_available' title="${vs_state_reason}">`
+                    }
+                    if (vs_status.includes('offline')) {
+                        var vs_status_img = `<img src='/static/f5_deployment/img/status_diamond_red.png' class='img-responsive center-block' alt='vs_offline' title="${vs_state_reason}">`
+                    }
+                    if (vs_status.includes('unknown')) {
+                        var vs_status_img = `<img src='/static/f5_deployment/img/status_square_blue.png' class='img-responsive center-block' alt='vs_unknown' title="${vs_state_reason}">`
+                    }
+                }
+                if (pool_name != 'none'){
+                    if (pool_status.includes('available')) {
+                        var pool_status_img = `<img src='/static/f5_deployment/img/status_circle_green.png' class='img-responsive center-block' alt='pool_available' title="${pool_state_reason}">`
+                    }
+                    if (pool_status.includes('offline')) {
+                        var pool_status_img = `<img src='/static/f5_deployment/img/status_diamond_red.png' class='img-responsive center-block' alt='pool_offline' title="${pool_state_reason}">`
+                    }
+                    if (pool_status.includes('unknown')) {
+                        var pool_status_img = `<img src='/static/f5_deployment/img/status_square_blue.png' class='img-responsive center-block' alt='pool_unknown' title="${pool_state_reason}">`
+                    }
+                }
+                if (pool_name == 'none'){
+                    var pool_status_img = ''
+                }
                 console.log("row click");
                 document.getElementById("vs_data").style.visibility = "visible";
-                var result_index = $(this).data('url');
-                //document.getElementById("vs_data_body").innerHTML
+                document.getElementById("vs_detail_status").innerHTML = vs_status_img;
+                document.getElementById("vs_detail_name").innerHTML = vs_name;
+                document.getElementById("vs_detail_destination").innerHTML = vs_ip;
+
+
                 });
             }
 
