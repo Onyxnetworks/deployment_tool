@@ -126,6 +126,13 @@ function get_task_info(task_id) {
                 var pool_name = results[result_index].vs_pool.pool_name;
                 var pool_status = results[result_index].vs_pool.pool_state;
                 var pool_state_reason = results[result_index].vs_pool.pool_state_reason;
+                var vs_bits_in = results[result_index].vs_stats.vs_bits_in;
+                var vs_bits_out = results[result_index].vs_stats.vs_bits_out;
+                var vs_packets_in = results[result_index].vs_stats.vs_packets_in;
+                var vs_packets_out = results[result_index].vs_stats.vs_packets_out;
+                var vs_conn_current = results[result_index].vs_stats.vs_conn_current;
+                var vs_conn_max = results[result_index].vs_stats.vs_conn_max;
+                var vs_conn_total = results[result_index].vs_stats.vs_conn_total;
                 if (vs_admin_state.includes('disabled')){
                     if (vs_status.includes('available')) {
                         var vs_status_img = `<img src='/static/f5_deployment/img/status_circle_black.png' class='img-responsive center-block' alt='vs_available' title=${vs_state_reason}">`
@@ -168,6 +175,15 @@ function get_task_info(task_id) {
                 document.getElementById("vs_detail_name").innerHTML = vs_name;
                 document.getElementById("vs_detail_destination").innerHTML = vs_ip;
                 document.getElementById("vs_detail_port").innerHTML = vs_port;
+                document.getElementById("vs_detail_bits_in").innerHTML = vs_bits_in;
+                document.getElementById("vs_detail_bits_out").innerHTML = vs_bits_out;
+                document.getElementById("vs_detail_packets_in").innerHTML = vs_packets_in;
+                document.getElementById("vs_detail_packets_out").innerHTML = vs_packets_out;
+                document.getElementById("vs_detail_connections_current").innerHTML = vs_conn_current;
+                document.getElementById("vs_detail_connections_maximum").innerHTML = vs_conn_max;
+                document.getElementById("vs_detail_connections_total").innerHTML = vs_conn_total;
+
+
                 });
             }
 

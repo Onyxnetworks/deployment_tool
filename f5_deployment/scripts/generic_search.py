@@ -7,7 +7,7 @@ from f5_deployment.scripts.baseline import bigip_login
 
 def get_vs_stats(base_url, selfLink, auth_token):
     headers = {'content-type': 'application/json', 'X-F5-Auth-Token': auth_token}
-    get_url = base_url + '/{0}/stats?$select=status.availabilityState,status.enabledState,status.statusReason'.format(selfLink)
+    get_url = base_url + '/{0}/stats'.format(selfLink)
     try:
         get_response = requests.get(get_url, headers=headers, timeout=5, verify=False)
         payload_response = json.loads(get_response.text)
@@ -92,6 +92,13 @@ def virtual_server_dashboard(url_list, username, password):
                 vs_state = vs_values['nestedStats']['entries']['status.availabilityState']['description']
                 vs_admin_state = vs_values['nestedStats']['entries']['status.enabledState']['description']
                 vs_state_reason = vs_values['nestedStats']['entries']['status.statusReason']['description']
+                vs_bits_in = vs_values['nestedStats']['entries']['clientside.bitsIn']['value']
+                vs_bits_out = vs_values['nestedStats']['entries']['clientside.bitsOut']['value']
+                vs_packets_in = vs_values['nestedStats']['entries']['clientside.pktsIn']['value']
+                vs_packets_out = vs_values['nestedStats']['entries']['clientside.pktsOut']['value']
+                vs_conn_current = vs_values['nestedStats']['entries']['clientside.curConns']['value']
+                vs_conn_max = vs_values['nestedStats']['entries']['clientside.maxConns']['value']
+                vs_conn_total = vs_values['nestedStats']['entries']['clientside.totConns']['value']
                 vs_state_reason = vs_state_reason.replace("'", "")
 
             try:
@@ -105,13 +112,13 @@ def virtual_server_dashboard(url_list, username, password):
                     pool_state = pool_values['nestedStats']['entries']['status.availabilityState']['description']
                     pool_state_reason = pool_values['nestedStats']['entries']['status.statusReason']['description']
                     pool_state_reason = pool_state_reason.replace("'", "")
-                    results.append({'location': location, 'vs_name': vs_name, 'vs_state': vs_state, 'vs_admin_state': vs_admin_state, 'vs_state_reason': vs_state_reason, 'vs_ip': vs_ip, 'vs_port': vs_port, 'vs_pool': {'pool_name': pool_name, 'pool_state': pool_state, 'pool_state_reason': pool_state_reason}})
+                    results.append({'location': location, 'vs_name': vs_name, 'vs_state': vs_state, 'vs_admin_state': vs_admin_state, 'vs_state_reason': vs_state_reason, 'vs_ip': vs_ip, 'vs_port': vs_port, 'vs_stats': {'vs_bits_in': vs_bits_in, 'vs_bits_out': vs_bits_out, 'vs_packets_in': vs_packets_in, 'vs_packets_out': vs_packets_out, 'vs_conn_current': vs_conn_current, 'vs_conn_max': vs_conn_max, 'vs_conn_total': vs_conn_total}, 'vs_pool': {'pool_name': pool_name, 'pool_state': pool_state, 'pool_state_reason': pool_state_reason}})
 
 
 
 
             except:
-                results.append({'location': location, 'vs_name': vs_name, 'vs_state': vs_state, 'vs_admin_state': vs_admin_state, 'vs_state_reason': vs_state_reason, 'vs_ip': vs_ip, 'vs_port': vs_port, 'vs_pool': {'pool_name': 'none', 'pool_state': 'unknown', 'pool_state_reason': 'unknown'}})
+                results.append({'location': location, 'vs_name': vs_name, 'vs_state': vs_state, 'vs_admin_state': vs_admin_state, 'vs_state_reason': vs_state_reason, 'vs_ip': vs_ip, 'vs_port': vs_port, 'vs_stats': {'vs_bits_in': vs_bits_in, 'vs_bits_out': vs_bits_out, 'vs_packets_in': vs_packets_in, 'vs_packets_out': vs_packets_out, 'vs_conn_current': vs_conn_current, 'vs_conn_max': vs_conn_max, 'vs_conn_total': vs_conn_total}, 'vs_pool': {'pool_name': 'none', 'pool_state': 'unknown', 'pool_state_reason': 'unknown'}})
 
         return results
 
