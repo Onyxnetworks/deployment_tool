@@ -119,7 +119,6 @@ function get_task_info(task_id) {
                 document.getElementById("vs_data").style.visibility = "visible";
                 var result_index = $(this).data('url');
                 //document.getElementById("vs_data_body").innerHTML
-                alert(data.result[result_index].vs_name + '\n' + data.result[result_index].vs_ip + '\n' + data.result[result_index].vs_state + '\n' + data.result[result_index].vs_admin_state + '\n' + data.result[result_index].vs_state_reason + '\n' + data.result[result_index].vs_pool.pool_name + '\n' + data.result[result_index].vs_pool.pool_state + '\n' + data.result[result_index].vs_pool.pool_state_reason);
                 });
             }
 
