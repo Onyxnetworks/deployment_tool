@@ -171,8 +171,6 @@ function get_task_info(task_id) {
                     var pool_requests_total = results[result_index].vs_pool.pool_stats.pool_requests_total;
                     document.getElementById("pool_detail_status").innerHTML = pool_status_img;
                     document.getElementById("pool_detail_name").innerHTML = pool_name;
-                    document.getElementById("pool_detail_destination").innerHTML = pool_ip;
-                    document.getElementById("pool_detail_port").innerHTML = pool_port;
                     document.getElementById("pool_detail_bits_in").innerHTML = pool_bits_in;
                     document.getElementById("pool_detail_bits_out").innerHTML = pool_bits_out;
                     document.getElementById("pool_detail_packets_in").innerHTML = pool_packets_in;
