@@ -172,10 +172,10 @@ function get_task_info(task_id) {
                     }
                 }
                 if (pool_name == 'none'){
-                    $("#pool_li").hide();
-                    $("#node_li").hide();
-                    $("#pool_tab").hide();
-                    $("#nodes_tab").hide();
+                    //$("#pool_li").hide();
+                    //$("#node_li").hide();
+                    //$("#pool_tab").hide();
+                    //$("#nodes_tab").hide();
                     var pool_status_img = ''
                 }
                 console.log("row click");
