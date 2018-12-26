@@ -157,6 +157,10 @@ function get_task_info(task_id) {
                     }
                 }
                 if (pool_name != 'none'){
+                    $("#pool_li").show();
+                    $("#node_li").show();
+                    $("#pool_tab").show();
+                    $("#nodes_tab").show();
                     if (pool_status.includes('available')) {
                         var pool_status_img = `<img src='/static/f5_deployment/img/status_circle_green.png' class='img-responsive center-block' alt='pool_available' title="${pool_state_reason}">`
                     }
@@ -168,11 +172,10 @@ function get_task_info(task_id) {
                     }
                 }
                 if (pool_name == 'none'){
-                    var vs_data_body = document.getElementById("vs_data_body");
-                    $("#pool_li").remove();
-                    $("#node_li").remove();
-                    $("#pool_tab").remove();
-                    $("#nodes_tab").remove();
+                    $("#pool_li").hide();
+                    $("#node_li").hide();
+                    $("#pool_tab").hide();
+                    $("#nodes_tab").hide();
                     var pool_status_img = ''
                 }
                 console.log("row click");
