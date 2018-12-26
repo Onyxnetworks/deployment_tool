@@ -116,6 +116,7 @@ function get_task_info(task_id) {
                     });
             }
             $(".clickable-row").click(function() {
+                document.getElementById("nodes_body").innerHTML = "";
                 var result_index = $(this).data('url');
                 var f5_location = results[result_index].location;
                 var vs_name = results[result_index].vs_name;
