@@ -241,7 +241,7 @@ function get_task_info(task_id) {
                         }
 
                         var node_tr = document.createElement("TR");
-                        var node_table_tr = 'node_table_tr' + i;
+                        var node_table_tr = 'node_table_tr' + ni;
                         node_tr.setAttribute("id", node_table_tr);
                         document.getElementById("nodes_body").appendChild(node_tr);
                         var node_details = [node_status_img, node_name, node_address, node_bits_in, node_bits_out, node_packets_in, node_packets_out, node_conn_current, node_conn_max, node_conn_total, node_requests_total, node_requests_depth, node_requests_max_age]
