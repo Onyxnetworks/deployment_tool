@@ -134,14 +134,9 @@ def virtual_server_dashboard(url_list, username, password):
                                                                                      'vs_conn_current': vs_conn_current,
                                                                                      'vs_conn_max': vs_conn_max,
                                                                                      'vs_conn_total': vs_conn_total},
-                                    'vs_pool': {'pool_name': pool_name, 'pool_state': pool_state,
-                                                'pool_state_reason': pool_state_reason, 'pool_stats': {
-                                            'pool_bits_in': pool_bits_in, 'pool_bits_out': pool_bits_out,
-                                            'pool_packets_in': pool_packets_in, 'pool_packets_out': pool_packets_out,
-                                            'pool_conn_current': pool_conn_current, 'pool_conn_max': pool_conn_max,
-                                            'pool_conn_total': pool_conn_total,
-                                            'pool_requests_total': pool_requests_total
-                                        }}})
+                                    'vs_pool': {'pool_name': pool_name, 'pool_state': pool_state, 'pool_state_reason': pool_state_reason, 'pool_stats': {'pool_bits_in': pool_bits_in, 'pool_bits_out': pool_bits_out, 'pool_packets_in': pool_packets_in, 'pool_packets_out': pool_packets_out, 'pool_conn_current': pool_conn_current, 'pool_conn_max': pool_conn_max, 'pool_conn_total': pool_conn_total, 'pool_requests_total': pool_requests_total}
+                                                }
+                                    })
 
 
 
