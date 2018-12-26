@@ -157,10 +157,10 @@ function get_task_info(task_id) {
                     }
                 }
                 if (pool_name != 'none'){
-                    $("#pool_li").show();
-                    $("#node_li").show();
-                    $("#pool_tab").show();
-                    $("#nodes_tab").show();
+                    //$("#pool_li").show();
+                    //$("#node_li").show();
+                    //$("#pool_tab").show();
+                    //$("#nodes_tab").show();
                     if (pool_status.includes('available')) {
                         var pool_status_img = `<img src='/static/f5_deployment/img/status_circle_green.png' class='img-responsive center-block' alt='pool_available' title="${pool_state_reason}">`
                     }
