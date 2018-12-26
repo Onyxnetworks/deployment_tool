@@ -176,6 +176,7 @@ def virtual_server_dashboard(url_list, username, password):
                     node_stats = get_node_stats(base_url, nodeLink, auth_token)
                     node_stats_dict = node_stats['entries'].values()
                     for node_values in node_stats_dict:
+                        node_admin_state = node_values['nestedStats']['entries']['status.enabledState']['description']
                         node_state = node_values['nestedStats']['entries']['status.availabilityState']['description']
                         node_state_reason = node_values['nestedStats']['entries']['status.statusReason']['description']
                         node_state_reason = node_state_reason.replace("'", "")
@@ -191,7 +192,8 @@ def virtual_server_dashboard(url_list, username, password):
                         node_requests_max_age = node_values['nestedStats']['entries']['connq.ageMax']['value']
                         node_details.append({'node_name': node_name, 'node_port': node_port,
                                              'node_address': node_address, 'node_state': node_state,
-                                             'node_state_reason': node_state_reason, 'node_stats':
+                                             'node_state_reason': node_state_reason,
+                                             'node_admin_state': node_admin_state, 'node_stats':
                                                  {'node_bits_in': node_bits_in, 'node_bits_out': node_bits_out,
                                                   'node_packets_in': node_packets_in,
                                                   'node_packets_out': node_packets_out,
