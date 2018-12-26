@@ -136,6 +136,8 @@ def virtual_server_dashboard(url_list, username, password):
                                                                                      'vs_conn_total': vs_conn_total},
                                     'vs_pool': {'pool_name': pool_name, 'pool_state': pool_state,
                                                 'pool_state_reason': pool_state_reason,
+                                                'pool_active_members': pool_active_members,
+                                                'pool_available_members': pool_available_members,
                                                 'pool_stats': {'pool_bits_in': pool_bits_in,
                                                                'pool_bits_out': pool_bits_out,
                                                                'pool_packets_in': pool_packets_in,

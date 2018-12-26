@@ -171,6 +171,8 @@ function get_task_info(task_id) {
                     var pool_requests_total = results[result_index].vs_pool.pool_stats.pool_requests_total;
                     var pool_requests_depth = results[result_index].vs_pool.pool_stats.pool_requests_depth;
                     var pool_requests_max_age = results[result_index].vs_pool.pool_stats.pool_requests_max_age;
+                    var pool_active_members = results[result_index].vs_pool.pool_active_members;
+                    var pool_available_members = results[result_index].vs_pool.pool_available_members;
 
                     if (pool_status.includes('available')) {
                         var pool_status_img = `<img src='/static/f5_deployment/img/status_circle_green.png' class='img-responsive center-block' alt='pool_available' title="${pool_state_reason}">`
@@ -184,6 +186,7 @@ function get_task_info(task_id) {
 
                     document.getElementById("pool_detail_status").innerHTML = pool_status_img;
                     document.getElementById("pool_detail_name").innerHTML = pool_name;
+                    document.getElementById("pool_detail_members").innerHTML = pool_active_members + '/' + pool_available_members;
                     document.getElementById("pool_detail_bits_in").innerHTML = pool_bits_in;
                     document.getElementById("pool_detail_bits_out").innerHTML = pool_bits_out;
                     document.getElementById("pool_detail_packets_in").innerHTML = pool_packets_in;
