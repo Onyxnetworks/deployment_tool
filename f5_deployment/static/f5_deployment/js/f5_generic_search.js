@@ -1,5 +1,10 @@
 var frm = $('#f5_search');
 var rslt = $('#f5_results');
+var pool_li = $('#pool_li');
+var node_li = $('#node_li');
+var pool_tab = $('#pool');
+var nodes_tab = $('#nodes');
+
 frm.submit(function () {
     document.getElementById("tablediv").style.visibility = "hidden";
     document.getElementById("vs_data").style.visibility = "hidden";
@@ -168,10 +173,10 @@ function get_task_info(task_id) {
                 }
                 if (pool_name == 'none'){
                     var vs_data_body = document.getElementById("vs_data_body");
-                    vs_data_body.parentElement.removeChild('#pool_li');
-                    vs_data_body.parentElement.removeChild('#node_li');
-                    vs_data_body.parentElement.removeChild('#pool');
-                    vs_data_body.parentElement.removeChild('#nodes');
+                    vs_data_body.parentElement.removeChild(pool_li);
+                    vs_data_body.parentElement.removeChild(node_li);
+                    vs_data_body.parentElement.removeChild(pool_tab);
+                    vs_data_body.parentElement.removeChild(nodes_tab);
                     var pool_status_img = ''
                 }
                 console.log("row click");
