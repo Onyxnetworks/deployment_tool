@@ -19,6 +19,32 @@ def get_vs_stats(base_url, selfLink, auth_token):
         return error
 
 
+def get_node_stats(base_url, nodeLink, auth_token):
+    headers = {'content-type': 'application/json', 'X-F5-Auth-Token': auth_token}
+    get_url = base_url + '/{0}/stats'.format(nodeLink)
+    try:
+        get_response = requests.get(get_url, headers=headers, timeout=5, verify=False)
+        payload_response = json.loads(get_response.text)
+        if get_response.status_code == 200:
+            return payload_response
+
+    except requests.exceptions.HTTPError as errh:
+        error_code = "Http Error:" + str(errh)
+        return error_code
+
+    except requests.exceptions.ConnectionError as errc:
+        error_code = "Error Connecting:" + str(errc)
+        return error_code
+
+    except requests.exceptions.Timeout as errt:
+        error_code = "Timeout Error:" + str(errt)
+        return error_code
+
+    except requests.exceptions.RequestException as err:
+        error_code = "Error:" + str(err)
+        return error_code
+
+
 def get_pool_stats(base_url, poolLink, auth_token):
     headers = {'content-type': 'application/json', 'X-F5-Auth-Token': auth_token}
     get_url = base_url + '/{0}/stats'.format(poolLink)
@@ -31,6 +57,35 @@ def get_pool_stats(base_url, poolLink, auth_token):
     except requests.exceptions.HTTPError as errh:
         error_code = "Http Error:" + str(errh)
         return error_code
+
+    except requests.exceptions.ConnectionError as errc:
+        error_code = "Error Connecting:" + str(errc)
+        return error_code
+
+    except requests.exceptions.Timeout as errt:
+        error_code = "Timeout Error:" + str(errt)
+        return error_code
+
+    except requests.exceptions.RequestException as err:
+        error_code = "Error:" + str(err)
+        return error_code
+
+
+def get_pool_by_reference(base_url, poolLink, auth_token):
+    headers = {'content-type': 'application/json', 'X-F5-Auth-Token': auth_token}
+    get_url = base_url +'/{0}?expandSubcollections=true'.format(poolLink)
+
+    try:
+        get_response = requests.get(get_url, headers=headers, timeout=5, verify=False)
+        payload_response = json.loads(get_response.text)
+
+        if get_response.status_code == 200:
+            return payload_response
+
+    except requests.exceptions.HTTPError as errh:
+        error_code = "Http Error:" + str(errh)
+        return error_code
+
 
     except requests.exceptions.ConnectionError as errc:
         error_code = "Error Connecting:" + str(errc)
@@ -108,6 +163,47 @@ def virtual_server_dashboard(url_list, username, password):
                 pool_name = vs['pool'].split('/')[-1]
                 pool_stats = get_pool_stats(base_url, poolLink, auth_token)
                 pool_state_dict = pool_stats['entries'].values()
+
+                # Get node details
+                node_details = []
+                pool_reference = get_pool_by_reference(base_url, poolLink, auth_token)
+                for nodes in pool_reference['membersReference']['items']:
+                    node_name = re.split(':', nodes['name'])[-2]
+                    node_port = re.split(':', nodes['name'])[-1]
+                    node_address = nodes['address']
+                    nodeLink_ver = nodes['selfLink'].split('/localhost/')[1]
+                    nodeLink = nodeLink_ver.split('?ver=')[0]
+                    node_stats = get_node_stats(base_url, nodeLink, auth_token)
+                    node_stats_dict = node_stats['entries'].values()
+                    for node_values in node_stats_dict:
+                        node_state = node_values['nestedStats']['entries']['status.availabilityState']['description']
+                        node_state_reason = node_values['nestedStats']['entries']['status.statusReason']['description']
+                        node_state_reason = node_state_reason.replace("'", "")
+                        node_bits_in = node_values['nestedStats']['entries']['serverside.bitsIn']['value']
+                        node_bits_out = node_values['nestedStats']['entries']['serverside.bitsOut']['value']
+                        node_packets_in = node_values['nestedStats']['entries']['serverside.pktsIn']['value']
+                        node_packets_out = node_values['nestedStats']['entries']['serverside.pktsOut']['value']
+                        node_conn_current = node_values['nestedStats']['entries']['serverside.curConns']['value']
+                        node_conn_max = node_values['nestedStats']['entries']['serverside.maxConns']['value']
+                        node_conn_total = node_values['nestedStats']['entries']['serverside.totConns']['value']
+                        node_requests_total = node_values['nestedStats']['entries']['totRequests']['value']
+                        node_requests_depth = node_values['nestedStats']['entries']['connq.depth']['value']
+                        node_requests_max_age = node_values['nestedStats']['entries']['connq.ageMax']['value']
+                        node_details.append({'node_name': node_name, 'node_port': node_port,
+                                             'node_address': node_address, 'node_state': node_state,
+                                             'node_state_reason': node_state_reason, 'node_stats':
+                                                 {'node_bits_in': node_bits_in, 'node_bits_out': node_bits_out,
+                                                  'node_packets_in': node_packets_in,
+                                                  'node_packets_out': node_packets_out,
+                                                  'node_conn_current': node_conn_current,
+                                                  'node_conn_max': node_conn_max, 'node_conn_total': node_conn_total,
+                                                  'node_requests_total': node_requests_total,
+                                                  'node_requests_depth': node_requests_depth,
+                                                  'node_requests_max_age': node_requests_max_age}})
+
+
+
+
                 for pool_values in pool_state_dict:
                     pool_state = pool_values['nestedStats']['entries']['status.availabilityState']['description']
                     pool_state_reason = pool_values['nestedStats']['entries']['status.statusReason']['description']
@@ -149,7 +245,8 @@ def virtual_server_dashboard(url_list, username, password):
                                                                'pool_requests_depth': pool_requests_depth,
                                                                'pool_requests_max_age': pool_requests_max_age,
                                                                }
-                                                }
+                                                },
+                                    'vs_nodes': node_details
                                     })
 
 
