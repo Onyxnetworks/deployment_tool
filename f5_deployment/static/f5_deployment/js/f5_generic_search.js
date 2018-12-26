@@ -169,16 +169,6 @@ function get_task_info(task_id) {
                     var pool_conn_max = results[result_index].vs_pool.pool_stats.pool_conn_max;
                     var pool_conn_total = results[result_index].vs_pool.pool_stats.pool_conn_total;
                     var pool_requests_total = results[result_index].vs_pool.pool_stats.pool_requests_total;
-                    document.getElementById("pool_detail_status").innerHTML = pool_status_img;
-                    document.getElementById("pool_detail_name").innerHTML = pool_name;
-                    document.getElementById("pool_detail_bits_in").innerHTML = pool_bits_in;
-                    document.getElementById("pool_detail_bits_out").innerHTML = pool_bits_out;
-                    document.getElementById("pool_detail_packets_in").innerHTML = pool_packets_in;
-                    document.getElementById("pool_detail_packets_out").innerHTML = pool_packets_out;
-                    document.getElementById("pool_detail_connections_current").innerHTML = pool_conn_current;
-                    document.getElementById("pool_detail_connections_maximum").innerHTML = pool_conn_max;
-                    document.getElementById("pool_detail_connections_total").innerHTML = pool_conn_total;   
-                    document.getElementById("pool_detail_requests_total").innerHTML = pool_requests_total;
 
                     if (pool_status.includes('available')) {
                         var pool_status_img = `<img src='/static/f5_deployment/img/status_circle_green.png' class='img-responsive center-block' alt='pool_available' title="${pool_state_reason}">`
@@ -189,13 +179,38 @@ function get_task_info(task_id) {
                     if (pool_status.includes('unknown')) {
                         var pool_status_img = `<img src='/static/f5_deployment/img/status_square_blue.png' class='img-responsive center-block' alt='pool_unknown' title="${pool_state_reason}">`
                     }
+
+                    document.getElementById("pool_detail_status").innerHTML = pool_status_img;
+                    document.getElementById("pool_detail_name").innerHTML = pool_name;
+                    document.getElementById("pool_detail_bits_in").innerHTML = pool_bits_in;
+                    document.getElementById("pool_detail_bits_out").innerHTML = pool_bits_out;
+                    document.getElementById("pool_detail_packets_in").innerHTML = pool_packets_in;
+                    document.getElementById("pool_detail_packets_out").innerHTML = pool_packets_out;
+                    document.getElementById("pool_detail_connections_current").innerHTML = pool_conn_current;
+                    document.getElementById("pool_detail_connections_maximum").innerHTML = pool_conn_max;
+                    document.getElementById("pool_detail_connections_total").innerHTML = pool_conn_total;
+                    document.getElementById("pool_detail_requests_total").innerHTML = pool_requests_total;
+
                 }
                 if (pool_name == 'none'){
+
                     //$("#pool_li").hide();
                     //$("#node_li").hide();
                     //$("#pool_tab").hide();
                     //$("#nodes_tab").hide();
-                    var pool_status_img = ''
+
+                    document.getElementById("pool_detail_status").innerHTML = '';
+                    document.getElementById("pool_detail_name").innerHTML = '';
+                    document.getElementById("pool_detail_bits_in").innerHTML = '';
+                    document.getElementById("pool_detail_bits_out").innerHTML = '';
+                    document.getElementById("pool_detail_packets_in").innerHTML = '';
+                    document.getElementById("pool_detail_packets_out").innerHTML = '';
+                    document.getElementById("pool_detail_connections_current").innerHTML = '';
+                    document.getElementById("pool_detail_connections_maximum").innerHTML = '';
+                    document.getElementById("pool_detail_connections_total").innerHTML = '';
+                    document.getElementById("pool_detail_requests_total").innerHTML = '';
+
+                    var pool_status_img = '';
                 }
                 document.getElementById("vs_data").style.visibility = "visible";
                 document.getElementById("vs_detail_status").innerHTML = vs_status_img;
