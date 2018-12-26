@@ -169,6 +169,8 @@ function get_task_info(task_id) {
                     var pool_conn_max = results[result_index].vs_pool.pool_stats.pool_conn_max;
                     var pool_conn_total = results[result_index].vs_pool.pool_stats.pool_conn_total;
                     var pool_requests_total = results[result_index].vs_pool.pool_stats.pool_requests_total;
+                    var pool_requests_depth = results[result_index].vs_pool.pool_stats.pool_requests_depth;
+                    var pool_requests_max_age = results[result_index].vs_pool.pool_stats.pool_requests_max_age;
 
                     if (pool_status.includes('available')) {
                         var pool_status_img = `<img src='/static/f5_deployment/img/status_circle_green.png' class='img-responsive center-block' alt='pool_available' title="${pool_state_reason}">`
@@ -190,7 +192,8 @@ function get_task_info(task_id) {
                     document.getElementById("pool_detail_connections_maximum").innerHTML = pool_conn_max;
                     document.getElementById("pool_detail_connections_total").innerHTML = pool_conn_total;
                     document.getElementById("pool_detail_requests_total").innerHTML = pool_requests_total;
-
+                    document.getElementById("pool_detail_requests_depth").innerHTML = pool_requests_depth;
+                    document.getElementById("pool_detail_requests_max_age").innerHTML = pool_requests_max_age;
                 }
                 if (pool_name == 'none'){
 
@@ -209,6 +212,8 @@ function get_task_info(task_id) {
                     document.getElementById("pool_detail_connections_maximum").innerHTML = '';
                     document.getElementById("pool_detail_connections_total").innerHTML = '';
                     document.getElementById("pool_detail_requests_total").innerHTML = '';
+                    document.getElementById("pool_detail_requests_depth").innerHTML = '';
+                    document.getElementById("pool_detail_requests_max_age").innerHTML = '';
 
                     var pool_status_img = '';
                 }
