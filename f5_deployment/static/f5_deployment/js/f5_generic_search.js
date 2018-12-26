@@ -167,6 +167,11 @@ function get_task_info(task_id) {
                     }
                 }
                 if (pool_name == 'none'){
+                    var vs_data_body = document.getElementById("vs_data_body")
+                    vs_data_body.parentElement.removeChild(#pool_li);
+                    vs_data_body.parentElement.removeChild(#node_li);
+                    vs_data_body.parentElement.removeChild(#pool);
+                    vs_data_body.parentElement.removeChild(#nodes);
 
                     var pool_status_img = ''
                 }
