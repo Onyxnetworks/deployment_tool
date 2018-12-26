@@ -215,7 +215,7 @@ function get_task_info(task_id) {
                         var node_requests_max_age = node_results[ni].node_stats.node_requests_max_age;
                         if (node_admin_state.includes('disabled')){
                             if (node_state.includes('available')) {
-                                var node_status_img = `<img src='/static/f5_deployment/img/status_circle_black.png' class='img-responsive center-block' alt='node_available' title=${node_state_reason}">`
+                                var node_status_img = `<img src='/static/f5_deployment/img/status_circle_black.png' class='img-responsive center-block' alt='node_available' title="${node_state_reason}">`
                             }
                             if (node_state.includes('offline')) {
                                 var node_status_img = `<img src='/static/f5_deployment/img/status_diamond_black.png' class='img-responsive center-block' alt='node_offline' title="${node_state_reason}">`
