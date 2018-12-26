@@ -112,13 +112,52 @@ def virtual_server_dashboard(url_list, username, password):
                     pool_state = pool_values['nestedStats']['entries']['status.availabilityState']['description']
                     pool_state_reason = pool_values['nestedStats']['entries']['status.statusReason']['description']
                     pool_state_reason = pool_state_reason.replace("'", "")
-                    results.append({'location': location, 'vs_name': vs_name, 'vs_state': vs_state, 'vs_admin_state': vs_admin_state, 'vs_state_reason': vs_state_reason, 'vs_ip': vs_ip, 'vs_port': vs_port, 'vs_stats': {'vs_bits_in': vs_bits_in, 'vs_bits_out': vs_bits_out, 'vs_packets_in': vs_packets_in, 'vs_packets_out': vs_packets_out, 'vs_conn_current': vs_conn_current, 'vs_conn_max': vs_conn_max, 'vs_conn_total': vs_conn_total}, 'vs_pool': {'pool_name': pool_name, 'pool_state': pool_state, 'pool_state_reason': pool_state_reason}})
+                    pool_active_members = pool_values['nestedStats']['entries']['activeMemberCnt']['value']
+                    pool_available_members = pool_values['nestedStats']['entries']['availableMemberCnt']['value']
+                    pool_bits_in = pool_values['nestedStats']['entries']['serverside.bitsIn']['value']
+                    pool_bits_out = pool_values['nestedStats']['entries']['serverside.bitsOut']['value']
+                    pool_packets_in = pool_values['nestedStats']['entries']['serverside.pktsIn']['value']
+                    pool_packets_out = pool_values['nestedStats']['entries']['serverside.pktsOut']['value']
+                    pool_conn_current = pool_values['nestedStats']['entries']['serverside.curConns']['value']
+                    pool_conn_max = pool_values['nestedStats']['entries']['serverside.maxConns']['value']
+                    pool_conn_total = pool_values['nestedStats']['entries']['serverside.totConns']['value']
+                    pool_requests_total = pool_values['nestedStats']['entries']['totRequests']['value']
+                    #pool_requests_depth = pool_values['nestedStats']['entries']
+                    #pool_requests_max_age = pool_values['nestedStats']['entries']
+
+                    results.append({'location': location, 'vs_name': vs_name, 'vs_state': vs_state,
+                                    'vs_admin_state': vs_admin_state, 'vs_state_reason': vs_state_reason,
+                                    'vs_ip': vs_ip, 'vs_port': vs_port, 'vs_stats': {'vs_bits_in': vs_bits_in,
+                                                                                     'vs_bits_out': vs_bits_out,
+                                                                                     'vs_packets_in': vs_packets_in,
+                                                                                     'vs_packets_out': vs_packets_out,
+                                                                                     'vs_conn_current': vs_conn_current,
+                                                                                     'vs_conn_max': vs_conn_max,
+                                                                                     'vs_conn_total': vs_conn_total},
+                                    'vs_pool': {'pool_name': pool_name, 'pool_state': pool_state,
+                                                'pool_state_reason': pool_state_reason, 'pool_stats': {
+                                            'pool_bits_in': pool_bits_in, 'pool_bits_out': pool_bits_out,
+                                            'pool_packets_in': pool_packets_in, 'pool_packets_out': pool_packets_out,
+                                            'pool_conn_current': pool_conn_current, 'pool_conn_max': pool_conn_max,
+                                            'pool_conn_total': pool_conn_total,
+                                            'pool_requests_total': pool_requests_total
+                                        }}})
 
 
 
 
             except:
-                results.append({'location': location, 'vs_name': vs_name, 'vs_state': vs_state, 'vs_admin_state': vs_admin_state, 'vs_state_reason': vs_state_reason, 'vs_ip': vs_ip, 'vs_port': vs_port, 'vs_stats': {'vs_bits_in': vs_bits_in, 'vs_bits_out': vs_bits_out, 'vs_packets_in': vs_packets_in, 'vs_packets_out': vs_packets_out, 'vs_conn_current': vs_conn_current, 'vs_conn_max': vs_conn_max, 'vs_conn_total': vs_conn_total}, 'vs_pool': {'pool_name': 'none', 'pool_state': 'unknown', 'pool_state_reason': 'unknown'}})
+                results.append({'location': location, 'vs_name': vs_name, 'vs_state': vs_state,
+                                'vs_admin_state': vs_admin_state, 'vs_state_reason': vs_state_reason,
+                                'vs_ip': vs_ip, 'vs_port': vs_port, 'vs_stats': {'vs_bits_in': vs_bits_in,
+                                                                                 'vs_bits_out': vs_bits_out,
+                                                                                 'vs_packets_in': vs_packets_in,
+                                                                                 'vs_packets_out': vs_packets_out,
+                                                                                 'vs_conn_current': vs_conn_current,
+                                                                                 'vs_conn_max': vs_conn_max,
+                                                                                 'vs_conn_total': vs_conn_total},
+                                'vs_pool': {'pool_name': 'none', 'pool_state': 'unknown',
+                                            'pool_state_reason': 'unknown'}})
 
         return results
 

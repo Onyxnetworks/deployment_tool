@@ -167,6 +167,7 @@ function get_task_info(task_id) {
                     }
                 }
                 if (pool_name == 'none'){
+
                     var pool_status_img = ''
                 }
                 console.log("row click");
