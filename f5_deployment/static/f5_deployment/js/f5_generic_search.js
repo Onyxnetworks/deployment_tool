@@ -158,10 +158,6 @@ function get_task_info(task_id) {
                     }
                 }
                 if (pool_name != 'none'){
-                    $("#pool_li").show();
-                    $("#node_li").show();
-                    $("#pool_tab").show();
-                    $("#nodes_tab").show();
                     var pool_bits_in = results[result_index].vs_pool.pool_stats.pool_bits_in;
                     var pool_bits_out = results[result_index].vs_pool.pool_stats.pool_bits_out;
                     var pool_packets_in = results[result_index].vs_pool.pool_stats.pool_packets_in;
@@ -257,12 +253,6 @@ function get_task_info(task_id) {
 
                 }
                 if (pool_name == 'none'){
-
-                    //$("#pool_li").hide();
-                    //$("#node_li").hide();
-                    //$("#pool_tab").hide();
-                    //$("#nodes_tab").hide();
-
                     document.getElementById("pool_detail_status").innerHTML = '';
                     document.getElementById("pool_detail_name").innerHTML = '';
                     document.getElementById("pool_detail_members").innerHTML = '';
