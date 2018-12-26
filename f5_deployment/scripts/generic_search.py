@@ -203,7 +203,7 @@ def virtual_server_dashboard(url_list, username, password):
 
 
 
-
+                print(node_details)
                 for pool_values in pool_state_dict:
                     pool_state = pool_values['nestedStats']['entries']['status.availabilityState']['description']
                     pool_state_reason = pool_values['nestedStats']['entries']['status.statusReason']['description']
