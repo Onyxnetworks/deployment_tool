@@ -161,6 +161,27 @@ function get_task_info(task_id) {
                     $("#node_li").show();
                     $("#pool_tab").show();
                     $("#nodes_tab").show();
+                    var pool_bits_in = results[result_index].pool_stats.pool_bits_in;
+                    var pool_bits_out = results[result_index].pool_stats.pool_bits_out;
+                    var pool_packets_in = results[result_index].pool_stats.pool_packets_in;
+                    var pool_packets_out = results[result_index].pool_stats.pool_packets_out;
+                    var pool_conn_current = results[result_index].pool_stats.pool_conn_current;
+                    var pool_conn_max = results[result_index].pool_stats.pool_conn_max;
+                    var pool_conn_total = results[result_index].pool_stats.pool_conn_total;
+                    var pool_requests_total = results[result_index].pool_stats.pool_requests_total;
+                    document.getElementById("pool_detail_status").innerHTML = pool_status_img;
+                    document.getElementById("pool_detail_name").innerHTML = pool_name;
+                    document.getElementById("pool_detail_destination").innerHTML = pool_ip;
+                    document.getElementById("pool_detail_port").innerHTML = pool_port;
+                    document.getElementById("pool_detail_bits_in").innerHTML = pool_bits_in;
+                    document.getElementById("pool_detail_bits_out").innerHTML = pool_bits_out;
+                    document.getElementById("pool_detail_packets_in").innerHTML = pool_packets_in;
+                    document.getElementById("pool_detail_packets_out").innerHTML = pool_packets_out;
+                    document.getElementById("pool_detail_connections_current").innerHTML = pool_conn_current;
+                    document.getElementById("pool_detail_connections_maximum").innerHTML = pool_conn_max;
+                    document.getElementById("pool_detail_connections_total").innerHTML = pool_conn_total;   
+                    document.getElementById("pool_detail_requests_total").innerHTML = pool_requests_total;
+
                     if (pool_status.includes('available')) {
                         var pool_status_img = `<img src='/static/f5_deployment/img/status_circle_green.png' class='img-responsive center-block' alt='pool_available' title="${pool_state_reason}">`
                     }
@@ -178,7 +199,6 @@ function get_task_info(task_id) {
                     //$("#nodes_tab").hide();
                     var pool_status_img = ''
                 }
-                console.log("row click");
                 document.getElementById("vs_data").style.visibility = "visible";
                 document.getElementById("vs_detail_status").innerHTML = vs_status_img;
                 document.getElementById("vs_detail_name").innerHTML = vs_name;
@@ -191,8 +211,6 @@ function get_task_info(task_id) {
                 document.getElementById("vs_detail_connections_current").innerHTML = vs_conn_current;
                 document.getElementById("vs_detail_connections_maximum").innerHTML = vs_conn_max;
                 document.getElementById("vs_detail_connections_total").innerHTML = vs_conn_total;
-
-
                 });
             }
 
