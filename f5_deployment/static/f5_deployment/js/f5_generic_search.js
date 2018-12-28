@@ -132,7 +132,7 @@ function get_task_info(task_id) {
                 var pool_name = results[result_index].vs_pool.pool_name;
                 var pool_status = results[result_index].vs_pool.pool_state;
                 var pool_state_reason = results[result_index].vs_pool.pool_state_reason;
-                var vs_bits_in = m(results[result_index].vs_stats.vs_bits_in);
+                var vs_bits_in = m(parseInt(results[result_index].vs_stats.vs_bits_in));
                 var vs_bits_out = results[result_index].vs_stats.vs_bits_out;
                 var vs_packets_in = results[result_index].vs_stats.vs_packets_in;
                 var vs_packets_out = results[result_index].vs_stats.vs_packets_out;
