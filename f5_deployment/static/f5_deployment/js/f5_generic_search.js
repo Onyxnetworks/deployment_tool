@@ -23,6 +23,7 @@ frm.submit(function () {
 
 });
 
+// Function to convert intigers to a readable format eg 1000 becomes 1k
 function m(n,d){x=(''+n).length,p=Math.pow,d=p(10,d)
     x-=x%3
     return Math.round(n*d/p(10,x))/d+" kMGTPE"[x/3]}
@@ -162,16 +163,16 @@ function get_task_info(task_id) {
                     }
                 }
                 if (pool_name != 'none'){
-                    var pool_bits_in = m(results[result_index].vs_pool.pool_stats.pool_bits_in, 0);
-                    var pool_bits_out = m(results[result_index].vs_pool.pool_stats.pool_bits_out, 0);
-                    var pool_packets_in = m(results[result_index].vs_pool.pool_stats.pool_packets_in, 0);
-                    var pool_packets_out = m(results[result_index].vs_pool.pool_stats.pool_packets_out, 0);
-                    var pool_conn_current = m(results[result_index].vs_pool.pool_stats.pool_conn_current, 0);
-                    var pool_conn_max = m(results[result_index].vs_pool.pool_stats.pool_conn_max, 0);
-                    var pool_conn_total = m(results[result_index].vs_pool.pool_stats.pool_conn_total, 0);
-                    var pool_requests_total = m(results[result_index].vs_pool.pool_stats.pool_requests_total, 0);
-                    var pool_requests_depth = m(results[result_index].vs_pool.pool_stats.pool_requests_depth, 0);
-                    var pool_requests_max_age = m(results[result_index].vs_pool.pool_stats.pool_requests_max_age, 0);
+                    var pool_bits_in = m(results[result_index].vs_pool.pool_stats.pool_bits_in, 2);
+                    var pool_bits_out = m(results[result_index].vs_pool.pool_stats.pool_bits_out, 2);
+                    var pool_packets_in = m(results[result_index].vs_pool.pool_stats.pool_packets_in, 2);
+                    var pool_packets_out = m(results[result_index].vs_pool.pool_stats.pool_packets_out, 2);
+                    var pool_conn_current = m(results[result_index].vs_pool.pool_stats.pool_conn_current, 2);
+                    var pool_conn_max = m(results[result_index].vs_pool.pool_stats.pool_conn_max, 2);
+                    var pool_conn_total = m(results[result_index].vs_pool.pool_stats.pool_conn_total, 2);
+                    var pool_requests_total = m(results[result_index].vs_pool.pool_stats.pool_requests_total, 2);
+                    var pool_requests_depth = m(results[result_index].vs_pool.pool_stats.pool_requests_depth, 2);
+                    var pool_requests_max_age = m(results[result_index].vs_pool.pool_stats.pool_requests_max_age, 2);
                     var pool_active_members = results[result_index].vs_pool.pool_active_members;
                     var pool_available_members = results[result_index].vs_pool.pool_available_members;
 
@@ -207,16 +208,16 @@ function get_task_info(task_id) {
                         var node_state = node_results[ni].node_state;
                         var node_state_reason = node_results[ni].node_state_reason;
                         var node_address = node_results[ni].node_address;
-                        var node_bits_in = m(node_results[ni].node_stats.node_bits_in, 0);
-                        var node_bits_out = m(node_results[ni].node_stats.node_bits_out, 0);
-                        var node_packets_in = m(node_results[ni].node_stats.node_packets_in, 0);
-                        var node_packets_out = m(node_results[ni].node_stats.node_packets_out, 0);
-                        var node_conn_current = m(node_results[ni].node_stats.node_conn_current, 0);
-                        var node_conn_max = m(node_results[ni].node_stats.node_conn_max, 0);
-                        var node_conn_total = m(node_results[ni].node_stats.node_conn_total, 0);
-                        var node_requests_total = m(node_results[ni].node_stats.node_requests_total, 0);
-                        var node_requests_depth = m(node_results[ni].node_stats.node_requests_depth, 0);
-                        var node_requests_max_age = m(node_results[ni].node_stats.node_requests_max_age, 0);
+                        var node_bits_in = m(node_results[ni].node_stats.node_bits_in, 2);
+                        var node_bits_out = m(node_results[ni].node_stats.node_bits_out, 2);
+                        var node_packets_in = m(node_results[ni].node_stats.node_packets_in, 2);
+                        var node_packets_out = m(node_results[ni].node_stats.node_packets_out, 2);
+                        var node_conn_current = m(node_results[ni].node_stats.node_conn_current, 2);
+                        var node_conn_max = m(node_results[ni].node_stats.node_conn_max, 2);
+                        var node_conn_total = m(node_results[ni].node_stats.node_conn_total, 2);
+                        var node_requests_total = m(node_results[ni].node_stats.node_requests_total, 2);
+                        var node_requests_depth = m(node_results[ni].node_stats.node_requests_depth, 2);
+                        var node_requests_max_age = m(node_results[ni].node_stats.node_requests_max_age, 2);
                         if (node_admin_state.includes('disabled')){
                             if (node_state.includes('available')) {
                                 var node_status_img = `<img src='/static/f5_deployment/img/status_circle_black.png' class='img-responsive center-block' alt='node_available' title="${node_state_reason}">`
