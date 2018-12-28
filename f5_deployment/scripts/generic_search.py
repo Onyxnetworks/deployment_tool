@@ -144,10 +144,11 @@ def virtual_server_dashboard(url_list, username, password):
             vs_stats = get_vs_stats(base_url, selfLink, auth_token)
             vs_state_dict = vs_stats['entries'].values()
             for vs_values in vs_state_dict:
+                print(type(vs_bits_out))
                 vs_state = vs_values['nestedStats']['entries']['status.availabilityState']['description']
                 vs_admin_state = vs_values['nestedStats']['entries']['status.enabledState']['description']
                 vs_state_reason = vs_values['nestedStats']['entries']['status.statusReason']['description']
-                vs_bits_in = vs_values['nestedStats']['entries']['clientside.bitsIn']['value']
+                vs_bits_in = int(vs_values['nestedStats']['entries']['clientside.bitsIn']['value'])
                 vs_bits_out = vs_values['nestedStats']['entries']['clientside.bitsOut']['value']
                 vs_packets_in = vs_values['nestedStats']['entries']['clientside.pktsIn']['value']
                 vs_packets_out = vs_values['nestedStats']['entries']['clientside.pktsOut']['value']
