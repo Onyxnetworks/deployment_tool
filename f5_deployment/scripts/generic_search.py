@@ -211,7 +211,7 @@ def virtual_server_dashboard(url_list, username, password):
                     pool_state_reason = pool_values['nestedStats']['entries']['status.statusReason']['description']
                     pool_state_reason = pool_state_reason.replace("'", "")
                     pool_active_members = pool_values['nestedStats']['entries']['activeMemberCnt']['value']
-                    pool_available_members = pool_values['nestedStats']['entries']['availableMemberCnt']['value']
+                    pool_available_members = pool_values['nestedStats']['entries']['memberCnt']['value']
                     pool_bits_in = pool_values['nestedStats']['entries']['serverside.bitsIn']['value']
                     pool_bits_out = pool_values['nestedStats']['entries']['serverside.bitsOut']['value']
                     pool_packets_in = pool_values['nestedStats']['entries']['serverside.pktsIn']['value']
