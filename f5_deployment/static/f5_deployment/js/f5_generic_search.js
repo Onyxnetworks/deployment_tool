@@ -132,13 +132,13 @@ function get_task_info(task_id) {
                 var pool_name = results[result_index].vs_pool.pool_name;
                 var pool_status = results[result_index].vs_pool.pool_state;
                 var pool_state_reason = results[result_index].vs_pool.pool_state_reason;
-                var vs_bits_in = results[result_index].vs_stats.vs_bits_in;
-                var vs_bits_out = results[result_index].vs_stats.vs_bits_out;
-                var vs_packets_in = results[result_index].vs_stats.vs_packets_in;
-                var vs_packets_out = results[result_index].vs_stats.vs_packets_out;
-                var vs_conn_current = results[result_index].vs_stats.vs_conn_current;
-                var vs_conn_max = results[result_index].vs_stats.vs_conn_max;
-                var vs_conn_total = results[result_index].vs_stats.vs_conn_total;
+                var vs_bits_in = m(results[result_index].vs_stats.vs_bits_in, 0);
+                var vs_bits_out = m(results[result_index].vs_stats.vs_bits_out, 0);
+                var vs_packets_in = m(results[result_index].vs_stats.vs_packets_in, 0);
+                var vs_packets_out = m(results[result_index].vs_stats.vs_packets_out, 0);
+                var vs_conn_current = m(results[result_index].vs_stats.vs_conn_current, 0);
+                var vs_conn_max = m(results[result_index].vs_stats.vs_conn_max, 0);
+                var vs_conn_total = m(results[result_index].vs_stats.vs_conn_total, 0);
                 if (vs_admin_state.includes('disabled')){
                     if (vs_status.includes('available')) {
                         var vs_status_img = `<img src='/static/f5_deployment/img/status_circle_black.png' class='img-responsive center-block' alt='vs_available' title=${vs_state_reason}">`
@@ -162,16 +162,16 @@ function get_task_info(task_id) {
                     }
                 }
                 if (pool_name != 'none'){
-                    var pool_bits_in = results[result_index].vs_pool.pool_stats.pool_bits_in;
-                    var pool_bits_out = results[result_index].vs_pool.pool_stats.pool_bits_out;
-                    var pool_packets_in = results[result_index].vs_pool.pool_stats.pool_packets_in;
-                    var pool_packets_out = results[result_index].vs_pool.pool_stats.pool_packets_out;
-                    var pool_conn_current = results[result_index].vs_pool.pool_stats.pool_conn_current;
-                    var pool_conn_max = results[result_index].vs_pool.pool_stats.pool_conn_max;
-                    var pool_conn_total = results[result_index].vs_pool.pool_stats.pool_conn_total;
-                    var pool_requests_total = results[result_index].vs_pool.pool_stats.pool_requests_total;
-                    var pool_requests_depth = results[result_index].vs_pool.pool_stats.pool_requests_depth;
-                    var pool_requests_max_age = results[result_index].vs_pool.pool_stats.pool_requests_max_age;
+                    var pool_bits_in = m(results[result_index].vs_pool.pool_stats.pool_bits_in, 0);
+                    var pool_bits_out = m(results[result_index].vs_pool.pool_stats.pool_bits_out, 0);
+                    var pool_packets_in = m(results[result_index].vs_pool.pool_stats.pool_packets_in, 0);
+                    var pool_packets_out = m(results[result_index].vs_pool.pool_stats.pool_packets_out, 0);
+                    var pool_conn_current = m(results[result_index].vs_pool.pool_stats.pool_conn_current, 0);
+                    var pool_conn_max = m(results[result_index].vs_pool.pool_stats.pool_conn_max, 0);
+                    var pool_conn_total = m(results[result_index].vs_pool.pool_stats.pool_conn_total, 0);
+                    var pool_requests_total = m(results[result_index].vs_pool.pool_stats.pool_requests_total, 0);
+                    var pool_requests_depth = m(results[result_index].vs_pool.pool_stats.pool_requests_depth, 0);
+                    var pool_requests_max_age = m(results[result_index].vs_pool.pool_stats.pool_requests_max_age, 0);
                     var pool_active_members = results[result_index].vs_pool.pool_active_members;
                     var pool_available_members = results[result_index].vs_pool.pool_available_members;
 
@@ -207,16 +207,16 @@ function get_task_info(task_id) {
                         var node_state = node_results[ni].node_state;
                         var node_state_reason = node_results[ni].node_state_reason;
                         var node_address = node_results[ni].node_address;
-                        var node_bits_in = node_results[ni].node_stats.node_bits_in;
-                        var node_bits_out = node_results[ni].node_stats.node_bits_out;
-                        var node_packets_in = node_results[ni].node_stats.node_packets_in;
-                        var node_packets_out = node_results[ni].node_stats.node_packets_out;
-                        var node_conn_current = node_results[ni].node_stats.node_conn_current;
-                        var node_conn_max = node_results[ni].node_stats.node_conn_max;
-                        var node_conn_total = node_results[ni].node_stats.node_conn_total;
-                        var node_requests_total = node_results[ni].node_stats.node_requests_total;
-                        var node_requests_depth = node_results[ni].node_stats.node_requests_depth;
-                        var node_requests_max_age = node_results[ni].node_stats.node_requests_max_age;
+                        var node_bits_in = m(node_results[ni].node_stats.node_bits_in, 0);
+                        var node_bits_out = m(node_results[ni].node_stats.node_bits_out, 0);
+                        var node_packets_in = m(node_results[ni].node_stats.node_packets_in, 0);
+                        var node_packets_out = m(node_results[ni].node_stats.node_packets_out, 0);
+                        var node_conn_current = m(node_results[ni].node_stats.node_conn_current, 0);
+                        var node_conn_max = m(node_results[ni].node_stats.node_conn_max, 0);
+                        var node_conn_total = m(node_results[ni].node_stats.node_conn_total, 0);
+                        var node_requests_total = m(node_results[ni].node_stats.node_requests_total, 0);
+                        var node_requests_depth = m(node_results[ni].node_stats.node_requests_depth, 0);
+                        var node_requests_max_age = m(node_results[ni].node_stats.node_requests_max_age, 0);
                         if (node_admin_state.includes('disabled')){
                             if (node_state.includes('available')) {
                                 var node_status_img = `<img src='/static/f5_deployment/img/status_circle_black.png' class='img-responsive center-block' alt='node_available' title="${node_state_reason}">`
