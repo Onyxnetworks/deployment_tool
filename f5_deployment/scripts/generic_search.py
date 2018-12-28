@@ -144,7 +144,6 @@ def virtual_server_dashboard(url_list, username, password):
             vs_stats = get_vs_stats(base_url, selfLink, auth_token)
             vs_state_dict = vs_stats['entries'].values()
             for vs_values in vs_state_dict:
-                print(type(vs_bits_out))
                 vs_state = vs_values['nestedStats']['entries']['status.availabilityState']['description']
                 vs_admin_state = vs_values['nestedStats']['entries']['status.enabledState']['description']
                 vs_state_reason = vs_values['nestedStats']['entries']['status.statusReason']['description']
@@ -156,6 +155,7 @@ def virtual_server_dashboard(url_list, username, password):
                 vs_conn_max = vs_values['nestedStats']['entries']['clientside.maxConns']['value']
                 vs_conn_total = vs_values['nestedStats']['entries']['clientside.totConns']['value']
                 vs_state_reason = vs_state_reason.replace("'", "")
+                print(type(vs_bits_out))
 
             try:
                 vs['poolReference']
