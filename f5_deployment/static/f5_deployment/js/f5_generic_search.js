@@ -133,13 +133,13 @@ function get_task_info(task_id) {
                 var pool_name = results[result_index].vs_pool.pool_name;
                 var pool_status = results[result_index].vs_pool.pool_state;
                 var pool_state_reason = results[result_index].vs_pool.pool_state_reason;
-                var vs_bits_in = m(results[result_index].vs_stats.vs_bits_in, 0);
-                var vs_bits_out = m(results[result_index].vs_stats.vs_bits_out, 0);
-                var vs_packets_in = m(results[result_index].vs_stats.vs_packets_in, 0);
-                var vs_packets_out = m(results[result_index].vs_stats.vs_packets_out, 0);
-                var vs_conn_current = m(results[result_index].vs_stats.vs_conn_current, 0);
-                var vs_conn_max = m(results[result_index].vs_stats.vs_conn_max, 0);
-                var vs_conn_total = m(results[result_index].vs_stats.vs_conn_total, 0);
+                var vs_bits_in = m(results[result_index].vs_stats.vs_bits_in, 2);
+                var vs_bits_out = m(results[result_index].vs_stats.vs_bits_out, 2);
+                var vs_packets_in = m(results[result_index].vs_stats.vs_packets_in, 2);
+                var vs_packets_out = m(results[result_index].vs_stats.vs_packets_out, 2);
+                var vs_conn_current = m(results[result_index].vs_stats.vs_conn_current, 2);
+                var vs_conn_max = m(results[result_index].vs_stats.vs_conn_max, 2);
+                var vs_conn_total = m(results[result_index].vs_stats.vs_conn_total, 2);
                 if (vs_admin_state.includes('disabled')){
                     if (vs_status.includes('available')) {
                         var vs_status_img = `<img src='/static/f5_deployment/img/status_circle_black.png' class='img-responsive center-block' alt='vs_available' title=${vs_state_reason}">`
