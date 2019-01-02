@@ -256,7 +256,7 @@ def f5_generic_search(base_urls, request_type, search_string, username, password
     if request_type == 'Virtual Server IP':
         # Get virtual server IP
         results = []
-        virtual_server_dashboard_result = virtual_server_dashboard(url_list, search_string, username, password)
+        virtual_server_dashboard_result = virtual_server_dashboard(url_list, request_type, search_string, username, password)
         if isinstance(virtual_server_dashboard_result, list):
             for vs in virtual_server_dashboard_result:
                 try:
@@ -273,7 +273,7 @@ def f5_generic_search(base_urls, request_type, search_string, username, password
     if request_type == 'Pool':
         # Get Pool name
         results = []
-        virtual_server_dashboard_result = virtual_server_dashboard(url_list, search_string, username, password)
+        virtual_server_dashboard_result = virtual_server_dashboard(url_list, request_type, search_string, username, password)
         if isinstance(virtual_server_dashboard_result, list):
             for vs in virtual_server_dashboard_result:
                 if search_string.upper() in vs['vs_pool']['pool_name'].upper():
