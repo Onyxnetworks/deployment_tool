@@ -138,7 +138,7 @@ def virtual_server_dashboard(url_list, search_string, username, password):
         all_vs = get_all_vs(base_url, auth_token)
 
         for vs in all_vs['items']:
-            if search_string.upper() in vs['vs_name'].upper():
+            if search_string.upper() in vs['name'].upper():
                 vs_name = vs['name']
                 print(vs_name)
                 vs_ip = re.split(':|/',vs['destination'])[-2]
