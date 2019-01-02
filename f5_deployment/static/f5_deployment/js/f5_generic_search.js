@@ -3,6 +3,7 @@ var rslt = $('#f5_results');
 
 function initdatatable() {
     table = $('#result_table_header').DataTable({
+            retrieve: true,
             responsive: true,
             "language": {
                 "search": "Filter records:"
@@ -44,6 +45,7 @@ function get_task_info(task_id) {
         data: {'task_id': task_id},
         success: function (data) {
             $('#result_table_header').DataTable({
+                retrieve: true,
                 destroy: true,
                 responsive: true,
                 "language": {
