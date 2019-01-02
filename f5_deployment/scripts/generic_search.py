@@ -147,7 +147,6 @@ def virtual_server_dashboard(url_list, request_type, search_string, username, pa
 
             elif request_type == 'Pool':
                 try:
-                    print(vs['pool'])
                     if search_string.upper() not in vs['pool'].upper():
                         continue
                 except:
