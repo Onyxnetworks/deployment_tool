@@ -154,9 +154,9 @@ def virtual_server_dashboard(url_list, request_type, search_string, username, pa
 
             elif request_type == 'Virtual Server IP':
                 print(vs_ip, search_string)
-                if IPNetwork(search_string) in IPNetwork(vs_ip) or IPNetwork(vs_ip) in IPNetwork(
+                if IPNetwork(search_string) not in IPNetwork(vs_ip) or IPNetwork(vs_ip) not in IPNetwork(
                         search_string):
-                    print('Match')
+                    print('No Match')
                     continue
 
             vs_name = vs['name']
