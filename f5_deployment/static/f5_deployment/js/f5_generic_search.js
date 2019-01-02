@@ -52,7 +52,6 @@ function get_task_info(task_id) {
             }
             else if (data.state == 'SUCCESS') {
 //                <!-- Clear Old table Data -->
-                initdatatable();
                 document.getElementById("result_table").innerHTML = "";
                 document.getElementById("tablediv").style.visibility = "visible";
                 //document.getElementById("vs_data_body").innerHTML = "";
@@ -134,6 +133,7 @@ function get_task_info(task_id) {
                     });
                 }
 
+                $('#result_table_header').DataTable().destroy()
                 initdatatable()
 
                 $(".clickable-row").click(function() {
