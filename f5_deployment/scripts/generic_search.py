@@ -1,4 +1,5 @@
 import json, requests, re
+from netaddr import IPNetwork, IPAddress
 
 # Ignore SSL Errors
 requests.packages.urllib3.disable_warnings()
@@ -127,18 +128,31 @@ def get_all_vs(base_url, auth_token):
             return error_code
 
 
-def virtual_server_dashboard(url_list, search_string, username, password):
+def virtual_server_dashboard(url_list, request_type, search_string, username, password):
     results = []
     for base_url in url_list:
-        print(base_url)
         # Authenticate against bigip
         location = base_url.split('.')[0][8:]
         auth_token = bigip_login(base_url, username, password)
         # Get all Virtual Servers
         all_vs = get_all_vs(base_url, auth_token)
-
         for vs in all_vs['items']:
-            if search_string.upper() in vs['name'].upper():
+
+            # Search based on VS Name
+            if request_type == 'Virtual Server Name':
+                if search_string.upper() not in vs['name'].upper():
+                    pass
+
+            elif request_type == 'Pool':
+                if search_string.upper() not in vs['pool'].split('/')[-1].upper():
+                    pass
+
+            elif request_type == 'Virtual Server IP':
+                if IPNetwork(search_string) not in IPNetwork(vs['vs_ip']) or IPNetwork(vs['vs_ip']) not in IPNetwork(
+                        search_string):
+                    pass
+
+            else:
                 vs_name = vs['name']
                 print(vs_name)
                 vs_ip = re.split(':|/',vs['destination'])[-2]
