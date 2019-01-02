@@ -153,10 +153,11 @@ def virtual_server_dashboard(url_list, request_type, search_string, username, pa
                         continue
 
             elif request_type == 'Virtual Server IP':
+                print(vs_ip, search_string)
                 if IPNetwork(search_string) in IPNetwork(vs_ip) or IPNetwork(vs_ip) in IPNetwork(
                         search_string):
                     print('Match')
-                    pass
+                    continue
 
             vs_name = vs['name']
             print(vs_name)
