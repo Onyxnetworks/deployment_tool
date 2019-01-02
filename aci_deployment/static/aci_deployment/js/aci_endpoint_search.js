@@ -1,16 +1,6 @@
 var frm = $('#endpoint_search');
 var rslt = $('#endpoint_results');
 
-function initdatatable() {
-    table = $('#endpoint_table').DataTable({
-            destroy: true,
-            retrieve: true,
-            responsive: true,
-            "language": {
-                "search": "Filter records:"
-            },
-        } );
-}
 
 frm.submit(function () {
     document.getElementById("tablediv").style.visibility = "hidden";
@@ -43,7 +33,7 @@ function get_task_info(task_id) {
             }
             else if (data.state == 'SUCCESS') {
                 <!-- Clear Old table Data -->
-                if ($.fn.DataTable.isDataTable("#result_table_header")){
+                if ($.fn.DataTable.isDataTable("#endpoint_table")){
                     $('#endpoint_table').DataTable().clear().destroy();
                 }
                 document.getElementById("result_table").innerHTML = "";
@@ -86,7 +76,13 @@ function get_task_info(task_id) {
                         document.body.appendChild(td);
                         document.getElementById(TABLE_TR).appendChild(td);
                     });}
-                initdatatable();
+                $('#endpoint_table').DataTable({
+                    retrieve: true,
+                    responsive: true,
+                    "language": {
+                        "search": "Filter records:"
+                    },
+                } );
             }
 
             if (data.state != 'SUCCESS') {
