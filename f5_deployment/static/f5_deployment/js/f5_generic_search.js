@@ -3,6 +3,7 @@ var rslt = $('#f5_results');
 
 function initdatatable() {
     table = $('#result_table_header').DataTable({
+            destroy: true,
             retrieve: true,
             responsive: true,
             "language": {
@@ -44,14 +45,6 @@ function get_task_info(task_id) {
         url: '/get_task_info/',
         data: {'task_id': task_id},
         success: function (data) {
-            $('#result_table_header').DataTable({
-                retrieve: true,
-                destroy: true,
-                responsive: true,
-                "language": {
-                    "search": "Filter records:"
-                },
-            } );
             rslt.html('');
 
             if (data.state == 'PENDING') {
@@ -140,12 +133,7 @@ function get_task_info(task_id) {
                     });
                 }
 
-                $('#result_table_header').DataTable({
-                    responsive: true,
-                    "language": {
-                        "search": "Filter records:"
-                    },
-                } );
+                initdatatable()
 
                 $(".clickable-row").click(function() {
                     document.getElementById("nodes_body").innerHTML = "";
