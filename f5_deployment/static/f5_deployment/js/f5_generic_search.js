@@ -306,6 +306,7 @@ function get_task_info(task_id) {
 
 function initdatatable() {
     $('#result_table_header').DataTable({
+            destroy: true,
             responsive: true,
             "language": {
                 "search": "Filter records:"
