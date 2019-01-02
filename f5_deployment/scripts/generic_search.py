@@ -130,6 +130,7 @@ def get_all_vs(base_url, auth_token):
 def virtual_server_dashboard(url_list, username, password):
     results = []
     for base_url in url_list:
+        print(base_url)
         # Authenticate against bigip
         location = base_url.split('.')[0][8:]
         auth_token = bigip_login(base_url, username, password)
@@ -137,6 +138,7 @@ def virtual_server_dashboard(url_list, username, password):
         all_vs = get_all_vs(base_url, auth_token)
         for vs in all_vs['items']:
             vs_name = vs['name']
+            print(vs_name)
             vs_ip = re.split(':|/',vs['destination'])[-2]
             vs_port = re.split(':|/', vs['destination'])[-1]
             selfLink_ver = vs['selfLink'].split('/localhost/')[1]
@@ -268,5 +270,5 @@ def virtual_server_dashboard(url_list, username, password):
                                 'vs_pool': {'pool_name': 'none', 'pool_state': 'unknown',
                                             'pool_state_reason': 'unknown'}})
 
-        return results
+    return results
 
