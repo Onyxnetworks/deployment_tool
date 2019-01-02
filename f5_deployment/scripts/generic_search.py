@@ -155,8 +155,8 @@ def virtual_server_dashboard(url_list, request_type, search_string, username, pa
             elif request_type == 'Virtual Server IP':
                 print(vs_ip, search_string)
                 search_string = ipaddress.IPv4Network(search_string)
-                vs_ip = ipaddress.IPv4Address(vs_ip)
-                if vs_ip not in search_string:
+                vs_ip_search = ipaddress.IPv4Address(vs_ip)
+                if vs_ip_search not in search_string:
                     print('No Match')
                     continue
 
