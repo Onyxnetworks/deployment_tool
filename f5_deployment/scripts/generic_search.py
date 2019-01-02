@@ -158,6 +158,7 @@ def virtual_server_dashboard(url_list, username, password):
 
             try:
                 vs['poolReference']
+                print('Pass 1')
                 poolLink_ver = vs['poolReference']['link'].split('/localhost/')[1]
                 poolLink = poolLink_ver.split('?ver=')[0]
                 pool_name = vs['pool'].split('/')[-1]
@@ -166,9 +167,10 @@ def virtual_server_dashboard(url_list, username, password):
 
                 # Get node details
                 node_details = []
-                pool_reference = get_pool_by_reference(base_url, poolLink, auth_token)
                 try:
+                    pool_reference = get_pool_by_reference(base_url, poolLink, auth_token)
                     pool_reference['membersReference']['items']
+                    print('Pass 2')
                     for nodes in pool_reference['membersReference']['items']:
                         node_name = re.split(':', nodes['name'])[-2]
                         node_port = re.split(':', nodes['name'])[-1]
