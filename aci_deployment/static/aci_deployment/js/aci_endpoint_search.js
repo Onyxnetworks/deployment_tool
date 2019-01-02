@@ -43,7 +43,9 @@ function get_task_info(task_id) {
             }
             else if (data.state == 'SUCCESS') {
                 <!-- Clear Old table Data -->
-                initdatatable();
+                if ($.fn.DataTable.isDataTable("#result_table_header")){
+                    $('#endpoint_table').DataTable().clear().destroy();
+                }
                 document.getElementById("result_table").innerHTML = "";
                 document.getElementById("tablediv").style.visibility = "visible";
                 var results = data.result;
