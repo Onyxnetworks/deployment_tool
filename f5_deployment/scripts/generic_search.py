@@ -213,6 +213,7 @@ def virtual_server_dashboard(url_list, username, password):
 
                 print('Pass 4')
                 for pool_values in pool_state_dict:
+                    print('test pass')
                     pool_state = pool_values['nestedStats']['entries']['status.availabilityState']['description']
                     pool_state_reason = pool_values['nestedStats']['entries']['status.statusReason']['description']
                     pool_state_reason = pool_state_reason.replace("'", "")
