@@ -1,5 +1,17 @@
 var frm = $('#endpoint_search');
 var rslt = $('#endpoint_results');
+
+function initdatatable() {
+    table = $('#endpoint_table').DataTable({
+            destroy: true,
+            retrieve: true,
+            responsive: true,
+            "language": {
+                "search": "Filter records:"
+            },
+        } );
+}
+
 frm.submit(function () {
     document.getElementById("tablediv").style.visibility = "hidden";
     $.ajax({
@@ -84,13 +96,4 @@ function get_task_info(task_id) {
             rslt.html("Something went wrong!");success()
         }
     });
-}
-
-function initdatatable() {
-    $('#endpoint_table').DataTable({
-            responsive: true,
-            "language": {
-                "search": "Filter records:"
-            },
-        } );
 }
