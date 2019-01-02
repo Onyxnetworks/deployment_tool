@@ -222,7 +222,7 @@ def virtual_server_dashboard(url_list, username, password):
                     print('test pass 3')
                     pool_active_members = pool_values['nestedStats']['entries']['activeMemberCnt']['value']
                     print('test pass 4')
-                    pool_available_members = pool_values['nestedStats']['entries']['memberCnt']['value']
+                    #pool_available_members = pool_values['nestedStats']['entries']['memberCnt']['value']
                     print('test pass 5')
                     pool_bits_in = pool_values['nestedStats']['entries']['serverside.bitsIn']['value']
                     print('test pass 6')
