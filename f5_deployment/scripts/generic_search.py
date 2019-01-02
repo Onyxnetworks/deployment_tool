@@ -153,15 +153,12 @@ def virtual_server_dashboard(url_list, request_type, search_string, username, pa
                         continue
 
             elif request_type == 'Virtual Server IP':
-                print(vs_ip, search_string)
                 search_string = ipaddress.IPv4Network(search_string)
                 vs_ip_search = ipaddress.IPv4Address(vs_ip)
                 if vs_ip_search not in search_string:
-                    print('No Match')
                     continue
 
             vs_name = vs['name']
-            print(vs_name)
             vs_port = re.split(':|/', vs['destination'])[-1]
             selfLink_ver = vs['selfLink'].split('/localhost/')[1]
             selfLink = selfLink_ver.split('?ver=')[0]
