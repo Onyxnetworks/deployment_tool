@@ -141,16 +141,16 @@ def virtual_server_dashboard(url_list, request_type, search_string, username, pa
             # Search based on VS Name
             if request_type == 'Virtual Server Name':
                 if search_string.upper() not in vs['name'].upper():
-                    pass
+                    continue
 
             elif request_type == 'Pool':
                 if search_string.upper() not in vs['pool'].split('/')[-1].upper():
-                    pass
+                    continue
 
             elif request_type == 'Virtual Server IP':
                 if IPNetwork(search_string) not in IPNetwork(vs['vs_ip']) or IPNetwork(vs['vs_ip']) not in IPNetwork(
                         search_string):
-                    pass
+                    continue
 
             vs_name = vs['name']
             print(vs_name)
