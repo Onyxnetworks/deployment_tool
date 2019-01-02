@@ -229,7 +229,7 @@ def virtual_server_dashboard(url_list, username, password):
                     pool_requests_total = pool_values['nestedStats']['entries']['totRequests']['value']
                     pool_requests_depth = pool_values['nestedStats']['entries']['connqAll.depth']['value']
                     pool_requests_max_age = pool_values['nestedStats']['entries']['connqAll.ageMax']['value']
-
+                    print('Test Pre Add')
                     results.append({'location': location, 'vs_name': vs_name, 'vs_state': vs_state,
                                     'vs_admin_state': vs_admin_state, 'vs_state_reason': vs_state_reason,
                                     'vs_ip': vs_ip, 'vs_port': vs_port, 'vs_stats': {'vs_bits_in': vs_bits_in,
