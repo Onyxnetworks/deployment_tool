@@ -128,6 +128,7 @@ CELERY_RESULT_BACKEND = 'redis://localhost:6379'
 MEDIA_URL = '/tmp/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'tmp')
 
+STATIC_ROOT = '/var/www/html/deployment_tool/static/'
 STATIC_URL = '/static/'
 
 # Login Config
