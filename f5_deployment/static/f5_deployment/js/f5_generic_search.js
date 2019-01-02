@@ -52,6 +52,7 @@ function get_task_info(task_id) {
             }
             else if (data.state == 'SUCCESS') {
 //                <!-- Clear Old table Data -->
+                initdatatable();
                 document.getElementById("result_table").innerHTML = "";
                 document.getElementById("tablediv").style.visibility = "visible";
                 //document.getElementById("vs_data_body").innerHTML = "";
