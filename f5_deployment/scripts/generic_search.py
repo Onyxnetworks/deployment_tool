@@ -194,6 +194,7 @@ def virtual_server_dashboard(url_list, username, password):
                             node_requests_total = node_values['nestedStats']['entries']['totRequests']['value']
                             node_requests_depth = node_values['nestedStats']['entries']['connq.depth']['value']
                             node_requests_max_age = node_values['nestedStats']['entries']['connq.ageMax']['value']
+                            print('Pass 3')
                             node_details.append({'node_name': node_name, 'node_port': node_port,
                                                  'node_address': node_address, 'node_state': node_state,
                                                  'node_state_reason': node_state_reason,
@@ -210,6 +211,7 @@ def virtual_server_dashboard(url_list, username, password):
                 except:
                     node_details = []
 
+                print('Pass 4')
                 for pool_values in pool_state_dict:
                     pool_state = pool_values['nestedStats']['entries']['status.availabilityState']['description']
                     pool_state_reason = pool_values['nestedStats']['entries']['status.statusReason']['description']
@@ -254,7 +256,7 @@ def virtual_server_dashboard(url_list, username, password):
                                                 },
                                     'vs_nodes': node_details
                                     })
-
+                print('Pass 5')
 
 
 
