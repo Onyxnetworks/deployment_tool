@@ -148,7 +148,7 @@ def virtual_server_dashboard(url_list, request_type, search_string, username, pa
                     continue
 
             elif request_type == 'Virtual Server IP':
-                if IPNetwork(search_string) not in IPNetwork(vs['vs_ip']) or IPNetwork(vs['vs_ip']) not in IPNetwork(
+                if IPNetwork(search_string) not in IPNetwork(re.split(':|/',vs['destination'])[-2]) or IPNetwork(re.split(':|/',vs['destination'])[-2]) not in IPNetwork(
                         search_string):
                     continue
 
