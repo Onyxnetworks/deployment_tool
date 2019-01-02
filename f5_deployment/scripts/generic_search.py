@@ -164,6 +164,7 @@ def virtual_server_dashboard(url_list, username, password):
                 pool_name = vs['pool'].split('/')[-1]
                 pool_stats = get_pool_stats(base_url, poolLink, auth_token)
                 pool_state_dict = pool_stats['entries'].values()
+                print(pool_state_dict)
 
                 # Get node details
                 node_details = []
