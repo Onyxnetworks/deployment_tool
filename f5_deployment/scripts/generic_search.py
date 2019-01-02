@@ -257,6 +257,7 @@ def virtual_server_dashboard(url_list, username, password):
                                                 },
                                     'vs_nodes': node_details
                                     })
+                    print('Test add')
                 print('Pass 5')
 
 
