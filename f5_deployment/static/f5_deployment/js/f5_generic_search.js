@@ -43,7 +43,8 @@ function get_task_info(task_id) {
         url: '/get_task_info/',
         data: {'task_id': task_id},
         success: function (data) {
-            table = $('#result_table_header').DataTable({
+            $('#result_table_header').DataTable({
+                destroy: true,
                 responsive: true,
                 "language": {
                     "search": "Filter records:"
@@ -137,8 +138,7 @@ function get_task_info(task_id) {
                     });
                 }
 
-                table = $('#result_table_header').DataTable({
-                    destroy: true,
+                $('#result_table_header').DataTable({
                     responsive: true,
                     "language": {
                         "search": "Filter records:"
