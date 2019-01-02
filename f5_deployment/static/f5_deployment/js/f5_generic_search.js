@@ -1,6 +1,15 @@
 var frm = $('#f5_search');
 var rslt = $('#f5_results');
 
+function initdatatable() {
+    table = $('#result_table_header').DataTable({
+            responsive: true,
+            "language": {
+                "search": "Filter records:"
+            },
+        } );
+}
+
 frm.submit(function () {
     document.getElementById("tablediv").style.visibility = "hidden";
     document.getElementById("vs_data").style.visibility = "hidden";
@@ -122,7 +131,13 @@ function get_task_info(task_id) {
                     });
                 }
 
-                initdatatable();
+                table = $('#result_table_header').DataTable({
+                    destroy: true,
+                    responsive: true,
+                    "language": {
+                        "search": "Filter records:"
+                    },
+                } );
 
                 $(".clickable-row").click(function() {
                     document.getElementById("nodes_body").innerHTML = "";
@@ -305,11 +320,4 @@ function get_task_info(task_id) {
     });
 }
 
-function initdatatable() {
-    table = $('#result_table_header').DataTable({
-            responsive: true,
-            "language": {
-                "search": "Filter records:"
-            },
-        } );
-}
+
