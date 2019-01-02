@@ -136,25 +136,29 @@ def virtual_server_dashboard(url_list, request_type, search_string, username, pa
         auth_token = bigip_login(base_url, username, password)
         # Get all Virtual Servers
         all_vs = get_all_vs(base_url, auth_token)
-        for vs in all_vs['items']:
 
+        for vs in all_vs['items']:
+            vs_name = vs['name']
+            vs_ip = re.split(':|/', vs['destination'])[-2]
             # Search based on VS Name
             if request_type == 'Virtual Server Name':
-                if search_string.upper() not in vs['name'].upper():
+                if search_string.upper() not in vs_name.upper():
                     continue
 
             elif request_type == 'Pool':
-                if search_string.upper() not in vs['pool'].split('/')[-1].upper():
-                    continue
+                try:
+                    if search_string.upper() not in vs['pool'].split('/')[-1].upper():
+                        continue
+                except:
+                        continue
 
             elif request_type == 'Virtual Server IP':
-                if IPNetwork(search_string) not in IPNetwork(re.split(':|/',vs['destination'])[-2]) or IPNetwork(re.split(':|/',vs['destination'])[-2]) not in IPNetwork(
+                if IPNetwork(search_string) not in IPNetwork(vs_ip) or IPNetwork(vs_ip) not in IPNetwork(
                         search_string):
                     continue
 
             vs_name = vs['name']
             print(vs_name)
-            vs_ip = re.split(':|/',vs['destination'])[-2]
             vs_port = re.split(':|/', vs['destination'])[-1]
             selfLink_ver = vs['selfLink'].split('/localhost/')[1]
             selfLink = selfLink_ver.split('?ver=')[0]
