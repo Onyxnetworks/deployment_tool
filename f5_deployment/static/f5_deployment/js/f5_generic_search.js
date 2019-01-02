@@ -34,6 +34,7 @@ function get_task_info(task_id) {
         url: '/get_task_info/',
         data: {'task_id': task_id},
         success: function (data) {
+            table.destroy();
             rslt.html('');
             if (data.state == 'PENDING') {
                 rslt.html('Searching BigIP...');
@@ -305,8 +306,7 @@ function get_task_info(task_id) {
 }
 
 function initdatatable() {
-    $('#result_table_header').DataTable({
-            destroy: true,
+    table = $('#result_table_header').DataTable({
             responsive: true,
             "language": {
                 "search": "Filter records:"
