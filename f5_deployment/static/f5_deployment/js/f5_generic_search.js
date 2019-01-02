@@ -3,8 +3,6 @@ var rslt = $('#f5_results');
 
 function initdatatable() {
     table = $('#result_table_header').DataTable({
-            destroy: true,
-            retrieve: true,
             responsive: true,
             "language": {
                 "search": "Filter records:"
@@ -133,8 +131,14 @@ function get_task_info(task_id) {
                     });
                 }
 
-                $('#result_table_header').DataTable().destroy()
-                initdatatable()
+                $('#result_table_header').DataTable().destroy();
+                $('#result_table_header').DataTable({
+                    retrieve: true,
+                    responsive: true,
+                    "language": {
+                        "search": "Filter records:"
+                    },
+                });
 
                 $(".clickable-row").click(function() {
                     document.getElementById("nodes_body").innerHTML = "";
