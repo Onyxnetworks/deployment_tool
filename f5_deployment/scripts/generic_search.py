@@ -215,19 +215,33 @@ def virtual_server_dashboard(url_list, username, password):
                 for pool_values in pool_state_dict:
                     print('test pass')
                     pool_state = pool_values['nestedStats']['entries']['status.availabilityState']['description']
+                    print('test pass 1')
                     pool_state_reason = pool_values['nestedStats']['entries']['status.statusReason']['description']
+                    print('test pass 2')
                     pool_state_reason = pool_state_reason.replace("'", "")
+                    print('test pass 3')
                     pool_active_members = pool_values['nestedStats']['entries']['activeMemberCnt']['value']
+                    print('test pass 4')
                     pool_available_members = pool_values['nestedStats']['entries']['memberCnt']['value']
+                    print('test pass 5')
                     pool_bits_in = pool_values['nestedStats']['entries']['serverside.bitsIn']['value']
+                    print('test pass 6')
                     pool_bits_out = pool_values['nestedStats']['entries']['serverside.bitsOut']['value']
+                    print('test pass 7')
                     pool_packets_in = pool_values['nestedStats']['entries']['serverside.pktsIn']['value']
+                    print('test pass 8')
                     pool_packets_out = pool_values['nestedStats']['entries']['serverside.pktsOut']['value']
+                    print('test pass 9')
                     pool_conn_current = pool_values['nestedStats']['entries']['serverside.curConns']['value']
+                    print('test pass 10')
                     pool_conn_max = pool_values['nestedStats']['entries']['serverside.maxConns']['value']
+                    print('test pass 11')
                     pool_conn_total = pool_values['nestedStats']['entries']['serverside.totConns']['value']
+                    print('test pass 12')
                     pool_requests_total = pool_values['nestedStats']['entries']['totRequests']['value']
+                    print('test pass 13')
                     pool_requests_depth = pool_values['nestedStats']['entries']['connqAll.depth']['value']
+                    print('test pass 14')
                     pool_requests_max_age = pool_values['nestedStats']['entries']['connqAll.ageMax']['value']
                     print('Test Pre Add')
                     results.append({'location': location, 'vs_name': vs_name, 'vs_state': vs_state,
