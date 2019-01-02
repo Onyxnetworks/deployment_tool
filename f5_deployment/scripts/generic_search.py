@@ -1,4 +1,4 @@
-import json, requests, re
+import json, requests, re, ipaddress
 from netaddr import IPNetwork, IPAddress
 
 # Ignore SSL Errors
@@ -154,7 +154,9 @@ def virtual_server_dashboard(url_list, request_type, search_string, username, pa
 
             elif request_type == 'Virtual Server IP':
                 print(vs_ip, search_string)
-                if IPNetwork(search_string) in IPNetwork(vs_ip) or IPNetwork(vs_ip) in IPNetwork(search_string):
+                search_string = ipaddress.IPv4Network(search_string)
+                vs_ip = ipaddress.IPv4Address(vs_ip)
+                if vs_ip not in search_string:
                     print('No Match')
                     continue
 
