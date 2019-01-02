@@ -43,7 +43,6 @@ function get_task_info(task_id) {
         url: '/get_task_info/',
         data: {'task_id': task_id},
         success: function (data) {
-            table.destroy();
             rslt.html('');
             if (data.state == 'PENDING') {
                 rslt.html('Searching BigIP...');
