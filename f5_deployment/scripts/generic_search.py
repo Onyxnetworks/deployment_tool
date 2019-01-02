@@ -158,20 +158,18 @@ def virtual_server_dashboard(url_list, username, password):
 
             try:
                 vs['poolReference']
-                print('Pass 1')
                 poolLink_ver = vs['poolReference']['link'].split('/localhost/')[1]
                 poolLink = poolLink_ver.split('?ver=')[0]
                 pool_name = vs['pool'].split('/')[-1]
                 pool_stats = get_pool_stats(base_url, poolLink, auth_token)
                 pool_state_dict = pool_stats['entries'].values()
-                print(pool_state_dict)
 
                 # Get node details
                 node_details = []
                 try:
                     pool_reference = get_pool_by_reference(base_url, poolLink, auth_token)
                     pool_reference['membersReference']['items']
-                    print('Pass 2')
+                    pool_available_members = len(pool_reference['membersReference']['items'])
                     for nodes in pool_reference['membersReference']['items']:
                         node_name = re.split(':', nodes['name'])[-2]
                         node_port = re.split(':', nodes['name'])[-1]
@@ -195,7 +193,6 @@ def virtual_server_dashboard(url_list, username, password):
                             node_requests_total = node_values['nestedStats']['entries']['totRequests']['value']
                             node_requests_depth = node_values['nestedStats']['entries']['connq.depth']['value']
                             node_requests_max_age = node_values['nestedStats']['entries']['connq.ageMax']['value']
-                            print('Pass 3')
                             node_details.append({'node_name': node_name, 'node_port': node_port,
                                                  'node_address': node_address, 'node_state': node_state,
                                                  'node_state_reason': node_state_reason,
@@ -212,39 +209,22 @@ def virtual_server_dashboard(url_list, username, password):
                 except:
                     node_details = []
 
-                print('Pass 4')
                 for pool_values in pool_state_dict:
-                    print('test pass')
                     pool_state = pool_values['nestedStats']['entries']['status.availabilityState']['description']
-                    print('test pass 1')
                     pool_state_reason = pool_values['nestedStats']['entries']['status.statusReason']['description']
-                    print('test pass 2')
                     pool_state_reason = pool_state_reason.replace("'", "")
-                    print('test pass 3')
                     pool_active_members = pool_values['nestedStats']['entries']['activeMemberCnt']['value']
-                    print('test pass 4')
                     #pool_available_members = pool_values['nestedStats']['entries']['memberCnt']['value']
-                    print('test pass 5')
                     pool_bits_in = pool_values['nestedStats']['entries']['serverside.bitsIn']['value']
-                    print('test pass 6')
                     pool_bits_out = pool_values['nestedStats']['entries']['serverside.bitsOut']['value']
-                    print('test pass 7')
                     pool_packets_in = pool_values['nestedStats']['entries']['serverside.pktsIn']['value']
-                    print('test pass 8')
                     pool_packets_out = pool_values['nestedStats']['entries']['serverside.pktsOut']['value']
-                    print('test pass 9')
                     pool_conn_current = pool_values['nestedStats']['entries']['serverside.curConns']['value']
-                    print('test pass 10')
                     pool_conn_max = pool_values['nestedStats']['entries']['serverside.maxConns']['value']
-                    print('test pass 11')
                     pool_conn_total = pool_values['nestedStats']['entries']['serverside.totConns']['value']
-                    print('test pass 12')
                     pool_requests_total = pool_values['nestedStats']['entries']['totRequests']['value']
-                    print('test pass 13')
                     pool_requests_depth = pool_values['nestedStats']['entries']['connqAll.depth']['value']
-                    print('test pass 14')
                     pool_requests_max_age = pool_values['nestedStats']['entries']['connqAll.ageMax']['value']
-                    print('Test Pre Add')
                     results.append({'location': location, 'vs_name': vs_name, 'vs_state': vs_state,
                                     'vs_admin_state': vs_admin_state, 'vs_state_reason': vs_state_reason,
                                     'vs_ip': vs_ip, 'vs_port': vs_port, 'vs_stats': {'vs_bits_in': vs_bits_in,
@@ -257,7 +237,7 @@ def virtual_server_dashboard(url_list, username, password):
                                     'vs_pool': {'pool_name': pool_name, 'pool_state': pool_state,
                                                 'pool_state_reason': pool_state_reason,
                                                 'pool_active_members': pool_active_members,
-                                                #'pool_available_members': pool_available_members,
+                                                'pool_available_members': pool_available_members,
                                                 'pool_stats': {'pool_bits_in': pool_bits_in,
                                                                'pool_bits_out': pool_bits_out,
                                                                'pool_packets_in': pool_packets_in,
@@ -272,8 +252,6 @@ def virtual_server_dashboard(url_list, username, password):
                                                 },
                                     'vs_nodes': node_details
                                     })
-                    print('Test add')
-                print('Pass 5')
 
 
 
