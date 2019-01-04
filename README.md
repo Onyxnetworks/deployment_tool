@@ -12,3 +12,8 @@ Requirements
 
 Example Files
 ------
+within `deployment_tool/deployment_tool` create a file called `secrets.py`
+'''python
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = 'SECRET KEY PUT HERE'
+'''
