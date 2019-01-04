@@ -133,7 +133,7 @@ From within your virtual environment run the following:
 This will provide us with the details we need to load the module into apache,
 it should look similar to the one below.  
 
-```Shell Session
+```Apache
 LoadModule wsgi_module "/path_to_venv/lib/python3.6/site-packages/mod_wsgi/server/mod_wsgi-py36.cpython-36m-x86_64-linux-gnu.so"
 WSGIPythonHome "/path_to_venv"
 ```
