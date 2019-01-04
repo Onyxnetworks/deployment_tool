@@ -20,7 +20,7 @@ SECRET_KEY = 'SECRET KEY PUT HERE'
 # Flower Config
 flower_basic_auth = ['USERNAME:PASSWORD']
 ```
-This is a file that is not stored om GIT and is used to keep your sensitive information.
+This is a file that is not stored on GIT and is used to keep your sensitive information.
 
 within `/deployment_tool/index/scripts` create a file called `baseline.py`
 ```python
@@ -118,3 +118,63 @@ To make the service start on boot run the following:
 `sudo systemctl enable celery`
 
 `sudo systemctl enable flower`
+
+Apache and mod_wsgi setup for Django
+------
+Install apache by running:
+
+`sudo yum install -y httpd http-devel`
+
+Once installed we need to load in the mod_wsgi module we downloaded from pip.
+From within your virtual environment run the following:
+
+`mod_wsgi-express module-config` 
+
+This will provide us with the details we need to load the module into apache,
+it should look similar to the one below.  
+
+```Shell Session
+LoadModule wsgi_module "/path_to_venv/lib/python3.6/site-packages/mod_wsgi/server/mod_wsgi-py36.cpython-36m-x86_64-linux-gnu.so"
+WSGIPythonHome "/path_to_venv"
+```
+
+next we need to create the file `/etc/httpd/conf.modules.d/01-django.conf` and add the output from above.
+
+Now start the service: `systemctl restart httpd` and check the module has been loaded:
+`httpd -M | grep wsgi`
+```Shell Script
+wsgi_module (shared)
+```
+
+finally we can add in our basic virtual host config file:
+`/etc/httpd/conf.d/django.conf`
+```Apache
+<VirtualHost *:80>
+
+    ServerAdmin webmaster@localhost
+
+    <Directory PATH_TO_REPO>
+        <Files wsgi.py>
+            Require all granted
+        </Files>
+    </Directory>
+
+
+    Alias /media/ PATH_TO_REPO/media/
+    Alias /static/ PATH_TO_REPO/static/
+
+    <Directory PATH_TO_REPO/static>
+        Require all granted
+    </Directory>
+
+    <Directory PATH_TO_REPO/media>
+        Require all granted
+    </Directory>
+
+    WSGIDaemonProcess deployment_tool python-path=PATH_TO_REPO:PATH_TO_VENV/lib/python3.6/site-packages
+    WSGIProcessGroup deployment_tool
+    WSGIScriptAlias / PATH_TO_REPO/deployment_tool/wsgi.py process-group=deployment_tool
+
+</VirtualHost>
+```
+
