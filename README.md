@@ -4,15 +4,15 @@ This is a Network tool to automate F5/ACI tasks. it is presented via a webpage h
 
 Requirements
 ------
-1. This has been deployed using Python 3.6 with the follwing set during configuration **_--enable-shared --enable-loadable-sqlite-extensions_**
-2. **rabbitmq** is used with celery which will require **erlang** to be installed. A guide for this can be found [here](https://www.rabbitmq.com/install-rpm.html "Installing RabbitMQ on CentOS")
-3. A full list of python requirements can be found in [requirements.txt](./requirements.txt)
-4. It is reccomended that this is run in a python virtual envrionemrnt. A guide for this can be found [here](https://www.google.com)
-5. Apache(httpd) is required with the mod_wsgi module loaded. A guide for this can be found [here](https://www.google.com)
+1. This has been deployed using Python 3.6 with the follwing set during configuration **_--enable-shared --enable-loadable-sqlite-extensions_**.
+2. **rabbitmq** is used with celery which will require **erlang** to be installed. A guide for this can be found [here](https://www.rabbitmq.com/install-rpm.html "Installing RabbitMQ on CentOS").
+3. A full list of python requirements can be found in [requirements.txt](./requirements.txt).
+4. It is reccomended that this is run in a python virtual envrionemrnt. A guide for this can be found [here](https://www.google.com).
+5. Apache(httpd) is required with the mod_wsgi module loaded. A guide for this can be found [here](https://www.google.com).
 
 Example Files
 ------
-within `deployment_tool/deployment_tool` create a file called `secrets.py`
+within `deployment_tool/deployment_tool` create a file called `secrets.py`.
 ```python
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'SECRET KEY PUT HERE'
@@ -22,7 +22,7 @@ flower_basic_auth = ['USERNAME:PASSWORD']
 ```
 This is a file that is not stored on GIT and is used to keep your sensitive information.
 
-within `/deployment_tool/index/scripts` create a file called `baseline.py`
+within `/deployment_tool/index/scripts` create a file called `baseline.py`.
 ```python
 def get_base_url(environment):
     if environment == 'Production':
@@ -46,7 +46,7 @@ As already stated Celery is used to queue tasks and provide results, Flower is u
 
 #### Create init files
 **Celery**
-create the following file: `/etc/systemd/system/celery.service`
+create the following file: `/etc/systemd/system/celery.service`.
 ```Shell Session
 [Unit]
 Description=Celery Service
@@ -80,7 +80,7 @@ WantedBy=multi-user.target
 ```
 
 **Flower**
-create the following file: `/etc/systemd/system/flower.service`
+create the following file: `/etc/systemd/system/flower.service`.
 ```Shell Session
 [Unit]
 Description=Flower Celery Service
