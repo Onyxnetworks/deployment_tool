@@ -8,3 +8,6 @@ def format_task(task):
     #ask.kwargs.pop('password')
     #task.result = humanize(task.result, length=20)
     return task
+
+basic_auth = home:mote74
+port = 8443
