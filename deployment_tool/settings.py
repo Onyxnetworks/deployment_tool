@@ -120,6 +120,8 @@ USE_L10N = True
 
 USE_TZ = True
 
+
+CELERYD_POOL_RESTARTS = True
 CELERY_BROKER_URL = 'amqp://localhost'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379'
 # Static files (CSS, JavaScript, Images)

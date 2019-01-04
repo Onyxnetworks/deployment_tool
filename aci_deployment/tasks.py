@@ -11,7 +11,7 @@ from index.scripts.baseline import get_base_url
 from celery import shared_task
 
 @shared_task
-def ENDPOINT_SEARCH(base_urls, APIC_USERNAME, APIC_PASSWORD, SUBNET):
+def ENDPOINT_SEARCH(base_urls, username, password, SUBNET):
     RESULTS = []
 
     # Build URL List to search.
@@ -19,7 +19,7 @@ def ENDPOINT_SEARCH(base_urls, APIC_USERNAME, APIC_PASSWORD, SUBNET):
     for url in base_urls['ACI']:
         url_list.append(base_urls['ACI'][url])
 
-    ENDPOINT_LIST = GET_ENDPOINTS(url_list, APIC_USERNAME, APIC_PASSWORD)
+    ENDPOINT_LIST = GET_ENDPOINTS(url_list, username, password)
 
 
 
@@ -147,7 +147,7 @@ def EXTERNAL_EPG_EXCEL_OPEN_WORKBOOK(WORKBOOK, LOCATION):
 
 
 @shared_task
-def EXTERNAL_EPG_VALIDATION(RULE_LIST, location, url_dict,  APIC_USERNAME, APIC_PASSWORD):
+def EXTERNAL_EPG_VALIDATION(RULE_LIST, location, url_dict,  username, password):
     OUTPUT_LOG = []
     DISPLAY_LIST = []
     TENANT_LIST = ['RED', 'GREEN', 'BLUE']
@@ -261,7 +261,7 @@ def EXTERNAL_EPG_VALIDATION(RULE_LIST, location, url_dict,  APIC_USERNAME, APIC_
 
         OUTPUT_LOG.append({'Headers': 'Connecting to APIC'})
         # Login to fabric
-        APIC_COOKIE = APIC_LOGIN(BASE_URL, APIC_USERNAME, APIC_PASSWORD)
+        APIC_COOKIE = APIC_LOGIN(BASE_URL, username, password)
         if APIC_COOKIE:
             OUTPUT_LOG.append({'Notifications': 'Successfully generated authentication cookie'})
 
@@ -450,7 +450,7 @@ def EXTERNAL_EPG_VALIDATION(RULE_LIST, location, url_dict,  APIC_USERNAME, APIC_
    
         
 @shared_task
-def EXTERNAL_EPG_DEPLOYMENT(RULE_LIST, location, url_dict, APIC_USERNAME, APIC_PASSWORD):
+def EXTERNAL_EPG_DEPLOYMENT(RULE_LIST, location, url_dict, username, password):
 
     BASE_URL = url_dict[location]
 
@@ -469,7 +469,7 @@ def EXTERNAL_EPG_DEPLOYMENT(RULE_LIST, location, url_dict, APIC_USERNAME, APIC_P
     # --------------------------------------------------------------------------#
     OUTPUT_LOG.append({'Headers': 'Starting External EPG Deployment.'})
     OUTPUT_LOG.append({'Headers': 'Connecting to APIC'})
-    APIC_COOKIE = APIC_LOGIN(BASE_URL, APIC_USERNAME, APIC_PASSWORD)
+    APIC_COOKIE = APIC_LOGIN(BASE_URL, username, password)
     if APIC_COOKIE:
         OUTPUT_LOG.append({'Notifications': 'Successfully generated authentication cookie'})
 
@@ -579,7 +579,7 @@ def EXTERNAL_EPG_DEPLOYMENT(RULE_LIST, location, url_dict, APIC_USERNAME, APIC_P
     return OUTPUT_LOG
 
 @shared_task
-def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, APIC_USERNAME, APIC_PASSWORD):
+def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, username, password):
     CONTRACT_LIST = []
     FILTER_LIST = []
     DISPLAY_LIST = []
@@ -732,7 +732,7 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, APIC_USERNAME,
         OUTPUT_LOG.append({'NotificationsSuccess': 'Services validated successfully'})
 
         OUTPUT_LOG.append({'Headers': 'Connecting to APIC'})
-        APIC_COOKIE = APIC_LOGIN(BASE_URL, APIC_USERNAME, APIC_PASSWORD)
+        APIC_COOKIE = APIC_LOGIN(BASE_URL, username, password)
 
         if APIC_COOKIE:
             OUTPUT_LOG.append({'Notifications': 'Successfully generated authentication cookie'})
@@ -944,7 +944,7 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, APIC_USERNAME,
     return OUTPUT_LOG
 
 @shared_task
-def CONTRACT_DEPLOYMENT(RULE_LIST, location, url_dict, APIC_USERNAME, APIC_PASSWORD):
+def CONTRACT_DEPLOYMENT(RULE_LIST, location, url_dict, username, password):
 
     BASE_URL = url_dict[location]
 
@@ -958,7 +958,7 @@ def CONTRACT_DEPLOYMENT(RULE_LIST, location, url_dict, APIC_USERNAME, APIC_PASSW
     # --------------------------------------------------------------------------#
     OUTPUT_LOG.append({'Headers': 'Starting contract provisioning.'})
     OUTPUT_LOG.append({'Headers': 'Connecting to APIC'})
-    APIC_COOKIE = APIC_LOGIN(BASE_URL, APIC_USERNAME, APIC_PASSWORD)
+    APIC_COOKIE = APIC_LOGIN(BASE_URL, username, password)
     if APIC_COOKIE:
         OUTPUT_LOG.append({'Notifications': 'Successfully generated authentication cookie'})
 
