@@ -140,7 +140,7 @@ WSGIPythonHome "/path_to_venv"
 
 next we need to create the file `/etc/httpd/conf.modules.d/01-django.conf` and add the output from above.
 
-Now start the service: `systemctl restart httpd` and check the module has been loaded:
+Now start the service: `systemctl start httpd` and check the module has been loaded:
 `httpd -M | grep wsgi`
 ```Shell Script
 wsgi_module (shared)
@@ -177,4 +177,11 @@ finally we can add in our basic virtual host config file:
 
 </VirtualHost>
 ```
+
+Now start the service: `systemctl restart httpd`.
+
+finally we can enable it to start on boot with:
+
+`systemctl enable httpd`
+
 
