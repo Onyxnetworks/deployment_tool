@@ -16,6 +16,9 @@ within `deployment_tool/deployment_tool` create a file called `secrets.py`
 ```python
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'SECRET KEY PUT HERE'
+
+# Flower Config
+flower_basic_auth = ['USERNAME:PASSWORD']
 ```
 This is a file that is not stored om GIT and is used to keep your sensitive information.
 
@@ -41,7 +44,7 @@ Daemonization of Celery and flower
 ------
 As already stated Celery is used to queue tasks and provide results, Flower is used to provide an environment to monitor the status of Celery. The base config for both of these are included in this repo, however for best results we want both processes to run as a daemon and to startup on boot. To do this follow the below steps.
 
-#### Creat init files
+#### Create init files
 **Celery**
 create the following file: `/etc/systemd/system/celery.service`
 ```Shell Session
@@ -111,5 +114,7 @@ systemctl restart flower
 ```
 
 To make the service start on boot run the following:
+
 `sudo systemctl enable celery`
+
 `sudo systemctl enable flower`
