@@ -2,7 +2,9 @@ from flower.utils.template import humanize
 
 def format_task(task):
     task.args = humanize(task.args, length=10)
+    print(type(task.args))
     print(task.args)
+    print(task.kwargs)
     #task.kwargs.pop('password')
     #task.result = humanize(task.result, length=20)
     return task
