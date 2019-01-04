@@ -95,7 +95,7 @@ WantedBy=multi-user.target
 ```
 
 There are some attributes you will need to change:
-`USERNAME``USERGROUP``PATH_TO_REPO_LOCATION``PATH_TO_VENV`
+`USERNAME` `USERGROUP` `PATH_TO_REPO_LOCATION` `PATH_TO_VENV`
 
 After these files have been created run `sudo systemctl daemon-reload`. This will register our new services. 
 
