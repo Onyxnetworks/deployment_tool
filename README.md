@@ -7,8 +7,8 @@ Requirements
 1. This has been deployed using Python 3.6 with the follwing set during configuration **_--enable-shared --enable-loadable-sqlite-extensions_**
 2. **rabbitmq** is used with celery which will require **erlang** to be installed. A guide for this can be found [here](https://www.rabbitmq.com/install-rpm.html "Installing RabbitMQ on CentOS")
 3. A full list of python requirements can be found in [requirements.txt](../requirements.txt)
-4. It is reccomended that this is run in a python virtual envrionemrnt. 
-5. Apache(httpd) is required with the mod_wsgi module loaded. A guide for this can be found [here](link to guide)
+4. It is reccomended that this is run in a python virtual envrionemrnt. A guide for this can be found [here[(https://www.google.com)
+5. Apache(httpd) is required with the mod_wsgi module loaded. A guide for this can be found [here](https://www.google.com)
 
 Example Files
 ------
@@ -36,3 +36,9 @@ def get_base_url(environment):
         return base_urls
 ```
 This file defines the URL's for all of the tasks our site can run. For ACI its straight forward its a key,value pair with the DC loation and URL. for F5 its a bit more complex as the different F5's at each DC serve a different function which is refernece as part of our deployment tasks.
+
+Daemonization of Celery and flower
+------
+As already stated Celery is used to queue tasks and provide results, Flower is used to provide an environment to monitor the status of Celery. The base config for both of these are included in this repo, however for best results we want both processes to run as a daemon and to startup on boot. To do this follow the below steps.
+
+
