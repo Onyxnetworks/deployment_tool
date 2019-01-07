@@ -25,12 +25,12 @@ def create_connection_bigip(base_url, username, password, output_log):
         credentials = str(bigip.get('%s/ltm/virtual' % bigip_url_base, timeout=5.0))
         
     except:
-        output_log.append({'Errors': 'Unable to communicate with F5.'})
+        output_log.append({'Errors': 'Unable to communicate with ' + base_url[8:]})
         error = True
         return output_log, error
     
     if credentials.__contains__('200'):
-        output_log.append({'NotificationsSuccess': 'Successfully connected to BigIP.'})
+        output_log.append({'NotificationsSuccess': 'Successfully connected to ' + base_url[8:]})
         return output_log, error, bigip_url_base, bigip         
     
     else:

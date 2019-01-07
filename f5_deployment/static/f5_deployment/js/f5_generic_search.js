@@ -1,6 +1,10 @@
 var frm = $('#f5_search');
 var rslt = $('#f5_results');
 
+function clicklisten() {
+
+}
+
 function initdatatable() {
     table = $('#result_table_header').DataTable({
             responsive: true,

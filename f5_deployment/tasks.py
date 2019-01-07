@@ -43,12 +43,12 @@ def vs_deployment_validation(vs_dict, location, url_dict, username, password):
     vs_name = vs_dict['vs']['A2']
     
     if location == 'UKDC1':
-        device_group = vs_name.rsplit('-', 10)[0]
+        device_group = vs_name.rsplit('-', 10)[0] + '-DGA'
         base_url = url_dict[location][device_group]
         output_log.append({'Notifications': 'Device group ' + device_group + ' DGA selected.'})
         
     elif location == 'UKDC2':
-        device_group = vs_name.rsplit('-', 10)[0]
+        device_group = vs_name.rsplit('-', 10)[0] + '-DGB'
         base_url = url_dict[location][device_group]
         output_log.append({'Notifications': 'Device group ' + device_group + ' DGB selected.'})
     
@@ -159,11 +159,11 @@ def virtual_server_deployment(vs_dict, location, url_dict, username, password):
     vs_name = vs_dict['vs']['A2']
 
     if location == 'UKDC1':
-        device_group = vs_name.rsplit('-', 10)[0]
+        device_group = vs_name.rsplit('-', 10)[0] + '-DGA'
         base_url = url_dict[location][device_group]
 
     elif location == 'UKDC2':
-        device_group = vs_name.rsplit('-', 10)[0]
+        device_group = vs_name.rsplit('-', 10)[0] + '-DGB'
         base_url = url_dict[location][device_group]
 
     elif location == 'LAB':

@@ -137,6 +137,7 @@ def virtual_server_dashboard(url_list, request_type, search_string, username, pa
         # Get all Virtual Servers
         all_vs = get_all_vs(base_url, auth_token)
 
+
         for vs in all_vs['items']:
             vs_name = vs['name']
             vs_ip = re.split(':|/', vs['destination'])[-2]
