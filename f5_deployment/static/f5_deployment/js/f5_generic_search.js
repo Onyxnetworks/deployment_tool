@@ -5,14 +5,14 @@ function clicklisten() {
 
 }
 
-function initdatatable() {
-    table = $('#result_table_header').DataTable({
-            responsive: true,
-            "language": {
-                "search": "Filter records:"
-            },
-        } );
-}
+//function initdatatable() {
+//    table = $('#result_table_header').DataTable({
+//            responsive: true,
+//            "language": {
+//                "search": "Filter records:"
+//            },
+//        } );
+//}
 
 frm.submit(function () {
     document.getElementById("tablediv").style.visibility = "hidden";
@@ -54,9 +54,9 @@ function get_task_info(task_id) {
             }
             else if (data.state == 'SUCCESS') {
 //                <!-- Clear Old table Data -->
-                if ($.fn.DataTable.isDataTable("#result_table_header")){
-                    $('#result_table_header').DataTable().clear().destroy();
-                }
+                //if ($.fn.DataTable.isDataTable("#result_table_header")){
+                 //   $('#result_table_header').DataTable().clear().destroy();
+                //}
                 document.getElementById("result_table").innerHTML = "";
                 document.getElementById("tablediv").style.visibility = "visible";
                 //document.getElementById("vs_data_body").innerHTML = "";
@@ -138,19 +138,17 @@ function get_task_info(task_id) {
                     });
                 }
 
-                $('#result_table_header').DataTable({
-                    retrieve: true,
-                    responsive: true,
-                    "language": {
-                        "search": "Filter records:"
-                    },
-                });
+                //var result_table = $('#result_table_header').DataTable({
+                //    retrieve: true,
+                //    responsive: true,
+                //    "language": {
+                //        "search": "Filter records:"
+                //    },
+                //});
 
-                //$(".clickable-row").click(function() {
-                $('#result_table_header').on('click', 'tr', function () {
-                    var result_index = table.row( this ).data('url');
+                $(".clickable-row").click(function() {
                     document.getElementById("nodes_body").innerHTML = "";
-                    //var result_index = $(this).data('url');
+                    var result_index = $(this).data('url');
                     var f5_location = results[result_index].location;
                     var vs_name = results[result_index].vs_name;
                     var vs_ip = results[result_index].vs_ip;
@@ -314,8 +312,7 @@ function get_task_info(task_id) {
                 document.getElementById("vs_detail_connections_current").innerHTML = vs_conn_current;
                 document.getElementById("vs_detail_connections_maximum").innerHTML = vs_conn_max;
                 document.getElementById("vs_detail_connections_total").innerHTML = vs_conn_total;
-                } );
-                //});
+                });
             }
 
             if (data.state != 'SUCCESS') {
