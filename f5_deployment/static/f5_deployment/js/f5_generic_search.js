@@ -146,9 +146,11 @@ function get_task_info(task_id) {
                     },
                 });
 
-                $(".clickable-row").click(function() {
+                //$(".clickable-row").click(function() {
+                $('#result_table_header').on('click', 'tr', function () {
+                    var result_index = table.row( this ).data('url');
                     document.getElementById("nodes_body").innerHTML = "";
-                    var result_index = $(this).data('url');
+                    //var result_index = $(this).data('url');
                     var f5_location = results[result_index].location;
                     var vs_name = results[result_index].vs_name;
                     var vs_ip = results[result_index].vs_ip;
@@ -312,7 +314,8 @@ function get_task_info(task_id) {
                 document.getElementById("vs_detail_connections_current").innerHTML = vs_conn_current;
                 document.getElementById("vs_detail_connections_maximum").innerHTML = vs_conn_max;
                 document.getElementById("vs_detail_connections_total").innerHTML = vs_conn_total;
-                });
+                } );
+                //});
             }
 
             if (data.state != 'SUCCESS') {
