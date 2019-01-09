@@ -147,7 +147,7 @@ function get_task_info(task_id) {
                 });
 
                 $('#result_table_header').on( 'click', 'tr', function () {
-                    var id = table.row( this ).id();
+                    var id = result_table.row( this ).id();
                     alert( 'Clicked row id '+id );
                 } );
 
