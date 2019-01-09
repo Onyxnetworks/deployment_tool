@@ -30,7 +30,9 @@ function get_validation_task_info(task_id, location, vs_dict) {
         success: function (data) {
             rslt.html('');
             if (data.state == 'PENDING') {
+                var loader = `<img src={% static 'index/svg/spinner.svg' %}" />`;
                 rslt.html('Validating data structure...');
+                document.getElementById("loader").innerHTML = loader;
             }
             else if (data.state == 'SUCCESS') {
                 <!-- Clear Old  Data -->
