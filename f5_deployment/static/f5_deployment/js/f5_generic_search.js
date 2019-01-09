@@ -55,8 +55,8 @@ function get_task_info(task_id) {
         <animateTransform attributeName="transform" type="rotate" from="0 25 25" to="360 25 25" dur="0.5s" repeatCount="indefinite"/>
     </path>
 </svg>`
-                rslt.html(loader);
-                //document.getElementById("result_table").innerHTML = ;
+                rslt.html('Searching BigIP...');
+                document.getElementById("accordion").innerHTML = loader;
             }
             else if (data.state == 'SUCCESS') {
 //                <!-- Clear Old table Data -->
