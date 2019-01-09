@@ -148,10 +148,10 @@ function get_task_info(task_id) {
 
                 $('#result_table_header').on( 'click', 'tr', function () {
                     var result_index = result_table.row( this ).id().split("_")[2];
-                    alert( 'Clicked row id '+ result_index );
+                    alert( 'Clicked row id '+result_index );
                 } );
 
-                $(".clickable-row").click(function() {
+                $(".clickable-row").click(function(result_index) {
                     document.getElementById("nodes_body").innerHTML = "";
                     //var result_index = $(this).data('url');
                     var f5_location = results[result_index].location;
