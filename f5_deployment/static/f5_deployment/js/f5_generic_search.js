@@ -147,13 +147,13 @@ function get_task_info(task_id) {
                 });
 
                 $('#result_table_header').on( 'click', 'tr', function () {
-                    var id = result_table.row( this ).data('url');
-                    alert( 'Clicked row id '+id );
+                    var result_index = result_table.row( this ).id().split("_")[2];
+                    alert( 'Clicked row id '+ result_index );
                 } );
 
                 $(".clickable-row").click(function() {
                     document.getElementById("nodes_body").innerHTML = "";
-                    var result_index = $(this).data('url');
+                    //var result_index = $(this).data('url');
                     var f5_location = results[result_index].location;
                     var vs_name = results[result_index].vs_name;
                     var vs_ip = results[result_index].vs_ip;
