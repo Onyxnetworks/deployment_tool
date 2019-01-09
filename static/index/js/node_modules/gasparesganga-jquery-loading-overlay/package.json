@@ -1,0 +1,106 @@
+{
+  "_args": [
+    [
+      {
+        "raw": "gasparesganga-jquery-loading-overlay",
+        "scope": null,
+        "escapedName": "gasparesganga-jquery-loading-overlay",
+        "name": "gasparesganga-jquery-loading-overlay",
+        "rawSpec": "",
+        "spec": "latest",
+        "type": "tag"
+      },
+      "/home/django/deployment_tool/index/static/index/js"
+    ]
+  ],
+  "_from": "gasparesganga-jquery-loading-overlay@latest",
+  "_hasShrinkwrap": false,
+  "_id": "gasparesganga-jquery-loading-overlay@2.1.6",
+  "_inCache": true,
+  "_location": "/gasparesganga-jquery-loading-overlay",
+  "_nodeVersion": "9.5.0",
+  "_npmOperationalInternal": {
+    "host": "s3://npm-registry-packages",
+    "tmp": "tmp/gasparesganga-jquery-loading-overlay_2.1.6_1537798036890_0.9001354164913811"
+  },
+  "_npmUser": {
+    "name": "gasparesganga",
+    "email": "contact@gasparesganga.com"
+  },
+  "_npmVersion": "5.6.0",
+  "_phantomChildren": {},
+  "_requested": {
+    "raw": "gasparesganga-jquery-loading-overlay",
+    "scope": null,
+    "escapedName": "gasparesganga-jquery-loading-overlay",
+    "name": "gasparesganga-jquery-loading-overlay",
+    "rawSpec": "",
+    "spec": "latest",
+    "type": "tag"
+  },
+  "_requiredBy": [
+    "#USER"
+  ],
+  "_resolved": "https://registry.npmjs.org/gasparesganga-jquery-loading-overlay/-/gasparesganga-jquery-loading-overlay-2.1.6.tgz",
+  "_shasum": "97f66e01eac5ceebd18d6839b42be841ff0a2615",
+  "_shrinkwrap": null,
+  "_spec": "gasparesganga-jquery-loading-overlay",
+  "_where": "/home/django/deployment_tool/index/static/index/js",
+  "author": {
+    "name": "Gaspare Sganga",
+    "email": "contact@gasparesganga.com",
+    "url": "https://gasparesganga.com"
+  },
+  "bugs": {
+    "url": "https://github.com/gasparesganga/jquery-loading-overlay/issues"
+  },
+  "dependencies": {
+    "jquery": ">=1.7.0"
+  },
+  "description": "A flexible loading overlay jQuery plugin",
+  "devDependencies": {
+    "del": "^3.0.0",
+    "gulp": "^4.0.0",
+    "gulp-header": "^2.0.5",
+    "gulp-rename": "^1.4.0",
+    "gulp-replace": "^0.6.1",
+    "gulp-sourcemaps": "^2.6.4",
+    "gulp-uglify": "^3.0.1",
+    "inquirer": "^5.2.0"
+  },
+  "directories": {},
+  "dist": {
+    "integrity": "sha512-dcHST/V1PyzPiZXStx7/Bu47aduo8vi2S9m6MlHACcP9gpZmqmyQaOBMm3dSQ34ZOlomfHkXBHPlmsrK7vWkTg==",
+    "shasum": "97f66e01eac5ceebd18d6839b42be841ff0a2615",
+    "tarball": "https://registry.npmjs.org/gasparesganga-jquery-loading-overlay/-/gasparesganga-jquery-loading-overlay-2.1.6.tgz",
+    "fileCount": 12,
+    "unpackedSize": 128407,
+    "npm-signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v3.0.4\r\nComment: https://openpgpjs.org\r\n\r\nwsFcBAEBCAAQBQJbqO+VCRA9TVsSAnZWagAAIKQP/iY8Q5s8o4y8hjxRCpnn\n+xosHZtv/umYEoOC3zKrDf0mBDhEaULFQqIkHA7OFNHD/b3JRJOXHAYCvnkm\nSihhehJQxW+1JR5DHlS6Wf+CT8dmlg3B5YVTF9vYZvDJJUsgWjXvx3z2ncTg\n95CXQrNyzPvXiPezWk6iREb3WvVWKhKnjxov9VoMdNpb2AXYrXrL70OjIYrO\nvNF4SByKz3jr39vrAh8CAbRA5fN9vflhIECGd12Z3sp+1u+mMDk+n1QjIftx\nXYYsJnQ1nKUK38lYnNPgyQ9DHfTEDvFloalJ64phPmD6A4AMtg5JkyBg0wlb\nEVNOn5XT9tAq2x8JkU1DwmvTlJpPGywiZhtCaSbeohuxTNHwUQtL+oSmPIcw\nljsYLXkpRuc8FFZa/ljn7Z3FEHwpeRICn8ST0WOZqDkfwd7KTINLTZqADS/C\noGBon20W1G1/mW+4EUSbHrAr5dNC+G1bP+dtdkewsjRBFW3dF8YYe13zJDUl\n6V086MocxxZZ/oBx0W8OPkaEzDJ0Ebz1b0c9XLot/nMzgqVb99T/D5MzNi1Z\nB/H4D1qlJ+6EWOCvZLOpFU3/sPWycOiSHB0zVZNpvSo/pXuA9nXGAIpIRRJM\nMY/3rYtKpT3Nul29VRxK8IH7fxi72LTrax6gLkhui44XD+thpdUppWPfNDZu\nJBKH\r\n=DGf5\r\n-----END PGP SIGNATURE-----\r\n"
+  },
+  "gitHead": "9972576122eaa861ef15a961a1cca65362cf60a9",
+  "homepage": "https://gasparesganga.com/labs/jquery-loading-overlay/",
+  "keywords": [
+    "ecosystem:jquery",
+    "jquery-plugin",
+    "jquery",
+    "plugin",
+    "loading",
+    "overlay"
+  ],
+  "license": "MIT",
+  "main": "dist/loadingoverlay.min.js",
+  "maintainers": [
+    {
+      "name": "gasparesganga",
+      "email": "contact@gasparesganga.com"
+    }
+  ],
+  "name": "gasparesganga-jquery-loading-overlay",
+  "optionalDependencies": {},
+  "readme": "ERROR: No README data found!",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gasparesganga/jquery-loading-overlay.git"
+  },
+  "version": "2.1.6"
+}
