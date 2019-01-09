@@ -54,9 +54,9 @@ function get_task_info(task_id) {
             }
             else if (data.state == 'SUCCESS') {
 //                <!-- Clear Old table Data -->
-                //if ($.fn.DataTable.isDataTable("#result_table_header")){
-                 //   $('#result_table_header').DataTable().clear().destroy();
-                //}
+                if ($.fn.DataTable.isDataTable("#result_table_header")){
+                    $('#result_table_header').DataTable().clear().destroy();
+                }
                 document.getElementById("result_table").innerHTML = "";
                 document.getElementById("tablediv").style.visibility = "visible";
                 //document.getElementById("vs_data_body").innerHTML = "";
@@ -138,13 +138,13 @@ function get_task_info(task_id) {
                     });
                 }
 
-                //var result_table = $('#result_table_header').DataTable({
-                //    retrieve: true,
-                //    responsive: true,
-                //    "language": {
-                //        "search": "Filter records:"
-                //    },
-                //});
+                var result_table = $('#result_table_header').DataTable({
+                    retrieve: true,
+                    responsive: true,
+                    "language": {
+                        "search": "Filter records:"
+                    },
+                });
 
                 $(".clickable-row").click(function() {
                     document.getElementById("nodes_body").innerHTML = "";
