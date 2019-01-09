@@ -110,7 +110,7 @@ function get_task_info(task_id) {
                     }
 
                     var tr = document.createElement("TR");
-                    var TABLE_TR = 'TABLE_TR' + i
+                    var TABLE_TR = 'TABLE_TR_' + i
                     tr.setAttribute("id", TABLE_TR);
                     tr.setAttribute("data-url", `${i}`);
                     if (vs_admin_state.includes('disabled')){
@@ -147,7 +147,7 @@ function get_task_info(task_id) {
                 });
 
                 $('#result_table_header').on( 'click', 'tr', function () {
-                    var id = result_table.row( this ).data-url();
+                    var id = result_table.row( this ).data('url');
                     alert( 'Clicked row id '+id );
                 } );
 
