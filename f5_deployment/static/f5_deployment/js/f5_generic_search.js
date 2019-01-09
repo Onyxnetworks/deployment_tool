@@ -56,14 +56,14 @@ function get_task_info(task_id) {
     </path>
 </svg>`
                 rslt.html('Searching BigIP...');
-                $("#accordion").LoadingOverlay("show");
+                document.getElementById("loader").innerHTML = loader;
             }
             else if (data.state == 'SUCCESS') {
 //                <!-- Clear Old table Data -->
                 if ($.fn.DataTable.isDataTable("#result_table_header")){
                     $('#result_table_header').DataTable().clear().destroy();
                 }
-                $("#accordion").LoadingOverlay("hide", true);
+                document.getElementById("loader").innerHTML = "";
                 document.getElementById("result_table").innerHTML = "";
                 document.getElementById("tablediv").style.visibility = "visible";
                 //document.getElementById("vs_data_body").innerHTML = "";
