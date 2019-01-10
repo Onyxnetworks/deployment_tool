@@ -30,10 +30,14 @@ function get_validation_task_info(task_id, location, rule_list) {
         success: function (data) {
             rslt.html('');
             if (data.state == 'PENDING') {
+                var loader = `<img src='/static/index/svg/spinner.svg'/>`;
+                document.getElementById("loader").style.display = "block";
+                document.getElementById("loader").innerHTML = loader;
                 rslt.html('Validating data structure...');
             }
             else if (data.state == 'SUCCESS') {
                 <!-- Clear Old  Data -->
+                document.getElementById("loader").style.display = "none";
                 document.getElementById("contract_deployment_results").innerHTML = "";
                 document.getElementById("resultdiv").style.visibility = "visible";
                 var results = data.result;
@@ -123,6 +127,7 @@ function get_validation_task_info(task_id, location, rule_list) {
                 }, 1000);
             }},
         error: function (data) {
+            document.getElementById("loader").style.display = "none";
             document.getElementById("resultdiv").style.visibility = "hidden";
             rslt.html("Something went wrong!");success()
         }
@@ -156,12 +161,16 @@ function get_deployment_task_info(task_id) {$.ajax({
     success: function (data) {
         rslt.html('');
         if (data.state == 'PENDING') {
+            var loader = `<img src='/static/index/svg/spinner.svg'/>`;
+            document.getElementById("loader").style.display = "block";
+            document.getElementById("loader").innerHTML = loader;
             rslt.html('Pushing configuration to APIC...');
             document.getElementById("resultdiv").style.visibility = "hidden";
             document.getElementById("contract_deployment_results").innerHTML = "";
         }
         else if (data.state == 'SUCCESS') {
             <!-- Clear Old  Data -->
+            document.getElementById("loader").style.display = "none";
             document.getElementById("contract_deployment_results").innerHTML = "";
             document.getElementById("resultdiv").style.visibility = "visible";
             var results = data.result;
@@ -235,6 +244,7 @@ function get_deployment_task_info(task_id) {$.ajax({
             }, 1000);
         }},
     error: function (data) {
+        document.getElementById("loader").style.display = "none";
         document.getElementById("tablediv").style.visibility = "hidden";
         rslt.html("Something went wrong!");success()
     }

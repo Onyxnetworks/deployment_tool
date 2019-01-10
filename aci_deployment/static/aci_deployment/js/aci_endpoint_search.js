@@ -29,6 +29,9 @@ function get_task_info(task_id) {
         success: function (data) {
             rslt.html('');
             if (data.state == 'PENDING') {
+                var loader = `<img src='/static/index/svg/spinner.svg'/>`;
+                document.getElementById("loader").style.display = "block";
+                document.getElementById("loader").innerHTML = loader;
                 rslt.html('Searching Endpoints...');
             }
             else if (data.state == 'SUCCESS') {
@@ -36,6 +39,7 @@ function get_task_info(task_id) {
                 if ($.fn.DataTable.isDataTable("#endpoint_table")){
                     $('#endpoint_table').DataTable().clear().destroy();
                 }
+                document.getElementById("loader").style.display = "none";
                 document.getElementById("result_table").innerHTML = "";
                 document.getElementById("tablediv").style.visibility = "visible";
                 var results = data.result;
@@ -92,6 +96,7 @@ function get_task_info(task_id) {
             }},
         error: function (data) {
             document.getElementById("tablediv").style.visibility = "hidden";
+            document.getElementById("loader").style.display = "none";
             rslt.html("Something went wrong!");success()
         }
     });
