@@ -6,5 +6,6 @@ def format_task(task):
     task.result = humanize(task.result, length=20)
     return task
 
+tasks_columns = ['name', 'state', 'args', 'result', 'received', 'started', 'runtime', 'worker']
 basic_auth = flower_basic_auth
 port = '8443'
