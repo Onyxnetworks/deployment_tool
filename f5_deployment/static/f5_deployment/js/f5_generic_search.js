@@ -1,9 +1,9 @@
 var frm = $('#f5_search');
 var rslt = $('#f5_results');
 
-function clicklisten() {
 
-}
+
+
 
 //function initdatatable() {
 //    table = $('#result_table_header').DataTable({
@@ -50,6 +50,7 @@ function get_task_info(task_id) {
             rslt.html('');
 
             if (data.state == 'PENDING') {
+                clicklisten()
                 var loader = `<img src='/static/index/svg/spinner.svg'/>`;
                 document.getElementById("loader").style.display = "block";
                 document.getElementById("loader").innerHTML = loader;
