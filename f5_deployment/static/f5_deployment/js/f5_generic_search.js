@@ -157,7 +157,8 @@ function get_task_info(task_id) {
                     //alert( 'Clicked row id '+result_index );
                 //} );
 
-                $(".clickable-row").click(function(result_index) {
+                $(".clickable-row").click(function() {
+                    document.getElementById("vs_data").scrollIntoView();
                     document.getElementById("nodes_body").innerHTML = "";
                     var result_index = $(this).data('url');
                     var f5_location = results[result_index].location;
@@ -311,7 +312,7 @@ function get_task_info(task_id) {
                         var pool_status_img = '';
                     }
                     document.getElementById("vs_data").style.visibility = "visible";
-                    ocument.getElementById("vs_detail_status").innerHTML = vs_status_img;
+                    document.getElementById("vs_detail_status").innerHTML = vs_status_img;
                     document.getElementById("vs_detail_name").innerHTML = vs_name;
                     document.getElementById("vs_detail_destination").innerHTML = vs_ip;
                     document.getElementById("vs_detail_port").innerHTML = vs_port;
@@ -323,7 +324,7 @@ function get_task_info(task_id) {
                     document.getElementById("vs_detail_connections_maximum").innerHTML = vs_conn_max;
                     document.getElementById("vs_detail_connections_total").innerHTML = vs_conn_total;
 
-                    document.getElementById("vs_data").scrollIntoView();
+
 
                 });
 
