@@ -1,0 +1,68 @@
+Index: f5_deployment/templates/f5_deployment/f5_generic_search.html
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- f5_deployment/templates/f5_deployment/f5_generic_search.html	(revision 945479eb6714d83391bd9fe06fb4aa83245b84c3)
++++ f5_deployment/templates/f5_deployment/f5_generic_search.html	(date 1547077968000)
+@@ -36,7 +36,7 @@
+         <p id="f5_results"></p>
+         <div class="row">
+             <div class="col-lg-12">
+-                <div id="loader" class='img-responsive center-block'></div>
++                <div id="loader" style="text-align:center;"></div>
+                 <div class="panel-group" id="accordion">
+                     <div class="panel panel-default" style="visibility: hidden;" id="tablediv">
+                         <div class="panel-heading">
+Index: f5_deployment/static/f5_deployment/js/f5_generic_search.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- f5_deployment/static/f5_deployment/js/f5_generic_search.js	(revision 945479eb6714d83391bd9fe06fb4aa83245b84c3)
++++ f5_deployment/static/f5_deployment/js/f5_generic_search.js	(date 1547078230000)
+@@ -50,11 +50,7 @@
+             rslt.html('');
+ 
+             if (data.state == 'PENDING') {
+-                var loader = `<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 50 50">
+-    <path fill="#C779D0" d="M25,5A20.14,20.14,0,0,1,45,22.88a2.51,2.51,0,0,0,2.49,2.26h0A2.52,2.52,0,0,0,50,22.33a25.14,25.14,0,0,0-50,0,2.52,2.52,0,0,0,2.5,2.81h0A2.51,2.51,0,0,0,5,22.88,20.14,20.14,0,0,1,25,5Z">
+-        <animateTransform attributeName="transform" type="rotate" from="0 25 25" to="360 25 25" dur="0.5s" repeatCount="indefinite"/>
+-    </path>
+-</svg>`
++                var loader = `<img src={% static 'index/svg/spinner.svg' %}" />`;
+                 rslt.html('Searching BigIP...');
+                 document.getElementById("loader").innerHTML = loader;
+             }
+Index: f5_deployment/static/f5_deployment/js/f5_vs_deployment.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- f5_deployment/static/f5_deployment/js/f5_vs_deployment.js	(revision 945479eb6714d83391bd9fe06fb4aa83245b84c3)
++++ f5_deployment/static/f5_deployment/js/f5_vs_deployment.js	(date 1547078226000)
+@@ -30,7 +30,9 @@
+         success: function (data) {
+             rslt.html('');
+             if (data.state == 'PENDING') {
++                var loader = `<img src={% static 'index/svg/spinner.svg' %}" />`;
+                 rslt.html('Validating data structure...');
++                document.getElementById("loader").innerHTML = loader;
+             }
+             else if (data.state == 'SUCCESS') {
+                 <!-- Clear Old  Data -->
+Index: f5_deployment/templates/f5_deployment/f5_vs_deployment.html
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- f5_deployment/templates/f5_deployment/f5_vs_deployment.html	(revision 945479eb6714d83391bd9fe06fb4aa83245b84c3)
++++ f5_deployment/templates/f5_deployment/f5_vs_deployment.html	(date 1547078030000)
+@@ -32,6 +32,7 @@
+                <p id="vs_deployment_result"></p>
+             <div class="row">
+                 <div class="col-lg-12">
++                    <div id="loader" style="text-align:center;"></div>
+                     <div class="panel panel-default" style="visibility: hidden;" id="resultdiv">
+                         <!-- /.panel-heading -->
+                         <div class="panel-body">
