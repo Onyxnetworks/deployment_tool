@@ -58,7 +58,7 @@ function get_task_info(task_id) {
             else if (data.state == 'SUCCESS') {
 //                <!-- Clear Old table Data -->
                 if ($.fn.DataTable.isDataTable("#result_table_header")){
-                    $('#result_table_header').DataTable().clear().destroy();
+                    var result_table = $('#result_table_header').DataTable().clear().destroy();
                 }
                 document.getElementById("loader").style.display = "none";
                 document.getElementById("result_table").innerHTML = "";
