@@ -50,13 +50,14 @@ function get_task_info(task_id) {
             rslt.html('');
 
             if (data.state == 'PENDING') {
-                clicklisten()
+                clicklisten_disable()
                 var loader = `<img src='/static/index/svg/spinner.svg'/>`;
                 document.getElementById("loader").style.display = "block";
                 document.getElementById("loader").innerHTML = loader;
                 rslt.html('Searching BigIP...');
             }
             else if (data.state == 'SUCCESS') {
+                clicklisten_enable()
 //                <!-- Clear Old table Data -->
                 if ($.fn.DataTable.isDataTable("#result_table_header")){
                      $('#result_table_header').DataTable().clear().destroy();
@@ -337,6 +338,7 @@ function get_task_info(task_id) {
                 }, 1000);
             }},
         error: function (data) {
+            clicklisten_enable()
             document.getElementById("tablediv").style.visibility = "hidden";
             document.getElementById("loader").style.display = "none";
             rslt.html("Something went wrong!");success()
