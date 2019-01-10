@@ -143,23 +143,23 @@ function get_task_info(task_id) {
                     });
                 }
 
-                var result_table = $('#result_table_header').DataTable({
-                    retrieve: true,
-                    responsive: true,
-                    destroy: true,
-                    "language": {
-                        "search": "Filter records:"
-                    },
-                });
+                //var result_table = $('#result_table_header').DataTable({
+                //    retrieve: true,
+                //    responsive: true,
+                //    destroy: true,
+                //    "language": {
+                //        "search": "Filter records:"
+                //    },
+                //});
 
-                $('#result_table_header').on( 'click', 'tr', function () {
-                    var result_index = result_table.row( this ).id().split("_")[2];
+                //$('#result_table_header').on( 'click', 'tr', function () {
+                    //var result_index = result_table.row( this ).id().split("_")[2];
                     //alert( 'Clicked row id '+result_index );
                 //} );
 
-                //$(".clickable-row").click(function(result_index) {
+                $(".clickable-row").click(function(result_index) {
                     document.getElementById("nodes_body").innerHTML = "";
-                    //var result_index = $(this).data('url');
+                    var result_index = $(this).data('url');
                     var f5_location = results[result_index].location;
                     var vs_name = results[result_index].vs_name;
                     var vs_ip = results[result_index].vs_ip;
@@ -292,37 +292,39 @@ function get_task_info(task_id) {
                                 document.getElementById(node_table_tr).appendChild(node_table_td);
                             });
                         }
+                    }
+                    if (pool_name == 'none'){
+                        document.getElementById("pool_detail_status").innerHTML = '';
+                        document.getElementById("pool_detail_name").innerHTML = '';
+                        document.getElementById("pool_detail_members").innerHTML = '';
+                        document.getElementById("pool_detail_bits_in").innerHTML = '';
+                        document.getElementById("pool_detail_bits_out").innerHTML = '';
+                        document.getElementById("pool_detail_packets_in").innerHTML = '';
+                        document.getElementById("pool_detail_packets_out").innerHTML = '';
+                        document.getElementById("pool_detail_connections_current").innerHTML = '';
+                        document.getElementById("pool_detail_connections_maximum").innerHTML = '';
+                        document.getElementById("pool_detail_connections_total").innerHTML = '';
+                        document.getElementById("pool_detail_requests_total").innerHTML = '';
+                        document.getElementById("pool_detail_requests_depth").innerHTML = '';
+                        document.getElementById("pool_detail_requests_max_age").innerHTML = '';
 
-                }
-                if (pool_name == 'none'){
-                    document.getElementById("pool_detail_status").innerHTML = '';
-                    document.getElementById("pool_detail_name").innerHTML = '';
-                    document.getElementById("pool_detail_members").innerHTML = '';
-                    document.getElementById("pool_detail_bits_in").innerHTML = '';
-                    document.getElementById("pool_detail_bits_out").innerHTML = '';
-                    document.getElementById("pool_detail_packets_in").innerHTML = '';
-                    document.getElementById("pool_detail_packets_out").innerHTML = '';
-                    document.getElementById("pool_detail_connections_current").innerHTML = '';
-                    document.getElementById("pool_detail_connections_maximum").innerHTML = '';
-                    document.getElementById("pool_detail_connections_total").innerHTML = '';
-                    document.getElementById("pool_detail_requests_total").innerHTML = '';
-                    document.getElementById("pool_detail_requests_depth").innerHTML = '';
-                    document.getElementById("pool_detail_requests_max_age").innerHTML = '';
+                        var pool_status_img = '';
+                    }
+                    document.getElementById("vs_data").style.visibility = "visible";
+                    ocument.getElementById("vs_detail_status").innerHTML = vs_status_img;
+                    document.getElementById("vs_detail_name").innerHTML = vs_name;
+                    document.getElementById("vs_detail_destination").innerHTML = vs_ip;
+                    document.getElementById("vs_detail_port").innerHTML = vs_port;
+                    document.getElementById("vs_detail_bits_in").innerHTML = vs_bits_in;
+                    document.getElementById("vs_detail_bits_out").innerHTML = vs_bits_out;
+                    document.getElementById("vs_detail_packets_in").innerHTML = vs_packets_in;
+                    document.getElementById("vs_detail_packets_out").innerHTML = vs_packets_out;
+                    document.getElementById("vs_detail_connections_current").innerHTML = vs_conn_current;
+                    document.getElementById("vs_detail_connections_maximum").innerHTML = vs_conn_max;
+                    document.getElementById("vs_detail_connections_total").innerHTML = vs_conn_total;
 
-                    var pool_status_img = '';
-                }
-                document.getElementById("vs_data").style.visibility = "visible";
-                document.getElementById("vs_detail_status").innerHTML = vs_status_img;
-                document.getElementById("vs_detail_name").innerHTML = vs_name;
-                document.getElementById("vs_detail_destination").innerHTML = vs_ip;
-                document.getElementById("vs_detail_port").innerHTML = vs_port;
-                document.getElementById("vs_detail_bits_in").innerHTML = vs_bits_in;
-                document.getElementById("vs_detail_bits_out").innerHTML = vs_bits_out;
-                document.getElementById("vs_detail_packets_in").innerHTML = vs_packets_in;
-                document.getElementById("vs_detail_packets_out").innerHTML = vs_packets_out;
-                document.getElementById("vs_detail_connections_current").innerHTML = vs_conn_current;
-                document.getElementById("vs_detail_connections_maximum").innerHTML = vs_conn_max;
-                document.getElementById("vs_detail_connections_total").innerHTML = vs_conn_total;
+                    document.getElementById("vs_data").scrollIntoView();
+
                 });
 
             }
