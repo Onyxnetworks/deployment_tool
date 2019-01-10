@@ -32,7 +32,7 @@ function get_validation_task_info(task_id, location, vs_dict) {
             if (data.state == 'PENDING') {
                 var loader = `<img src='/static/index/svg/spinner.svg'/>`;
                 rslt.html('Validating data structure...');
-                document.getElementById("loader").innerHTML = loader;
+                document.getElementById("loader").style.display = "none";
             }
             else if (data.state == 'SUCCESS') {
                 <!-- Clear Old  Data -->
@@ -239,6 +239,8 @@ function get_deployment_task_info(task_id) {$.ajax({
     error: function (data) {
         document.getElementById("tablediv").style.visibility = "hidden";
         rslt.html("Something went wrong!");success()
+        document.getElementById("loader").style.display = "none";
+
     }
 })
 }

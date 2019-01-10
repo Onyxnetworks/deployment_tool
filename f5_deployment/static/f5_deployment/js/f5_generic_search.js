@@ -52,7 +52,7 @@ function get_task_info(task_id) {
             if (data.state == 'PENDING') {
                 var loader = `<img src='/static/index/svg/spinner.svg'/>`;
                 rslt.html('Searching BigIP...');
-                document.getElementById("loader").innerHTML = loader;
+                document.getElementById("loader").style.display = "none";
             }
             else if (data.state == 'SUCCESS') {
 //                <!-- Clear Old table Data -->
@@ -331,6 +331,7 @@ function get_task_info(task_id) {
             }},
         error: function (data) {
             document.getElementById("tablediv").style.visibility = "hidden";
+            document.getElementById("loader").style.display = "none";
             rslt.html("Something went wrong!");success()
         }
     });
