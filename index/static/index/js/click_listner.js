@@ -1,5 +1,6 @@
 function clicklisten() {
-    $(".navbar").click(function () {
-        alert('Test');
+    $(".navbar").click(function (event) {
+        event.preventDefault();
+        console.log('Test');
     });
 }
