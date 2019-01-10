@@ -50,7 +50,7 @@ function get_task_info(task_id) {
             rslt.html('');
 
             if (data.state == 'PENDING') {
-                var loader = `<img src={% static 'index/svg/spinner.svg' %}" />`;
+                var loader = `<img src="{% static 'index/svg/spinner.svg' %}" />`;
                 rslt.html('Searching BigIP...');
                 document.getElementById("loader").innerHTML = loader;
             }
