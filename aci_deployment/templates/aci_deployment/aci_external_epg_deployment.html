@@ -13,7 +13,7 @@
                         <select class="form-control-sm" name="location" id="location" required="required" >
                               <option>UKDC1</option>
                               <option>UKDC2</option>
-                              <option>LAB</option>
+                              {% if environment == 'Lab' %}<option>LAB</option>{% endif %}
                         </select>
                       </div>
                       <div class="form-group">
