@@ -133,7 +133,8 @@ def virtual_server_dashboard(url_list, request_type, search_string, username, pa
     for base_url in url_list:
         # Authenticate against bigip
         location = base_url.split('.')[0][8:]
-        auth_token = bigip_login(base_url, username, password)
+        bigip_login_response = bigip_login(base_url, username, password)
+        auth_token = bigip_login_response['token']['token']
         # Get all Virtual Servers
         all_vs = get_all_vs(base_url, auth_token)
 
