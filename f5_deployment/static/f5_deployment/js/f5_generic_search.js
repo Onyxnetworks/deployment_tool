@@ -146,6 +146,7 @@ function get_task_info(task_id) {
                 var result_table = $('#result_table_header').DataTable({
                     retrieve: true,
                     responsive: true,
+                    destroy: true,
                     "language": {
                         "search": "Filter records:"
                     },
