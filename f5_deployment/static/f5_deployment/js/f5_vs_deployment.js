@@ -32,7 +32,7 @@ function get_validation_task_info(task_id, location, vs_dict) {
             if (data.state == 'PENDING') {
                 var loader = `<img src='/static/index/svg/spinner.svg'/>`;
                 document.getElementById("loader").style.display = "block";
-                document.getElementById("result_table").innerHTML = loader;
+                document.getElementById("loader").innerHTML = loader;
                 rslt.html('Validating data structure...');
             }
             else if (data.state == 'SUCCESS') {

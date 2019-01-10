@@ -52,7 +52,7 @@ function get_task_info(task_id) {
             if (data.state == 'PENDING') {
                 var loader = `<img src='/static/index/svg/spinner.svg'/>`;
                 document.getElementById("loader").style.display = "block";
-                document.getElementById("result_table").innerHTML = loader;
+                document.getElementById("loader").innerHTML = loader;
                 rslt.html('Searching BigIP...');
             }
             else if (data.state == 'SUCCESS') {
