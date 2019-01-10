@@ -31,11 +31,12 @@ function get_validation_task_info(task_id, location, vs_dict) {
             rslt.html('');
             if (data.state == 'PENDING') {
                 var loader = `<img src='/static/index/svg/spinner.svg'/>`;
+                document.getElementById("loader").style.display = "block";
                 rslt.html('Validating data structure...');
-                document.getElementById("loader").style.display = "none";
             }
             else if (data.state == 'SUCCESS') {
                 <!-- Clear Old  Data -->
+                document.getElementById("loader").style.display = "none";
                 document.getElementById("vs_deployment_results").innerHTML = "";
                 document.getElementById("resultdiv").style.visibility = "visible";
                 var results = data.result[0];

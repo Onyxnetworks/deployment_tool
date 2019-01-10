@@ -51,15 +51,15 @@ function get_task_info(task_id) {
 
             if (data.state == 'PENDING') {
                 var loader = `<img src='/static/index/svg/spinner.svg'/>`;
+                document.getElementById("loader").style.display = "block";
                 rslt.html('Searching BigIP...');
-                document.getElementById("loader").style.display = "none";
             }
             else if (data.state == 'SUCCESS') {
 //                <!-- Clear Old table Data -->
                 if ($.fn.DataTable.isDataTable("#result_table_header")){
                     $('#result_table_header').DataTable().clear().destroy();
                 }
-                document.getElementById("loader").innerHTML = "";
+                document.getElementById("loader").style.display = "none";
                 document.getElementById("result_table").innerHTML = "";
                 document.getElementById("tablediv").style.visibility = "visible";
                 //document.getElementById("vs_data_body").innerHTML = "";
