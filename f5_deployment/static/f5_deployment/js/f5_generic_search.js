@@ -50,7 +50,7 @@ function get_task_info(task_id) {
             rslt.html('');
 
             if (data.state == 'PENDING') {
-                //clicklisten()
+                clicklisten()
                 var loader = `<img src='/static/index/svg/spinner.svg'/>`;
                 document.getElementById("loader").style.display = "block";
                 document.getElementById("loader").innerHTML = loader;
