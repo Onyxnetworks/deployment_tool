@@ -66,7 +66,11 @@ def login(request):
                 base_url = next(iter(base_urls['F5'].values()))
                 base_url = next(iter(base_url.values()))
 
-                auth_token = bigip_login(base_url, username, password)
+                login_response = bigip_login(base_url, username, password)
+                try:
+                    auth_token = login_response['token']['token']
+                except:
+                    auth_token = False
 
                 if auth_token:
                     request.session['APIC_COOKIE'] = auth_token

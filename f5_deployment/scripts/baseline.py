@@ -17,7 +17,7 @@ def bigip_login(base_url, username, password):
 
         if post_response.status_code == 200:
             auth_token = payload_response['token']['token']
-            return auth_token
+            return payload_response
 
     except requests.exceptions.HTTPError as errh:
         error_code = "Http Error:" + str(errh)
