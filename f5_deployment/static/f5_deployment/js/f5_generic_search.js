@@ -1,6 +1,7 @@
 var frm = $('#f5_search');
 var rslt = $('#f5_results');
-
+var enable_json = {"state": "user-up", "session": "user-enabled"};
+var disable_json = {"state": "user-up", "session": "user-disabled"};
 
 
 
