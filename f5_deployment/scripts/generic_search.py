@@ -199,7 +199,7 @@ def virtual_server_dashboard(url_list, request_type, search_string, username, pa
                         nodeLink = nodeLink_ver.split('?ver=')[0]
                         node_stats = get_node_stats(base_url, nodeLink, auth_token)
                         node_selfLink_ver = node_stats['selfLink'].split('/localhost/')[1]
-                        node_selfLink = node_selfLink_ver.split('stats?ver=')[0]
+                        node_selfLink = base_url + '/' + node_selfLink_ver.split('stats?ver=')[0]
                         node_stats_dict = node_stats['entries'].values()
                         for node_values in node_stats_dict:
                             node_admin_state = node_values['nestedStats']['entries']['status.enabledState']['description']
