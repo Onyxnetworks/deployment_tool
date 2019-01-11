@@ -246,7 +246,7 @@ def f5_generic_search(base_urls, request_type, search_string, username, password
         results = []
         virtual_server_dashboard_result = virtual_server_dashboard(url_list, request_type, search_string, username, password)
         if isinstance(virtual_server_dashboard_result, list):
-            results = virtual_server_dashboard_result
+            results = {'search': {'search_string': search_string, 'request_type': request_type}, 'data': virtual_server_dashboard_result}
 
             return results
 
@@ -259,7 +259,8 @@ def f5_generic_search(base_urls, request_type, search_string, username, password
             for vs in virtual_server_dashboard_result:
                 try:
                     network = ipaddress.IPv4Network(search_string)
-                    results = virtual_server_dashboard_result
+                    results = {'search': {'search_string': search_string, 'request_type': request_type},
+                               'data': virtual_server_dashboard_result}
 
                 except ValueError:
                     pass
@@ -271,7 +272,7 @@ def f5_generic_search(base_urls, request_type, search_string, username, password
         results = []
         virtual_server_dashboard_result = virtual_server_dashboard(url_list, request_type, search_string, username, password)
         if isinstance(virtual_server_dashboard_result, list):
-            results = virtual_server_dashboard_result
+            results = {'search': {'search_string': search_string, 'request_type': request_type}, 'data': virtual_server_dashboard_result}
 
             return results
 

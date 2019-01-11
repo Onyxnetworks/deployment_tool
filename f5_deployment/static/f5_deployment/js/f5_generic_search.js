@@ -50,11 +50,6 @@ function get_task_info(task_id) {
             rslt.html('');
 
             if (data.state == 'PENDING') {
-                $(".navbar").click(function () {
-                    console.log('Link Clicked');
-                    return false;
-                });
-
                 var loader = `<img src='/static/index/svg/spinner.svg'/>`;
                 document.getElementById("loader").style.display = "block";
                 document.getElementById("loader").innerHTML = loader;
@@ -70,7 +65,9 @@ function get_task_info(task_id) {
                 document.getElementById("result_table").innerHTML = "";
                 document.getElementById("tablediv").style.visibility = "visible";
                 //document.getElementById("vs_data_body").innerHTML = "";
-                var results = data.result;
+                var results = data.result.data;
+                var search_string = data.result.search.search_string;
+                var request_type = data.result.search.request_type;
                 for (i = 0, len = results.length, text = ""; i < len; i++) {
                     f5_location = results[i].location;
                     vs_name = results[i].vs_name;
