@@ -286,6 +286,7 @@ def f5_disable_enable(base_urls, action, f5_selected_items, request_type, search
     enabled_json = {"state": "user-up", "session": "user-enabled"}
 
     if action == 'disable':
+        print(f5_selected_items)
         # Loop through items and disable them on thee respective F5.
         for selflink in f5_selected_items:
             # get URL got base login (hostname without)
