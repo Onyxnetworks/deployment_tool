@@ -191,7 +191,7 @@ function get_task_info(task_id) {
                     //var result_index = result_table.row( this ).id().split("_")[2];
                     //alert( 'Clicked row id '+result_index );
                 //} );
-
+                var results = data.result.data;
                 $(".clickable-row").click(function() {
                     document.getElementById("vs_data").scrollIntoView();
                     document.getElementById("nodes_body").innerHTML = "";
