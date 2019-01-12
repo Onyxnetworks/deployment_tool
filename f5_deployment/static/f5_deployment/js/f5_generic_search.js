@@ -125,7 +125,7 @@ function node_control_on_off(action) {
                         type: "POST",
                         url: '/f5/generic_search/',
                         //traditional: true,
-                        processData: false,
+                        //processData: false,
                         dataType: 'json',
                         contentType: 'application/json',
                         data: post_data,
