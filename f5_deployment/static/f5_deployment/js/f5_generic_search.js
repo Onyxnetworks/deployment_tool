@@ -22,7 +22,7 @@ function node_control_off() {
         // Do something with the row
         console.log($(this).parent('tr').find('.data-selector').val());
     });
-    if (!checkedItems.size()) {
+    if (!checkedItems.length) {
         console.log('Nothing Checked')
     // Nothing was checked
     }
