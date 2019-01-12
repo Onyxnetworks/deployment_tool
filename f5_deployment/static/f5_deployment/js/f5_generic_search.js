@@ -39,6 +39,7 @@ function node_control_off() {
             dataType: "json",
             traditional: true,
             data: {
+                'action': 'disable',
                 'f5_selected_items': f5_selected_items,
                 'cached_search_string': search_string,
                 'cached_request_type': request_type

@@ -119,7 +119,7 @@ def generic_search(request):
 
     # Get data to use Enable Disable task
     if request.method == 'POST' and 'f5_selected_items' in request.POST:
-        print('Selected Item')
+        action = request.POST['action']
         f5_selected_items = request.POST['f5_selected_items']
         search_string = request.POST['cached_search_string']
         request_type = request.POST['cached_request_type']
@@ -141,7 +141,7 @@ def generic_search(request):
         # Get base url to use
         base_urls = get_base_url(environment)
 
-        task = f5_disable_enable.delay(base_urls, f5_selected_items, request_type, search_string, username, password)
+        task = f5_disable_enable.delay(base_urls, action, f5_selected_items, request_type, search_string, username, password)
 
         # Return task id back to client for ajax use.
         return HttpResponse(json.dumps({'task_id': task.id}), content_type='application/json')

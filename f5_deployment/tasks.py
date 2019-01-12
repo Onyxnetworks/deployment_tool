@@ -7,6 +7,7 @@ from celery import shared_task
 # Custom Functions
 from f5_deployment.scripts.vs_deployment import *
 from f5_deployment.scripts.generic_search import *
+from f5_deployment.scripts.enable_disable import *
 
 def vs_deployment_excel_open_workbook(file):
     wb = openpyxl.load_workbook(file, data_only=True)
@@ -278,8 +279,23 @@ def f5_generic_search(base_urls, request_type, search_string, username, password
 
 
 @shared_task
-def f5_disable_enable(base_urls, f5_selected_items, request_type, search_string, username, password):
-    print(f5_selected_items)
+def f5_disable_enable(base_urls, action, f5_selected_items, request_type, search_string, username, password):
+    # Different json posts for various F5 states
+    forced_offline_json = {"state": "user-down", "session": "user-disabled"}
+    disabled_json = {"state": "user-up", "session": "user-disabled"}
+    enabled_json = {"state": "user-up", "session": "user-enabled"}
+
+    if action == 'disable':
+        # Loop through items and disable them on thee respective F5.
+        for selflink in f5_selected_items:
+            # get URL got base login (hostname without)
+            login_url = selflink.split('/mgmt/')[0]
+            bigip_login_response = bigip_login(login_url, username, password)
+            auth_token = bigip_login_response['token']['token']
+            disable_response = disable(selflink, auth_token, disabled_json)
+            print(disable_response)
+
+
 
 
 
