@@ -279,7 +279,7 @@ def f5_generic_search(base_urls, request_type, search_string, username, password
 
 
 @shared_task
-def f5_disable_enable(base_urls, action, f5_selected_items, request_type, search_string, username, password):
+def f5_disable_enable(base_urls, action, f5_selected_items, username, password):
     # Different json posts for various F5 states
     forced_offline_json = {"state": "user-down", "session": "user-disabled"}
     disabled_json = {"state": "user-up", "session": "user-disabled"}

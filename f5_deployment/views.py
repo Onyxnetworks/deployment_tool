@@ -150,7 +150,7 @@ def f5_disable_enable_push(request):
         # Get base url to use
         base_urls = get_base_url(environment)
 
-        task = f5_disable_enable.delay(base_urls, action, f5_selected_items, request_type, search_string, username, password)
+        task = f5_disable_enable.delay(base_urls, action, f5_selected_items, username, password)
 
         # Return task id back to client for ajax use.
         return HttpResponse(json.dumps({'task_id': task.id}), content_type='application/json')

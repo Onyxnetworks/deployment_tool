@@ -1,7 +1,6 @@
 var frm = $('#f5_search');
 var rslt = $('#f5_results');
-var enable_json = {"state": "user-up", "session": "user-enabled"};
-var disable_json = {"state": "user-up", "session": "user-disabled"};
+
 
 
 function build_result_table(data) {
@@ -107,10 +106,8 @@ function node_control_on_off(action) {
     }
     else {
         // Post call to go and disable items.
-        post_data = JSON.stringify({'action': action, 'f5_selected_items': f5_selected_items, 'cached_search_string': search_string, 'cached_request_type': request_type});
+        post_data = JSON.stringify({'action': action, 'f5_selected_items': f5_selected_items,});
         $.ajax({
-
-
             type: "POST",
             url: '/f5/f5_disable_enable_push/',
             dataType: 'json',
@@ -120,8 +117,27 @@ function node_control_on_off(action) {
 
             success: function (data) {
                 if (data.task_id != null) {
-                    console.log(data.task_id)
-                    //get_task_info(data.task_id);
+                    console.log('Function Task ID: ' + data.task_id);
+
+                    // Now post call to refresh data.
+                    post_data = {'f5_search': search_string, 'request_type': request_type};
+                    $.ajax({
+                        type: "POST",
+                        url: '/f5/generic_search/',
+                        dataType: 'json',
+                        contentType: 'application/json',
+                        //traditional: true,
+                        data: post_data,
+
+                        success: function (data) {
+                            if (data.task_id != null) {
+                                console.log('Search Task ID: ' + data.task_id);
+                                get_task_info(data.task_id);
+                            }},
+                        error: function (data) {
+                            console.log("Something went wrong!");
+                        }
+                    });
                 }},
             error: function (data) {
                 //document.getElementById("tablediv").style.visibility = "hidden";
@@ -191,6 +207,7 @@ function get_task_info(task_id) {
                     //var result_index = result_table.row( this ).id().split("_")[2];
                     //alert( 'Clicked row id '+result_index );
                 //} );
+
                 var results = data.result.data;
                 $(".clickable-row").click(function() {
                     document.getElementById("vs_data").scrollIntoView();
