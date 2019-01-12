@@ -15,7 +15,7 @@ var disable_json = {"state": "user-up", "session": "user-disabled"};
 //        } );
 //}
 
-function node_control() {
+function node_control_off() {
 
     var checkedItems = $('#nodes_body input[type="checkbox"]:checked').each(function() {
 
@@ -23,6 +23,7 @@ function node_control() {
         console.log($(this).parent('tr').find('.data-selector').val());
     });
     if (!checkedItems.size()) {
+        console.log('Nothing Checked')
     // Nothing was checked
     }
 
@@ -344,10 +345,6 @@ function get_task_info(task_id) {
 
 
 
-                });
-                $('#disable_btn').click(function() {
-                    console.log('Starting Node Control');
-                    node_control()
                 });
 
             }
