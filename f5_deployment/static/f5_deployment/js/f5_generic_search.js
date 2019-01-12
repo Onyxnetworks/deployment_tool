@@ -31,13 +31,15 @@ function node_control_off() {
     }
     else {
         // Post call to go and disable items.
-        var form_data = {"f5_selected_items": f5_selected_items};
         $.ajax({
 
-            type: 'POST',
+            type: "POST",
             url: '/f5/generic_search/',
-            data: form_data,
             dataType: "json",
+            traditional: true,
+            data: {
+                'f5_selected_items': f5_selected_items
+            },
 
             success: function (data) {
                 if (data.task_id != null) {
