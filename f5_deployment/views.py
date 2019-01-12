@@ -40,9 +40,14 @@ def vs_deployment(request):
         return HttpResponse(json.dumps({'task_id': task.id, 'location': location}),
                             content_type='application/json')
 
-
+    # Get base url to use
     environment = request.session.get('environment')
-    content = {'environment': environment}
+    base_urls = get_base_url(environment)
+    url_dict = base_urls['F5']
+    location_list = list(url_dict.keys())
+
+
+    content = {'environment': environment, 'locations': location_list}
     return render(request, 'f5_deployment/f5_vs_deployment.html', content)
 
 
