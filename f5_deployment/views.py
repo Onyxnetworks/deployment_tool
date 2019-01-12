@@ -119,10 +119,13 @@ def generic_search(request):
 
     # Get data to use Enable Disable task
     if request.method == 'POST' and 'f5_selected_items' in request.POST:
-        action = request.POST['action']
-        f5_selected_items = list(request.POST['f5_selected_items'])
-        search_string = request.POST['cached_search_string']
-        request_type = request.POST['cached_request_type']
+        response_json = request.body
+        data = json.loads(response_json)
+
+        action = data['action']
+        f5_selected_items = data['f5_selected_items']
+        search_string = data['cached_search_string']
+        request_type = data['cached_request_type']
 
         environment = request.session.get('environment')
         if environment == 'Production':
