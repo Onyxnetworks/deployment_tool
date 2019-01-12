@@ -89,7 +89,7 @@ def vs_deployment_push(request):
 
 
 def generic_search(request):
-
+    print(request.POST)
     # Get data to use for search task.
     if request.method == 'POST' and 'f5_search' in request.POST:
         search_string = request.POST['f5_search']
