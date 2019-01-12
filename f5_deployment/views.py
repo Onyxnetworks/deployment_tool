@@ -120,7 +120,7 @@ def generic_search(request):
     # Get data to use Enable Disable task
     if request.method == 'POST' and 'f5_selected_items' in request.POST:
         action = request.POST['action']
-        f5_selected_items = request.POST['f5_selected_items']
+        f5_selected_items = list(request.POST['f5_selected_items'])
         search_string = request.POST['cached_search_string']
         request_type = request.POST['cached_request_type']
 

@@ -286,17 +286,17 @@ def f5_disable_enable(base_urls, action, f5_selected_items, request_type, search
     enabled_json = {"state": "user-up", "session": "user-enabled"}
 
     if action == 'disable':
-        print(type(f5_selected_items))
+        print(f5_selected_items)
         # Loop through items and disable them on thee respective F5.
-        for item in f5_selected_items:
+        for selflink in f5_selected_items:
             # get URL got base login (hostname without)
-            print('Link: ' + item)
-            login_url = item.split('/mgmt/')[0]
+            print('Link: ' + selflink)
+            login_url = selflink.split('/mgmt/')[0]
             print(login_url)
             bigip_login_response = bigip_login(login_url, username, password)
             print(bigip_login_response)
             auth_token = bigip_login_response['token']['token']
-            disable_response = disable(item, auth_token, disabled_json)
+            disable_response = disable(selflink, auth_token, disabled_json)
             print(disable_response)
 
 
