@@ -15,6 +15,19 @@ var disable_json = {"state": "user-up", "session": "user-disabled"};
 //        } );
 //}
 
+function node_control() {
+
+    var checkedItems = $('#nodes_body input[type="checkbox"]:checked').each(function() {
+
+        // Do something with the row
+        console.log($(this).parent('tr').find('.data-selector').val());
+    });
+    if (!checkedItems.size()) {
+    // Nothing was checked
+    }
+
+}
+
 frm.submit(function () {
     document.getElementById("tablediv").style.visibility = "hidden";
     document.getElementById("vs_data").style.visibility = "hidden";
@@ -285,7 +298,8 @@ function get_task_info(task_id) {
 
                             var node_tr = document.createElement("TR");
                             var node_table_tr = 'node_table_tr' + ni;
-                            var node_checkbox = '<input type="checkbox">'
+                            var checkbox_id = 'node_checkbox_' + ni;
+                            var node_checkbox = `<input type="checkbox" id="checkbox">`;
                             node_tr.setAttribute("id", node_table_tr);
                             document.getElementById("nodes_body").appendChild(node_tr);
                             var node_details = [node_checkbox, node_status_img, node_name, node_address, node_bits_in, node_bits_out, node_packets_in, node_packets_out, node_conn_current, node_conn_max, node_conn_total, node_requests_total, node_requests_depth, node_requests_max_age]
@@ -331,6 +345,10 @@ function get_task_info(task_id) {
 
 
                 });
+                $('#disable_btn').click(function() {
+                    console.log('Starting Node Control')
+                    node_control()
+                };
 
             }
 
