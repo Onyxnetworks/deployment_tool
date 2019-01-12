@@ -21,6 +21,8 @@ function node_control_off() {
 
         // Do something with the row
         console.log($(this).parents('tr').data('url'));
+        var selected_items = $(this).parents('tr').data('url');
+        alert(selected_items)
     });
     if (!checkedItems.length) {
         console.log('Nothing Checked')
