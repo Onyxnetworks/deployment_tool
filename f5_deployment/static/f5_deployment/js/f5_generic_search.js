@@ -257,6 +257,7 @@ function get_task_info(task_id) {
 
                         var node_results = results[result_index].vs_nodes;
                         for (ni = 0, len = node_results.length, text = ""; ni < len; ni++) {
+                            var node_self_link = node_results[ni].node_selfLink;
                             var node_admin_state = node_results[ni].node_admin_state;
                             var node_name = node_results[ni].node_name;
                             var node_port = node_results[ni].node_port;
@@ -298,6 +299,7 @@ function get_task_info(task_id) {
                             }
 
                             var node_tr = document.createElement("TR");
+                            node_tr.setAttribute("data-url", `${node_self_link}`);
                             var node_table_tr = 'node_table_tr' + ni;
                             var checkbox_id = 'node_checkbox_' + ni;
                             var node_checkbox = `<input type="checkbox" id="checkbox">`;
