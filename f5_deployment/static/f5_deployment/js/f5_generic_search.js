@@ -346,9 +346,9 @@ function get_task_info(task_id) {
 
                 });
                 $('#disable_btn').click(function() {
-                    console.log('Starting Node Control')
+                    console.log('Starting Node Control');
                     node_control()
-                };
+                });
 
             }
 
