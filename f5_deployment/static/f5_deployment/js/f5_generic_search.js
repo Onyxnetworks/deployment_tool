@@ -120,14 +120,16 @@ function node_control_on_off(action) {
                     console.log('Function Task ID: ' + data.task_id);
 
                     // Now post call to refresh data.
-                    post_data = {'f5_search': search_string, 'request_type': request_type};
+                    //post_data = {'f5_search': search_string, 'request_type': request_type};
                     $.ajax({
                         type: "POST",
                         url: '/f5/generic_search/',
                         dataType: 'json',
-                        contentType: 'application/json',
                         traditional: true,
-                        data: post_data,
+                        data: {
+                            'f5_search': search_string,
+                            'request_type': request_type
+                        },
 
                         success: function (data) {
                             if (data.task_id != null) {
