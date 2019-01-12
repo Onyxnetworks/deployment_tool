@@ -121,7 +121,7 @@ def generic_search(request):
     if request.method == 'POST' and 'f5_selected_items' in request.POST:
         print('Selected Item')
         f5_selected_items = request.POST['f5_selected_items']
-        search_string = request.POST['cached_f5_search']
+        search_string = request.POST['cached_search_string']
         request_type = request.POST['cached_request_type']
 
         environment = request.session.get('environment')
