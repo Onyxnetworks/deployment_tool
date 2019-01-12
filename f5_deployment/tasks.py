@@ -277,4 +277,11 @@ def f5_generic_search(base_urls, request_type, search_string, username, password
             return results
 
 
+@shared_task
+def f5_disable_enable(base_urls, f5_selected_items, request_type, search_string, username, password):
+    print(f5_selected_items)
+
+
+
+
 

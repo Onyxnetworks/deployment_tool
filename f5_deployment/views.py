@@ -117,6 +117,35 @@ def generic_search(request):
         # Return task id back to client for ajax use.
         return HttpResponse(json.dumps({'task_id': task.id}), content_type='application/json')
 
+    # Get data to use Enable Disable task
+    if request.method == 'POST' and 'f5_selected_items' in request.POST:
+        print('Selected Item')
+        f5_selected_items = request.POST['f5_selected_items']
+        search_string = request.POST['cached_f5_search']
+        request_type = request.POST['cached_request_type']
+
+        environment = request.session.get('environment')
+        if environment == 'Production':
+            username = request.session.get('prod_username')
+            password = request.session.get('prod_password')
+
+        if environment == 'Pre-Production':
+            # Need to put in an error as PPE search wont work!
+            username = request.session.get('ppe_username')
+            password = request.session.get('ppe_password')
+
+        if environment == 'Lab':
+            username = request.session.get('lab_username')
+            password = request.session.get('lab_password')
+
+        # Get base url to use
+        base_urls = get_base_url(environment)
+
+        task = f5_disable_enable.delay(base_urls, f5_selected_items, request_type, search_string, username, password)
+
+        # Return task id back to client for ajax use.
+        return HttpResponse(json.dumps({'task_id': task.id}), content_type='application/json')
+
     environment = request.session.get('environment')
     content = {'environment': environment}
     return render(request, 'f5_deployment/f5_generic_search.html', content)

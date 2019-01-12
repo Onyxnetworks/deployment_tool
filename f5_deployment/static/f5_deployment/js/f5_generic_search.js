@@ -16,12 +16,13 @@ var disable_json = {"state": "user-up", "session": "user-disabled"};
 //}
 
 function node_control_off() {
-    var selected_items = []
+    // Create empty list
+    var f5_selected_items = []
     var checkedItems = $('#nodes_table input[type="checkbox"]:checked').each(function() {
 
-        // Do something with the row
-        console.log($(this).parents('tr').data('url'));
-        selected_items.push($(this).parents('tr').data('url'));
+        // Add selected items to the selected_items list.
+        //console.log($(this).parents('tr').data('url'));
+        f5_selected_items.push($(this).parents('tr').data('url'));
 
     });
     if (!checkedItems.length) {
@@ -29,7 +30,25 @@ function node_control_off() {
     // Nothing was checked
     }
     else {
-        alert(selected_items)
+        // Post call to go and disable items.
+        var form_data = {'f5_selected_items': f5_selected_items}
+        $.ajax({
+
+            type: 'POST',
+            url: '/generic_search/',
+            data: form_data,
+
+            success: function (data) {
+                if (data.task_id != null) {
+                    console.log(data.task_id)
+                    //get_task_info(data.task_id);
+                }},
+            error: function (data) {
+                //document.getElementById("tablediv").style.visibility = "hidden";
+                //document.getElementById("vs_data").style.visibility = "hidden";
+                console.log("Something went wrong!");
+            }
+        });
     }
 
 }
