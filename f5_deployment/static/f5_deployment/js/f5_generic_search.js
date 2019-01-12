@@ -35,7 +35,7 @@ function node_control_off() {
         $.ajax({
 
             type: 'POST',
-            url: '/generic_search/',
+            url: '/f5/generic_search/',
             data: form_data,
 
             success: function (data) {
