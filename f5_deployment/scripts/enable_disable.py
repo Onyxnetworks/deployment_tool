@@ -1,12 +1,12 @@
 import json, requests
 
-def disable(selflink, auth_token, disabled_json):
+def disable_enable_force(selflink, auth_token, request_json):
     # Build auth token header
     headers = {'content-type': 'application/json', 'X-F5-Auth-Token': auth_token}
 
     put_url = selflink
     try:
-        put_response = requests.put(put_url, headers=headers, data=json.dumps(disabled_json), timeout=5, verify=False)
+        put_response = requests.put(put_url, headers=headers, data=json.dumps(request_json), timeout=5, verify=False)
         payload_response = json.loads(put_response.text)
 
         if put_response.status_code == 200:

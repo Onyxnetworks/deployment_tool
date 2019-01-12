@@ -15,7 +15,7 @@ var disable_json = {"state": "user-up", "session": "user-disabled"};
 //        } );
 //}
 
-function node_control_off() {
+function node_control_on_off(action) {
     // Create empty list
     var f5_selected_items = []
     var checkedItems = $('#nodes_table input[type="checkbox"]:checked').each(function() {
@@ -31,7 +31,7 @@ function node_control_off() {
     }
     else {
         // Post call to go and disable items.
-        post_data = JSON.stringify({'action': 'disable', 'f5_selected_items': f5_selected_items, 'cached_search_string': search_string, 'cached_request_type': request_type});
+        post_data = JSON.stringify({'action': action, 'f5_selected_items': f5_selected_items, 'cached_search_string': search_string, 'cached_request_type': request_type});
         $.ajax({
 
 
