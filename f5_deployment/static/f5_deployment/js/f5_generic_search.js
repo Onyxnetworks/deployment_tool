@@ -36,7 +36,7 @@ function node_control_off() {
 
 
             type: "POST",
-            url: '/f5/generic_search/',
+            url: '/f5/f5_disable_enable_push/',
             dataType: 'json',
             contentType: 'application/json',
             //traditional: true,

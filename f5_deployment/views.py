@@ -117,8 +117,14 @@ def generic_search(request):
         # Return task id back to client for ajax use.
         return HttpResponse(json.dumps({'task_id': task.id}), content_type='application/json')
 
+
+    environment = request.session.get('environment')
+    content = {'environment': environment}
+    return render(request, 'f5_deployment/f5_generic_search.html', content)
+
+def f5_disable_enable_push(request):
     # Get data to use Enable Disable task
-    if request.method == 'POST' and 'f5_selected_items' in request.POST:
+    if request.method == 'POST':
         response_json = request.body
         data = json.loads(response_json)
 
@@ -148,7 +154,3 @@ def generic_search(request):
 
         # Return task id back to client for ajax use.
         return HttpResponse(json.dumps({'task_id': task.id}), content_type='application/json')
-
-    environment = request.session.get('environment')
-    content = {'environment': environment}
-    return render(request, 'f5_deployment/f5_generic_search.html', content)
