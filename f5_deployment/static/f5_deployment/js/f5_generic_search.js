@@ -126,7 +126,7 @@ function node_control_on_off(action) {
                         url: '/f5/generic_search/',
                         dataType: 'json',
                         contentType: 'application/json',
-                        //traditional: true,
+                        traditional: true,
                         data: post_data,
 
                         success: function (data) {
