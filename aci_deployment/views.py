@@ -34,8 +34,14 @@ def endpoint_search(request):
         # Return task id back to client for ajax use.
         return HttpResponse(json.dumps({'task_id': task.id}), content_type='application/json')        
 
+    # Get base url to use
     environment = request.session.get('environment')
-    content = {'environment': environment}
+    base_urls = get_base_url(environment)
+    url_dict = base_urls['ACI']
+    location_list = list(url_dict.keys())
+
+
+    content = {'environment': environment, 'locations': location_list}
     return render(request, 'aci_deployment/aci_endpoint_search.html', content)
 
 
