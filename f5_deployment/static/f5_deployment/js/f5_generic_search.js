@@ -121,13 +121,14 @@ function node_control_on_off(action) {
 
                     // Now post call to refresh data.
                     post_data = {'f5_search': search_string, 'request_type': request_type};
+                    console.log(post_data);
                     $.ajax({
                         type: "POST",
                         url: '/f5/generic_search/',
                         //traditional: true,
                         //processData: false,
-                        dataType: 'json',
-                        contentType: 'application/json',
+                        //dataType: 'json',
+                        //contentType: 'application/json',
                         data: post_data,
 
                         success: function (data) {
