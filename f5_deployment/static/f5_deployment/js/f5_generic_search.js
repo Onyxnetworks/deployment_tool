@@ -20,7 +20,7 @@ function node_control_off() {
     var checkedItems = $('#nodes_table input[type="checkbox"]:checked').each(function() {
 
         // Do something with the row
-        console.log($(this).parent('tr').id.value());
+        console.log($(this).parent('tr').id);
     });
     if (!checkedItems.length) {
         console.log('Nothing Checked')
