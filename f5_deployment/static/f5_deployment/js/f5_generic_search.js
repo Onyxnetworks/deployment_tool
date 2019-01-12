@@ -124,7 +124,6 @@ function node_control_on_off(action) {
                     $.ajax({
                         type: "POST",
                         url: '/f5/generic_search/',
-                        dataType: 'json',
                         traditional: true,
                         data: {
                             'f5_search': search_string,
