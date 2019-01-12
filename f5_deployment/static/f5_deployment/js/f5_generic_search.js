@@ -31,19 +31,16 @@ function node_control_off() {
     }
     else {
         // Post call to go and disable items.
+        post_data = JSON.stringify({'action': 'disable', 'f5_selected_items': f5_selected_items, 'cached_search_string': search_string, 'cached_request_type': request_type});
         $.ajax({
 
 
             type: "POST",
             url: '/f5/generic_search/',
-            dataType: "json",
-            traditional: true,
-            data: {
-                'action': 'disable',
-                'f5_selected_items': f5_selected_items,
-                'cached_search_string': search_string,
-                'cached_request_type': request_type
-            },
+            dataType: 'json',
+            contentType: 'application/json',
+            //traditional: true,
+            data: post_data,
 
             success: function (data) {
                 if (data.task_id != null) {
