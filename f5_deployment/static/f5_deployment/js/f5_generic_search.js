@@ -17,7 +17,7 @@ var disable_json = {"state": "user-up", "session": "user-disabled"};
 
 function node_control_off() {
 
-    var checkedItems = $('#nodes_body input[type="checkbox"]:checked').each(function() {
+    var checkedItems = $('#nodes_table input[type="checkbox"]:checked').each(function() {
 
         // Do something with the row
         console.log($(this).parent('tr').find('.data-selector').val());
