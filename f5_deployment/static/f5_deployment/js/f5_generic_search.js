@@ -1,11 +1,11 @@
 var frm = $('#f5_search');
 var rslt = $('#f5_results');
 
-function build_detailed_table(results) {
+function build_detailed_table(results, result_index) {
 
     document.getElementById("vs_data").scrollIntoView();
     document.getElementById("nodes_body").innerHTML = "";
-    var result_index = $(this).data('url');
+    //var result_index = $(this).data('url');
     var f5_location = results[result_index].location;
     var vs_name = results[result_index].vs_name;
     var vs_ip = results[result_index].vs_ip;
@@ -381,7 +381,8 @@ function get_task_info(task_id) {
 
                 var results = data.result.data;
                 $(".clickable-row").click(function() {
-                    build_detailed_table(this, results)
+                    result_index = $(this).data('url');
+                    build_detailed_table(results, result_index)
                 });
 
             }
