@@ -290,7 +290,9 @@ def f5_disable_enable(base_urls, action, f5_selected_items, request_type, search
         for selflink in f5_selected_items:
             # get URL got base login (hostname without)
             login_url = selflink.split('/mgmt/')[0]
+            print(login_url)
             bigip_login_response = bigip_login(login_url, username, password)
+            print(bigip_login_response)
             auth_token = bigip_login_response['token']['token']
             disable_response = disable(selflink, auth_token, disabled_json)
             print(disable_response)
