@@ -130,7 +130,7 @@ function node_control_on_off(action) {
                         contentType: 'application/json',
                         data: {
                             'f5_search': search_string,
-                            'request_type': request_type
+                            'request_type': request_type,
                         },
 
                         success: function (data) {
