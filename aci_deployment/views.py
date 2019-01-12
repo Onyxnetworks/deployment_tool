@@ -80,8 +80,14 @@ def external_epg_deployment(request):
         return HttpResponse(json.dumps({'task_id': task.id, 'rule_list': rule_list, 'location': location}),
                             content_type='application/json')
 
+    # Get base url to use
     environment = request.session.get('environment')
-    content = {'environment': environment}
+    base_urls = get_base_url(environment)
+    url_dict = base_urls['ACI']
+    location_list = list(url_dict.keys())
+
+
+    content = {'environment': environment, 'locations': location_list}
     return render(request, 'aci_deployment/aci_external_epg_deployment.html', content)
 
 
@@ -156,8 +162,14 @@ def contract_deployment(request):
         return HttpResponse(json.dumps({'task_id': task.id, 'rule_list': rule_list, 'location': location}),
                             content_type='application/json')
 
+    # Get base url to use
     environment = request.session.get('environment')
-    content = {'environment': environment}
+    base_urls = get_base_url(environment)
+    url_dict = base_urls['ACI']
+    location_list = list(url_dict.keys())
+
+
+    content = {'environment': environment, 'locations': location_list}
     return render(request, 'aci_deployment/aci_contract_deployment.html', content)
 
 
