@@ -33,12 +33,15 @@ function node_control_off() {
         // Post call to go and disable items.
         $.ajax({
 
+
             type: "POST",
             url: '/f5/generic_search/',
             dataType: "json",
             traditional: true,
             data: {
-                'f5_selected_items': f5_selected_items
+                'f5_selected_items': f5_selected_items,
+                'cached_search_string': search_string,
+                'cached_request_type': request_type
             },
 
             success: function (data) {
@@ -108,8 +111,8 @@ function get_task_info(task_id) {
                 document.getElementById("tablediv").style.visibility = "visible";
                 //document.getElementById("vs_data_body").innerHTML = "";
                 var results = data.result.data;
-                var search_string = data.result.search.search_string;
-                var request_type = data.result.search.request_type;
+                window.search_string = data.result.search.search_string;
+                window.request_type = data.result.search.request_type;
                 for (i = 0, len = results.length, text = ""; i < len; i++) {
                     f5_location = results[i].location;
                     vs_name = results[i].vs_name;
