@@ -16,17 +16,20 @@ var disable_json = {"state": "user-up", "session": "user-disabled"};
 //}
 
 function node_control_off() {
-
+    var selected_items = []
     var checkedItems = $('#nodes_table input[type="checkbox"]:checked').each(function() {
 
         // Do something with the row
         console.log($(this).parents('tr').data('url'));
-        var selected_items = $(this).parents('tr').data('url');
-        alert(selected_items)
+        selected_items.push($(this).parents('tr').data('url'));
+
     });
     if (!checkedItems.length) {
         console.log('Nothing Checked')
     // Nothing was checked
+    }
+    else {
+        alert(selected_items)
     }
 
 }
