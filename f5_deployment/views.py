@@ -130,8 +130,6 @@ def f5_disable_enable_push(request):
 
         action = data['action']
         f5_selected_items = data['f5_selected_items']
-        search_string = data['cached_search_string']
-        request_type = data['cached_request_type']
 
         environment = request.session.get('environment')
         if environment == 'Production':
