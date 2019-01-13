@@ -411,7 +411,7 @@ function set_status(action, request_type) {
         });
     }
 
-    console.log(f5_items_to_modify);
+    console.log(f5_selected_items);
     if (!checkedItems.length) {
         console.log('Nothing Checked')
     // Nothing was checked
