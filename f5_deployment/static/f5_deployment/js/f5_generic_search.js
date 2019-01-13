@@ -219,21 +219,40 @@ function build_detailed_table(results, result_index) {
         document.getElementById("pool_detail_requests_max_age").innerHTML = '';
         var pool_status_img = '';
     }
-    document.getElementById("vs_checkbox").innerHTML = `<input type="checkbox" class="checkbox">`
+
+    var vs_tr = document.createElement("TR");
+    vs_tr.setAttribute("data-url", `${node_self_link}`);
+    vs_tr.setAttribute("data-id", `${result_index}`);
+    var vs_table_tr = 'vs_table_tr' + ni;
+    var checkbox_id = 'vs_checkbox_' + ni;
+    var vs_checkbox = `<input type="checkbox" class="checkbox" id="checkbox">`;
+    vs_tr.setAttribute("id", vs_tr);
+    document.getElementById("vs_body").appendChild(vs_tr);
+    var vs_details = [vs_checkbox, vs_status_img, vs_name, vs_ip, vs_port, vs_bits_in, vs_bits_out, vs_packets_in, vs_packets_out, vs_conn_current, vs_conn_max, vs_conn_total];
+    vs_details.forEach(function(items) {
+        var vs_table_td = document.createElement("TD");
+        vs_table_td.setAttribute("style", "text-align: center; vertical-align: middle;");
+        vs_table_td.innerHTML = items;
+        document.body.appendChild(vs_table_td);
+        document.getElementById(vs_table_tr).appendChild(vs_table_td);
+    });
+
+
+    //document.getElementById("vs_checkbox").innerHTML = `<input type="checkbox" class="checkbox">`
     document.getElementById("vs_data").style.visibility = "visible";
-    document.getElementById("vs_detail_status").innerHTML = vs_status_img;
-    document.getElementById("vs_detail_name").innerHTML = vs_name;
-    document.getElementById("vs_detail_destination").innerHTML = vs_ip;
-    document.getElementById("vs_detail_port").innerHTML = vs_port;
-    document.getElementById("vs_detail_bits_in").innerHTML = vs_bits_in;
-    document.getElementById("vs_detail_bits_out").innerHTML = vs_bits_out;
-    document.getElementById("vs_detail_packets_in").innerHTML = vs_packets_in;
-    document.getElementById("vs_detail_packets_out").innerHTML = vs_packets_out;
-    document.getElementById("vs_detail_connections_current").innerHTML = vs_conn_current;
-    document.getElementById("vs_detail_connections_maximum").innerHTML = vs_conn_max;
-    document.getElementById("vs_detail_connections_total").innerHTML = vs_conn_total;
-    document.getElementById("vs_detail_row").setAttribute("data-url", `${vs_self_link}`);
-    document.getElementById("vs_detail_row").setAttribute("data-id", `${result_index}`);
+    //document.getElementById("vs_detail_status").innerHTML = vs_status_img;
+    //document.getElementById("vs_detail_name").innerHTML = vs_name;
+    //document.getElementById("vs_detail_destination").innerHTML = vs_ip;
+    //document.getElementById("vs_detail_port").innerHTML = vs_port;
+    //document.getElementById("vs_detail_bits_in").innerHTML = vs_bits_in;
+    //document.getElementById("vs_detail_bits_out").innerHTML = vs_bits_out;
+    //document.getElementById("vs_detail_packets_in").innerHTML = vs_packets_in;
+    //document.getElementById("vs_detail_packets_out").innerHTML = vs_packets_out;
+    //document.getElementById("vs_detail_connections_current").innerHTML = vs_conn_current;
+    //document.getElementById("vs_detail_connections_maximum").innerHTML = vs_conn_max;
+    //document.getElementById("vs_detail_connections_total").innerHTML = vs_conn_total;
+    //document.getElementById("vs_detail_row").setAttribute("data-url", `${vs_self_link}`);
+    //document.getElementById("vs_detail_row").setAttribute("data-id", `${result_index}`);
 
 
 
@@ -339,7 +358,7 @@ function set_status(action, request_type) {
             f5_selected_items.push($(this).parents('tr').data('url'));
         });}
     if (request_type == 'vs'){
-        var checkedItems = $('#vs_table input[type="checkbox"]:checked').each(function() {
+        checkedItems = $('#vs_table input[type="checkbox"]:checked').each(function() {
 
             // Add selected items to the selected_items list.
             console.log($(this).parents('tr').data('url'));
