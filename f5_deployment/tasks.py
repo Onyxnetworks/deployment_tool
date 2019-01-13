@@ -279,12 +279,13 @@ def f5_generic_search(base_urls, request_type, search_string, username, password
 
 
 @shared_task
-def f5_disable_enable(base_urls, action, f5_selected_items, username, password):
+def f5_disable_enable(base_urls, request_type, action, f5_selected_items, username, password):
     # Different json posts for various F5 states
-    forced_offline_json = {"state": "user-down", "session": "user-disabled"}
-    disabled_json = {"state": "user-up", "session": "user-disabled"}
-    enabled_json = {"state": "user-up", "session": "user-enabled"}
-
+    node_forced_offline_json = {"state": "user-down", "session": "user-disabled"}
+    node_disabled_json = {"state": "user-up", "session": "user-disabled"}
+    node_enabled_json = {"state": "user-up", "session": "user-enabled"}
+    vs_disabled_json = {"disabled": "true"}
+    vs_enabled_json = {"enabled": "true"}
     # Loop through items and disable them on thee respective F5.
     for selflink in f5_selected_items:
         # get URL got base login (hostname without)
@@ -292,11 +293,17 @@ def f5_disable_enable(base_urls, action, f5_selected_items, username, password):
         bigip_login_response = bigip_login(login_url, username, password)
         auth_token = bigip_login_response['token']['token']
 
-        if action == 'disable':
-            disable_response = disable_enable_force(selflink, auth_token, disabled_json)
+        if action == 'disable' and request_type == 'node':
+            disable_response = node_disable_enable_force(selflink, auth_token, node_disabled_json)
 
-        if action == 'enable':
-            disable_response = disable_enable_force(selflink, auth_token, enabled_json)
+        if action == 'enable' and request_type == 'node':
+            enable_response = node_disable_enable_force(selflink, auth_token, node_enabled_json)
+
+        if action == 'disable' and request_type == 'vs':
+            disable_response = vs_disable_enable_force(selflink, auth_token, vs_disabled_json)
+
+        if action == 'enable' and request_type == 'vs':
+            enable_response = vs_disable_enable_force(selflink, auth_token, vs_enabled_json)
 
 
 

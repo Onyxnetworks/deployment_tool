@@ -319,7 +319,7 @@ function build_result_table(data) {
 
 }
 
-function node_control_on_off(action) {
+function set_status(action, request_type) {
     // Create empty list
     var f5_selected_items = []
     var checkedItems = $('#nodes_table input[type="checkbox"]:checked').each(function() {
@@ -334,7 +334,7 @@ function node_control_on_off(action) {
     }
     else {
         // Post call to go and disable items.
-        post_data = JSON.stringify({'action': action, 'f5_selected_items': f5_selected_items,});
+        post_data = JSON.stringify({'action': action, 'request_type': request_type, 'f5_selected_items': f5_selected_items,});
         $.ajax({
             type: "POST",
             url: '/f5/f5_disable_enable_push/',
