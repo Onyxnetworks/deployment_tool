@@ -1,6 +1,34 @@
 var frm = $('#f5_search');
 var rslt = $('#f5_results');
 
+function get_refresh_task_info(task_id, f5_selected_items_index) {
+    $.ajax({
+        type: 'get',
+        url: '/get_task_info/',
+        data: {'task_id': task_id},
+        success: function (data) {
+            rslt.html('');
+            if (data.state == 'PENDING') {
+                var loader = `<img src='/static/index/svg/spinner.svg'/>`;
+                document.getElementById("loader").style.display = "block";
+                document.getElementById("loader").innerHTML = loader;
+                rslt.html('Updating Result Data...');
+            }
+            else if (data.state == 'SUCCESS') {
+                build_result_table(data);
+                var results = data.result.data;
+                build_detailed_table(results, f5_selected_items_index)
+            }
+            if (data.state != 'SUCCESS') {
+                setTimeout(function () {
+                    get_refresh_task_info(task_id, f5_selected_items_index)
+                }, 1000);
+            }},
+        error: function (data) {
+            rslt.html("Something went wrong!");success()
+        }
+    });}
+
 function build_detailed_table(results, result_index) {
     console.log('Building Detailed Data');
     document.getElementById("vs_data").scrollIntoView();
@@ -305,37 +333,8 @@ function node_control_on_off(action) {
                             if (data.task_id != null) {
                                 console.log('Search Task ID: ' + data.task_id);
                                 console.log(f5_selected_items_index)
+                                get_refresh_task_info(data.task_id, f5_selected_items_index)
 
-                                // New get task id call to rebuild updated table data.
-                                $.ajax({
-                                    type: 'get',
-                                    url: '/get_task_info/',
-                                    data: {'task_id': data.task_id},
-                                    success: function (data) {
-                                        rslt.html('');
-                                        if (data.state == 'PENDING') {
-                                            var loader = `<img src='/static/index/svg/spinner.svg'/>`;
-                                            document.getElementById("loader").style.display = "block";
-                                            document.getElementById("loader").innerHTML = loader;
-                                            rslt.html('Updating Result Data...');
-                                        }
-                                        else if (data.state == 'SUCCESS') {
-
-                                            build_result_table(data);
-
-                                            var results = data.result.data;
-                                            build_detailed_table(results, f5_selected_items_index)
-
-                                        }
-                                        if (data.state != 'SUCCESS') {
-                                            setTimeout(function () {
-                                                get_task_info(data.task_id)
-                                            }, 1000);
-                                        }},
-                                    error: function (data) {
-                                        rslt.html("Something went wrong!");success()
-                                    }
-                                });
                             }},
                         error: function (data) {
                             console.log("Something went wrong!");
