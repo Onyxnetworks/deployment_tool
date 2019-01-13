@@ -1,6 +1,29 @@
 var frm = $('#f5_search');
 var rslt = $('#f5_results');
 
+
+function JSconfirm(action, items){
+	swal({
+    title: "Are you sure you want to " + action + "these items?",
+    text: items,
+    type: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#DD6B55",
+    confirmButtonText: "Yes",
+    cancelButtonText: "No",
+    closeOnConfirm: false,
+    closeOnCancel: false },
+    function(isConfirm){
+        if (isConfirm)
+    {
+        window.location = "https://www.jquery-az.com/";
+        }
+        else {
+            swal("No changes will be made!");
+            } });
+}
+
+
 function refresh_search_info() {
     post_data = {'f5_search': search_string, 'request_type': request_type};
     console.log('Updating Results');
@@ -369,9 +392,7 @@ function set_status(action, request_type) {
         var checkedItems = $('#nodes_table input[type="checkbox"]:checked').each(function() {
 
             // Add selected items to the selected_items list.
-            if (action == 'disable'){
-                alert('Are you sure you want to disable the following: ' + $(this).parents('tr').data('url'));
-            }
+
             // Need to add statement to present confirmation in alert window.
             f5_selected_items.push($(this).parents('tr').data('url'));
         });
@@ -387,6 +408,11 @@ function set_status(action, request_type) {
             f5_selected_items.push($(this).parents('tr').data('url'));
         });
     }
+    if (action == 'disable'){
+        JSconfirm(action, f5_selected_items)
+        //alert('Are you sure you want to disable the following: ' + $(this).parents('tr').data('url'));
+    }
+
     console.log(f5_selected_items);
     if (!checkedItems.length) {
         console.log('Nothing Checked')
