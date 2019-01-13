@@ -304,6 +304,7 @@ function node_control_on_off(action) {
                         success: function (data) {
                             if (data.task_id != null) {
                                 console.log('Search Task ID: ' + data.task_id);
+                                console.log(f5_selected_items_index)
                                 get_task_info(data.task_id);
                                 var results = data.result.data;
                                 build_detailed_table(results, f5_selected_items_index)
