@@ -1,6 +1,30 @@
 var frm = $('#f5_search');
 var rslt = $('#f5_results');
 
+function refresh_search_info() {
+    post_data = {'f5_search': search_string, 'request_type': request_type};
+    console.log(post_data);
+    $.ajax({
+        type: "POST",
+        url: '/f5/generic_search/',
+        //traditional: true,
+        //processData: false,
+        //dataType: 'json',
+        //contentType: 'application/json',
+        data: post_data,
+        success: function (data) {
+            if (data.task_id != null) {
+                console.log('Search Task ID: ' + data.task_id);
+                console.log(f5_selected_items_index)
+                get_refresh_task_info(data.task_id, f5_selected_items_index)
+            }},
+        error: function (data) {
+            console.log("Something went wrong!");
+        }
+    });
+
+}
+
 function get_refresh_task_info(task_id, f5_selected_items_index) {
     $.ajax({
         type: 'get',
@@ -324,28 +348,7 @@ function node_control_on_off(action) {
                     console.log('Function Task ID: ' + data.task_id);
 
                     // Now post call to refresh data.
-                    post_data = {'f5_search': search_string, 'request_type': request_type};
-                    console.log(post_data);
-                    $.ajax({
-                        type: "POST",
-                        url: '/f5/generic_search/',
-                        //traditional: true,
-                        //processData: false,
-                        //dataType: 'json',
-                        //contentType: 'application/json',
-                        data: post_data,
-
-                        success: function (data) {
-                            if (data.task_id != null) {
-                                console.log('Search Task ID: ' + data.task_id);
-                                console.log(f5_selected_items_index)
-                                get_refresh_task_info(data.task_id, f5_selected_items_index)
-
-                            }},
-                        error: function (data) {
-                            console.log("Something went wrong!");
-                        }
-                    });
+                    refresh_search_info()
                 }},
             error: function (data) {
                 //document.getElementById("tablediv").style.visibility = "hidden";
