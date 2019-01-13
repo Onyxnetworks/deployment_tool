@@ -329,17 +329,13 @@ function node_control_on_off(action) {
                                         }
                                         if (data.state != 'SUCCESS') {
                                             setTimeout(function () {
-                                                get_task_info(task_id)
+                                                get_task_info(data.task_id)
                                             }, 1000);
                                         }},
                                     error: function (data) {
                                         rslt.html("Something went wrong!");success()
                                     }
                                 });
-
-                                get_task_info(data.task_id);
-                                console.log(data);
-                                var results = data.result.data;
                             }},
                         error: function (data) {
                             console.log("Something went wrong!");
