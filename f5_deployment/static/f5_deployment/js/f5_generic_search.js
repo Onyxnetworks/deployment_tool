@@ -44,7 +44,9 @@ function get_refresh_task_info(task_id, f5_selected_items_index) {
                 build_detailed_table(results, f5_selected_items_index);
 
                 $(".clickable-row").click(function() {
-                    $(".checkbox").prop('checked', checked);
+                    $('.checkbox:checked').each(function() {
+                        $(this).prop('checked', false);
+                    });
                     result_index = $(this).data('id');
                     window.f5_selected_items_index = ($(this).data('id'));
                     build_detailed_table(results, result_index)
@@ -433,7 +435,6 @@ function get_task_info(task_id) {
                 var results = data.result.data;
                 $(".clickable-row").click(function() {
                     $('.checkbox:checked').each(function() {
-                        console.log('test')
                         $(this).prop('checked', false);
                     });
 
