@@ -2,11 +2,11 @@ var frm = $('#f5_search');
 var rslt = $('#f5_results');
 
 
-function JSconfirm(action, f5_selected_items, f5_selected_items_name)
+function JSconfirm(action, request_type, f5_selected_items, f5_selected_items_name)
 {
 	swal({
     title: "Are you sure you want to " + action + " these items?",
-    text: f5_selected_items,
+    text: f5_selected_items_name,
     type: "warning",
     showCancelButton: true,
     confirmButtonColor: "#DD6B55",
@@ -17,7 +17,7 @@ function JSconfirm(action, f5_selected_items, f5_selected_items_name)
     function(isConfirm){
         if (isConfirm)
     {
-        return f5_selected_items
+        set_status_deploy(action, request_type, f5_selected_items)
         }
         else {
             f5_selected_items.length = 0;
@@ -390,7 +390,6 @@ function set_status(action, request_type) {
     // Create empty list
     console.log('Action Button pressed.');
     var f5_selected_items = [];
-    var f5_items_to_modify = [];
     if (request_type == 'node'){
         var checkedItems = $('#nodes_table input[type="checkbox"]:checked').each(function() {
 
@@ -411,44 +410,45 @@ function set_status(action, request_type) {
             f5_selected_items.push($(this).parents('tr').data('url'));
         });
     }
-    if (action == 'disable'){
-        f5_selected_items_name = 'test';
-        var f5_items_to_modify = JSconfirm(action, f5_selected_items, f5_selected_items_name)
-        //alert('Are you sure you want to disable the following: ' + $(this).parents('tr').data('url'));
-    }
 
     console.log(f5_items_to_modify);
-    if (!f5_items_to_modify.length) {
+    if (!checkedItems.length) {
         console.log('Nothing Checked')
     // Nothing was checked
     }
     else {
-        // Post call to go and disable items.
-        post_data = JSON.stringify({'action': action, 'request_type': request_type, 'f5_selected_items': f5_selected_items,});
-        $.ajax({
-            type: "POST",
-            url: '/f5/f5_disable_enable_push/',
-            dataType: 'json',
-            contentType: 'application/json',
-            //traditional: true,
-            data: post_data,
-
-            success: function (data) {
-                if (data.task_id != null) {
-                    console.log('Function Task ID: ' + data.task_id);
-
-                    // Now post call to refresh data.
-                    refresh_search_info()
-                }},
-            error: function (data) {
-                //document.getElementById("tablediv").style.visibility = "hidden";
-                //document.getElementById("vs_data").style.visibility = "hidden";
-                console.log("Something went wrong!");
-            }
-        });
+        f5_selected_items_name = 'test';
+        JSconfirm(action, request_type, f5_selected_items, f5_selected_items_name);
     }
+}
+
+function set_status_deploy(action, request_type, f5_selected_items){
+    // Post call to go and disable items.
+    post_data = JSON.stringify({'action': action, 'request_type': request_type, 'f5_selected_items': f5_selected_items});
+    $.ajax({
+        type: "POST",
+        url: '/f5/f5_disable_enable_push/',
+        dataType: 'json',
+        contentType: 'application/json',
+        //traditional: true,
+        data: post_data,
+        success: function (data) {
+            if (data.task_id != null) {
+                console.log('Function Task ID: ' + data.task_id);
+                // Now post call to refresh data.
+                refresh_search_info()
+            }},
+        error: function (data) {
+            //document.getElementById("tablediv").style.visibility = "hidden";
+            //document.getElementById("vs_data").style.visibility = "hidden";
+            console.log("Something went wrong!");
+        }
+    });
 
 }
+
+
+
 
 frm.submit(function () {
     document.getElementById("tablediv").style.visibility = "hidden";
