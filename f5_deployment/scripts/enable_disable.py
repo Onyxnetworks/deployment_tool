@@ -34,6 +34,7 @@ def vs_disable_enable_force(selflink, auth_token, request_json):
 
     patch_url = selflink
     print(patch_url)
+    print(request_json)
     try:
         patch_response = requests.patch(patch_url, headers=headers, data=json.dumps(request_json), timeout=5, verify=False)
         payload_response = json.loads(patch_response.text)
