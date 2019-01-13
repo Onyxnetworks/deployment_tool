@@ -164,6 +164,7 @@ def virtual_server_dashboard(url_list, request_type, search_string, username, pa
             vs_port = re.split(':|/', vs['destination'])[-1]
             selfLink_ver = vs['selfLink'].split('/localhost/')[1]
             selfLink = selfLink_ver.split('?ver=')[0]
+            vs_selfLink = base_url + '/' + selfLink
             vs_stats = get_vs_stats(base_url, selfLink, auth_token)
             vs_state_dict = vs_stats['entries'].values()
             for vs_values in vs_state_dict:
@@ -247,7 +248,7 @@ def virtual_server_dashboard(url_list, request_type, search_string, username, pa
                     pool_requests_total = pool_values['nestedStats']['entries']['totRequests']['value']
                     pool_requests_depth = pool_values['nestedStats']['entries']['connqAll.depth']['value']
                     pool_requests_max_age = pool_values['nestedStats']['entries']['connqAll.ageMax']['value']
-                    results.append({'location': location, 'vs_selfLink': selfLink,
+                    results.append({'location': location, 'vs_selfLink': vs_selfLink,
                                     'vs_name': vs_name, 'vs_state': vs_state,
                                     'vs_admin_state': vs_admin_state, 'vs_state_reason': vs_state_reason,
                                     'vs_ip': vs_ip, 'vs_port': vs_port, 'vs_stats': {'vs_bits_in': vs_bits_in,
@@ -276,7 +277,7 @@ def virtual_server_dashboard(url_list, request_type, search_string, username, pa
                                     'vs_nodes': node_details
                                     })
             except:
-                results.append({'location': location, 'vs_selfLink': selfLink, 'vs_name': vs_name, 'vs_state': vs_state,
+                results.append({'location': location, 'vs_selfLink': vs_selfLink, 'vs_name': vs_name, 'vs_state': vs_state,
                                 'vs_admin_state': vs_admin_state, 'vs_state_reason': vs_state_reason,
                                 'vs_ip': vs_ip, 'vs_port': vs_port, 'vs_stats': {'vs_bits_in': vs_bits_in,
                                                                                  'vs_bits_out': vs_bits_out,
