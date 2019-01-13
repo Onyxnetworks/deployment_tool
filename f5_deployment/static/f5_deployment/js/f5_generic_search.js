@@ -2,9 +2,10 @@ var frm = $('#f5_search');
 var rslt = $('#f5_results');
 
 
-function JSconfirm(action, items){
+function JSconfirm(action, f5_selected_items, f5_selected_items_name)
+{
 	swal({
-    title: "Are you sure you want to " + action + "these items?",
+    title: "Are you sure you want to " + action + " these items?",
     text: items,
     type: "warning",
     showCancelButton: true,
@@ -16,9 +17,10 @@ function JSconfirm(action, items){
     function(isConfirm){
         if (isConfirm)
     {
-        window.location = "https://www.jquery-az.com/";
+        return f5_selected_items
         }
         else {
+            f5_selected_items.length = 0;
             swal("No changes will be made!");
             } });
 }
@@ -409,12 +411,13 @@ function set_status(action, request_type) {
         });
     }
     if (action == 'disable'){
-        JSconfirm(action, f5_selected_items)
+        f5_selected_items_name = 'test';
+        var f5_items_to_modify = JSconfirm(action, f5_selected_items, f5_selected_items_name)
         //alert('Are you sure you want to disable the following: ' + $(this).parents('tr').data('url'));
     }
 
-    console.log(f5_selected_items);
-    if (!checkedItems.length) {
+    console.log(f5_items_to_modify);
+    if (!f5_items_to_modify.length) {
         console.log('Nothing Checked')
     // Nothing was checked
     }
