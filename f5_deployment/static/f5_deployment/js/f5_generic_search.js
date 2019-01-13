@@ -3,7 +3,7 @@ var rslt = $('#f5_results');
 
 function refresh_search_info() {
     post_data = {'f5_search': search_string, 'request_type': request_type};
-    console.log(post_data);
+    console.log('Updating Results');
     $.ajax({
         type: "POST",
         url: '/f5/generic_search/',
@@ -15,7 +15,6 @@ function refresh_search_info() {
         success: function (data) {
             if (data.task_id != null) {
                 console.log('Search Task ID: ' + data.task_id);
-                console.log(f5_selected_items_index)
                 get_refresh_task_info(data.task_id, f5_selected_items_index)
             }},
         error: function (data) {
@@ -65,7 +64,7 @@ function get_refresh_task_info(task_id, f5_selected_items_index) {
 
 function build_detailed_table(results, result_index) {
     //document.getElementById("vs_detail_row").removeAttribute("data-url");
-    console.log('Building Detailed Data');
+    console.log('Building Detailed Data Table');
     document.getElementById("vs_data").scrollIntoView();
     document.getElementById("nodes_body").innerHTML = "";
     document.getElementById("vs_body").innerHTML = "";
@@ -237,7 +236,6 @@ function build_detailed_table(results, result_index) {
         document.getElementById("pool_detail_requests_max_age").innerHTML = '';
         var pool_status_img = '';
     }
-    console.log('vs_build')
     var vs_tr = document.createElement("TR");
     vs_tr.setAttribute("data-url", `${vs_self_link}`);
     vs_tr.setAttribute("data-id", `${result_index}`);
@@ -245,8 +243,6 @@ function build_detailed_table(results, result_index) {
     var vs_checkbox = `<input type="checkbox" class="checkbox" id="checkbox">`;
     vs_tr.setAttribute("id", vs_table_tr);
     document.getElementById("vs_body").appendChild(vs_tr);
-    console.log('build data');
-    console.log(vs_table_tr);
     var vs_details = [vs_checkbox, vs_status_img, vs_name, vs_ip, vs_port, vs_bits_in, vs_bits_out, vs_packets_in, vs_packets_out, vs_conn_current, vs_conn_max, vs_conn_total]
     vs_details.forEach(function(items) {
         var vs_table_td = document.createElement("TD");
@@ -367,24 +363,30 @@ function build_result_table(data) {
 
 function set_status(action, request_type) {
     // Create empty list
-    console.log('start')
-    console.log(f5_selected_items)
+    console.log('Action Button pressed.')
     var f5_selected_items = [];
     if (request_type == 'node'){
         var checkedItems = $('#nodes_table input[type="checkbox"]:checked').each(function() {
 
             // Add selected items to the selected_items list.
-            //console.log($(this).parents('tr').data('url'));
+            if (action == 'disable'){
+                alert('Are you sure you want to disable the following: ' + $(this).parents('tr').data('url'));
+            }
+            // Need to add statement to present confirmation in alert window.
             f5_selected_items.push($(this).parents('tr').data('url'));
-        });}
+        });
+    }
     if (request_type == 'vs'){
         checkedItems = $('#vs_table input[type="checkbox"]:checked').each(function() {
 
             // Add selected items to the selected_items list.
-            console.log($(this).parents('tr').data('url'));
-            alert($(this).parents('tr').data('url'));
+            if (action == 'disable'){
+                alert('Are you sure you want to disable the following: ' + $(this).parents('tr').data('url'));
+            }
+            // Need to add statement to present confirmation in alert window.
             f5_selected_items.push($(this).parents('tr').data('url'));
-        });}
+        });
+    }
     console.log(f5_selected_items);
     if (!checkedItems.length) {
         console.log('Nothing Checked')
