@@ -64,7 +64,7 @@ function get_refresh_task_info(task_id, f5_selected_items_index) {
     });}
 
 function build_detailed_table(results, result_index) {
-    document.getElementById("vs_detail_row").removeAttribute("data-url");
+    //document.getElementById("vs_detail_row").removeAttribute("data-url");
     console.log('Building Detailed Data');
     document.getElementById("vs_data").scrollIntoView();
     document.getElementById("nodes_body").innerHTML = "";
