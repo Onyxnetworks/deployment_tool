@@ -322,12 +322,20 @@ function build_result_table(data) {
 function set_status(action, request_type) {
     // Create empty list
     var f5_selected_items = []
-    var checkedItems = $('#nodes_table input[type="checkbox"]:checked').each(function() {
+    if (request_type == 'node')
+        var checkedItems = $('#nodes_table input[type="checkbox"]:checked').each(function() {
 
-        // Add selected items to the selected_items list.
-        //console.log($(this).parents('tr').data('url'));
-        f5_selected_items.push($(this).parents('tr').data('url'));
-    });
+            // Add selected items to the selected_items list.
+            //console.log($(this).parents('tr').data('url'));
+            f5_selected_items.push($(this).parents('tr').data('url'));
+        });
+    if (request_type == 'vs')
+        var checkedItems = $('#vs_table input[type="checkbox"]:checked').each(function() {
+
+            // Add selected items to the selected_items list.
+            //console.log($(this).parents('tr').data('url'));
+            f5_selected_items.push($(this).parents('tr').data('url'));
+        });
     if (!checkedItems.length) {
         console.log('Nothing Checked')
     // Nothing was checked
