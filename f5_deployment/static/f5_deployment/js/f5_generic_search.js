@@ -241,7 +241,7 @@ function build_detailed_table(results, result_index) {
 
 
     //document.getElementById("vs_checkbox").innerHTML = `<input type="checkbox" class="checkbox">`
-    //document.getElementById("vs_data").style.visibility = "visible";
+    document.getElementById("vs_data").style.visibility = "visible";
     //document.getElementById("vs_detail_status").innerHTML = vs_status_img;
     //document.getElementById("vs_detail_name").innerHTML = vs_name;
     //document.getElementById("vs_detail_destination").innerHTML = vs_ip;
