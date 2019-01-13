@@ -6,7 +6,7 @@ function JSconfirm(action, f5_selected_items, f5_selected_items_name)
 {
 	swal({
     title: "Are you sure you want to " + action + " these items?",
-    text: items,
+    text: f5_selected_items,
     type: "warning",
     showCancelButton: true,
     confirmButtonColor: "#DD6B55",
@@ -388,7 +388,7 @@ function build_result_table(data) {
 
 function set_status(action, request_type) {
     // Create empty list
-    console.log('Action Button pressed.')
+    console.log('Action Button pressed.');
     var f5_selected_items = [];
     if (request_type == 'node'){
         var checkedItems = $('#nodes_table input[type="checkbox"]:checked').each(function() {
