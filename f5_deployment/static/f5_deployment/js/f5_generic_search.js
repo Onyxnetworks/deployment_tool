@@ -66,7 +66,7 @@ function get_refresh_task_info(task_id, f5_selected_items_index) {
 function build_detailed_table(results, result_index) {
     //document.getElementById("vs_detail_row").removeAttribute("data-url");
     console.log('Building Detailed Data');
-    document.getElementById("vs_data").scrollIntoView();
+    //document.getElementById("vs_data").scrollIntoView();
     document.getElementById("nodes_body").innerHTML = "";
     //var result_index = $(this).data('url');
     var vs_self_link = results[result_index].vs_selfLink;
@@ -227,8 +227,8 @@ function build_detailed_table(results, result_index) {
     var vs_checkbox = `<input type="checkbox" class="checkbox" id="checkbox">`;
     vs_tr.setAttribute("id", vs_tr);
     document.getElementById("vs_body").appendChild(vs_tr);
-    console.log('build data')
-    console.log(vs_table_tr)
+    console.log('build data');
+    console.log(vs_table_tr);
     var vs_details = [vs_checkbox, vs_status_img, vs_name, vs_ip, vs_port, vs_bits_in, vs_bits_out, vs_packets_in, vs_packets_out, vs_conn_current, vs_conn_max, vs_conn_total]
     vs_details.forEach(function(items) {
         var vs_table_td = document.createElement("TD");
