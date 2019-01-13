@@ -390,6 +390,7 @@ function set_status(action, request_type) {
     // Create empty list
     console.log('Action Button pressed.');
     var f5_selected_items = [];
+    var f5_items_to_modify = [];
     if (request_type == 'node'){
         var checkedItems = $('#nodes_table input[type="checkbox"]:checked').each(function() {
 
