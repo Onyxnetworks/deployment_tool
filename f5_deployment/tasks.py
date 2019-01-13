@@ -288,8 +288,10 @@ def f5_disable_enable(base_urls, request_type, action, f5_selected_items, userna
     vs_enabled_json = {"enabled": "true"}
     # Loop through items and disable them on thee respective F5.
     for selflink in f5_selected_items:
+        print(selflink)
         # get URL got base login (hostname without)
         login_url = selflink.split('/mgmt/')[0]
+        print(login_url)
         bigip_login_response = bigip_login(login_url, username, password)
         auth_token = bigip_login_response['token']['token']
 
