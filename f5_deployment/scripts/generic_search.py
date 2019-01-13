@@ -234,6 +234,7 @@ def virtual_server_dashboard(url_list, request_type, search_string, username, pa
                     node_details = []
                 for pool_values in pool_state_dict:
                     pool_state = pool_values['nestedStats']['entries']['status.availabilityState']['description']
+                    pool_admin_state = pool_values['nestedStats']['entries']['status.enabledState']['description']
                     pool_state_reason = pool_values['nestedStats']['entries']['status.statusReason']['description']
                     pool_state_reason = pool_state_reason.replace("'", "")
                     pool_active_members = pool_values['nestedStats']['entries']['activeMemberCnt']['value']
@@ -259,6 +260,7 @@ def virtual_server_dashboard(url_list, request_type, search_string, username, pa
                                                                                      'vs_conn_max': vs_conn_max,
                                                                                      'vs_conn_total': vs_conn_total},
                                     'vs_pool': {'pool_name': pool_name, 'pool_state': pool_state,
+                                                'pool_admin_state': pool_admin_state,
                                                 'pool_state_reason': pool_state_reason,
                                                 'pool_active_members': pool_active_members,
                                                 'pool_available_members': pool_available_members,

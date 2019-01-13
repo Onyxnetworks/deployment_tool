@@ -79,6 +79,7 @@ function build_detailed_table(results, result_index) {
     var vs_admin_state = results[result_index].vs_admin_state;
     var vs_state_reason = results[result_index].vs_state_reason;
     var pool_name = results[result_index].vs_pool.pool_name;
+    var pool_admin_state = results[result_index].vs_pool.pool_admin_state;
     var pool_status = results[result_index].vs_pool.pool_state;
     var pool_state_reason = results[result_index].vs_pool.pool_state_reason;
     var vs_bits_in = m(results[result_index].vs_stats.vs_bits_in, 2);
@@ -123,15 +124,31 @@ function build_detailed_table(results, result_index) {
         var pool_requests_max_age = m(results[result_index].vs_pool.pool_stats.pool_requests_max_age, 2);
         var pool_active_members = results[result_index].vs_pool.pool_active_members;
         var pool_available_members = results[result_index].vs_pool.pool_available_members;
-        if (pool_status.includes('available')) {
-            var pool_status_img = `<img src='/static/f5_deployment/img/status_circle_green.png' class='img-responsive center-block' alt='pool_available' title="${pool_state_reason}">`
+
+        if (pool_admin_state.includes('enabled')){
+            if (pool_status.includes('available')) {
+                var pool_status_img = `<img src='/static/f5_deployment/img/status_circle_green.png' class='img-responsive center-block' alt='pool_available' title="${pool_state_reason}">`
+            }
+            if (pool_status.includes('offline')) {
+                var pool_status_img = `<img src='/static/f5_deployment/img/status_diamond_red.png' class='img-responsive center-block' alt='pool_offline' title="${pool_state_reason}">`
+            }
+            if (pool_status.includes('unknown')) {
+                var pool_status_img = `<img src='/static/f5_deployment/img/status_square_blue.png' class='img-responsive center-block' alt='pool_unknown' title="${pool_state_reason}">`
+            }
         }
-        if (pool_status.includes('offline')) {
-            var pool_status_img = `<img src='/static/f5_deployment/img/status_diamond_red.png' class='img-responsive center-block' alt='pool_offline' title="${pool_state_reason}">`
+
+        if (pool_admin_state.includes('disabled')){
+            if (pool_status.includes('available')) {
+                var pool_status_img = `<img src='/static/f5_deployment/img/status_circle_black.png' class='img-responsive center-block' alt='pool_available' title="${pool_state_reason}">`
+            }
+            if (pool_status.includes('offline')) {
+                var pool_status_img = `<img src='/static/f5_deployment/img/status_diamond_black.png' class='img-responsive center-block' alt='pool_offline' title="${pool_state_reason}">`
+            }
+            if (pool_status.includes('unknown')) {
+                var pool_status_img = `<img src='/static/f5_deployment/img/status_square_black.png' class='img-responsive center-block' alt='pool_unknown' title="${pool_state_reason}">`
+            }
         }
-        if (pool_status.includes('unknown')) {
-            var pool_status_img = `<img src='/static/f5_deployment/img/status_square_blue.png' class='img-responsive center-block' alt='pool_unknown' title="${pool_state_reason}">`
-        }
+
         document.getElementById("pool_detail_status").innerHTML = pool_status_img;
         document.getElementById("pool_detail_name").innerHTML = pool_name;
         document.getElementById("pool_detail_members").innerHTML = pool_active_members + '/' + pool_available_members;
@@ -239,22 +256,9 @@ function build_detailed_table(results, result_index) {
         document.getElementById(vs_table_tr).appendChild(vs_table_td);
     });
 
-
-    //document.getElementById("vs_checkbox").innerHTML = `<input type="checkbox" class="checkbox">`
+    // Remove Hidden attribute from table
     document.getElementById("vs_data").style.visibility = "visible";
-    //document.getElementById("vs_detail_status").innerHTML = vs_status_img;
-    //document.getElementById("vs_detail_name").innerHTML = vs_name;
-    //document.getElementById("vs_detail_destination").innerHTML = vs_ip;
-    //document.getElementById("vs_detail_port").innerHTML = vs_port;
-    //document.getElementById("vs_detail_bits_in").innerHTML = vs_bits_in;
-    //document.getElementById("vs_detail_bits_out").innerHTML = vs_bits_out;
-    //document.getElementById("vs_detail_packets_in").innerHTML = vs_packets_in;
-    //document.getElementById("vs_detail_packets_out").innerHTML = vs_packets_out;
-    //document.getElementById("vs_detail_connections_current").innerHTML = vs_conn_current;
-    //document.getElementById("vs_detail_connections_maximum").innerHTML = vs_conn_max;
-    //document.getElementById("vs_detail_connections_total").innerHTML = vs_conn_total;
-    //document.getElementById("vs_detail_row").setAttribute("data-url", `${vs_self_link}`);
-    //document.getElementById("vs_detail_row").setAttribute("data-id", `${result_index}`);
+
 
 
 
@@ -278,6 +282,7 @@ function build_result_table(data) {
         vs_state_reason = results[i].vs_state_reason;
         pool_name = results[i].vs_pool.pool_name;
         pool_status = results[i].vs_pool.pool_state;
+        pool_admin_state = results[i].vs_pool.pool_admin_state;
         pool_state_reason = results[i].vs_pool.pool_state_reason;
         if (vs_admin_state.includes('disabled')){
             if (vs_status.includes('available')) {
@@ -302,14 +307,27 @@ function build_result_table(data) {
             }
         }
         if (pool_name != 'none'){
-            if (pool_status.includes('available')) {
-                var pool_status_img = `<img src='/static/f5_deployment/img/status_circle_green.png' class='img-responsive center-block' alt='pool_available' title="${pool_state_reason}">`
+            if (pool_admin_state.includes('enabled')){
+                if (pool_status.includes('available')) {
+                    var pool_status_img = `<img src='/static/f5_deployment/img/status_circle_green.png' class='img-responsive center-block' alt='pool_available' title="${pool_state_reason}">`
+                }
+                if (pool_status.includes('offline')) {
+                    var pool_status_img = `<img src='/static/f5_deployment/img/status_diamond_red.png' class='img-responsive center-block' alt='pool_offline' title="${pool_state_reason}">`
+                }
+                if (pool_status.includes('unknown')) {
+                    var pool_status_img = `<img src='/static/f5_deployment/img/status_square_blue.png' class='img-responsive center-block' alt='pool_unknown' title="${pool_state_reason}">`
+                }
             }
-            if (pool_status.includes('offline')) {
-                var pool_status_img = `<img src='/static/f5_deployment/img/status_diamond_red.png' class='img-responsive center-block' alt='pool_offline' title="${pool_state_reason}">`
-            }
-            if (pool_status.includes('unknown')) {
-                var pool_status_img = `<img src='/static/f5_deployment/img/status_square_blue.png' class='img-responsive center-block' alt='pool_unknown' title="${pool_state_reason}">`
+            if (pool_admin_state.includes('disabled')){
+                if (pool_status.includes('available')) {
+                    var pool_status_img = `<img src='/static/f5_deployment/img/status_circle_black.png' class='img-responsive center-block' alt='pool_available' title="${pool_state_reason}">`
+                }
+                if (pool_status.includes('offline')) {
+                    var pool_status_img = `<img src='/static/f5_deployment/img/status_diamond_black.png' class='img-responsive center-block' alt='pool_offline' title="${pool_state_reason}">`
+                }
+                if (pool_status.includes('unknown')) {
+                    var pool_status_img = `<img src='/static/f5_deployment/img/status_square_black.png' class='img-responsive center-block' alt='pool_unknown' title="${pool_state_reason}">`
+                }
             }
         }
         if (pool_name == 'none'){
