@@ -123,6 +123,7 @@ function build_detailed_table(results, result_index) {
             }
             var node_tr = document.createElement("TR");
             node_tr.setAttribute("data-url", `${node_self_link}`);
+            node_tr.setAttribute("data-id", `${result_index}`);
             var node_table_tr = 'node_table_tr' + ni;
             var checkbox_id = 'node_checkbox_' + ni;
             var node_checkbox = `<input type="checkbox" id="checkbox">`;
@@ -230,7 +231,7 @@ function build_result_table(data) {
         var tr = document.createElement("TR");
         var TABLE_TR = 'TABLE_TR_' + i
         tr.setAttribute("id", TABLE_TR);
-        tr.setAttribute("data-url", `${i}`);
+        tr.setAttribute("data-id", `${i}`);
         if (vs_admin_state.includes('disabled')){
             tr.setAttribute("class", "muted clickable-row");
         }
@@ -267,7 +268,7 @@ function node_control_on_off(action) {
         // Add selected items to the selected_items list.
         //console.log($(this).parents('tr').data('url'));
         f5_selected_items.push($(this).parents('tr').data('url'));
-
+        window.f5_selected_items_index = ($(this).parents('tr').data('id'));
     });
     if (!checkedItems.length) {
         console.log('Nothing Checked')
@@ -304,6 +305,8 @@ function node_control_on_off(action) {
                             if (data.task_id != null) {
                                 console.log('Search Task ID: ' + data.task_id);
                                 get_task_info(data.task_id);
+                                var results = data.result.data;
+                                build_detailed_table(results, f5_selected_items_index)
                             }},
                         error: function (data) {
                             console.log("Something went wrong!");
@@ -381,7 +384,7 @@ function get_task_info(task_id) {
 
                 var results = data.result.data;
                 $(".clickable-row").click(function() {
-                    result_index = $(this).data('url');
+                    result_index = $(this).data('id');
                     build_detailed_table(results, result_index)
                 });
 
