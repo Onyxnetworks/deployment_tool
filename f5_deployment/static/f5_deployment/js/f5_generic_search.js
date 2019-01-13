@@ -432,7 +432,7 @@ function get_task_info(task_id) {
 
                 var results = data.result.data;
                 $(".clickable-row").click(function() {
-                    $('.nodes_table:checked').each(function() {
+                    $('.checkbox:checked').each(function() {
                         console.log('test')
                         $(this).prop('checked');
                     });
