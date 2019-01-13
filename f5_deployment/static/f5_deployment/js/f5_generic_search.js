@@ -44,6 +44,7 @@ function get_refresh_task_info(task_id, f5_selected_items_index) {
                 build_detailed_table(results, f5_selected_items_index);
 
                 $(".clickable-row").click(function() {
+                    $(".checkbox").prop('checked', checked);
                     result_index = $(this).data('id');
                     window.f5_selected_items_index = ($(this).data('id'));
                     build_detailed_table(results, result_index)
@@ -186,7 +187,7 @@ function build_detailed_table(results, result_index) {
             node_tr.setAttribute("data-id", `${result_index}`);
             var node_table_tr = 'node_table_tr' + ni;
             var checkbox_id = 'node_checkbox_' + ni;
-            var node_checkbox = `<input type="checkbox" id="checkbox">`;
+            var node_checkbox = `<input type="checkbox" class="checkbox" id="checkbox">`;
             node_tr.setAttribute("id", node_table_tr);
             document.getElementById("nodes_body").appendChild(node_tr);
             var node_details = [node_checkbox, node_status_img, node_name, node_address, node_bits_in, node_bits_out, node_packets_in, node_packets_out, node_conn_current, node_conn_max, node_conn_total, node_requests_total, node_requests_depth, node_requests_max_age]
@@ -431,6 +432,7 @@ function get_task_info(task_id) {
 
                 var results = data.result.data;
                 $(".clickable-row").click(function() {
+                    $(".checkbox").prop('checked', checked);
                     result_index = $(this).data('id');
                     window.f5_selected_items_index = ($(this).data('id'));
                     build_detailed_table(results, result_index)
