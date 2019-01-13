@@ -65,6 +65,7 @@ function build_detailed_table(results, result_index) {
     document.getElementById("vs_data").scrollIntoView();
     document.getElementById("nodes_body").innerHTML = "";
     //var result_index = $(this).data('url');
+    var vs_self_link = results[result_index].vs_selfLink;
     var f5_location = results[result_index].location;
     var vs_name = results[result_index].vs_name;
     var vs_ip = results[result_index].vs_ip;
@@ -226,7 +227,8 @@ function build_detailed_table(results, result_index) {
     document.getElementById("vs_detail_connections_current").innerHTML = vs_conn_current;
     document.getElementById("vs_detail_connections_maximum").innerHTML = vs_conn_max;
     document.getElementById("vs_detail_connections_total").innerHTML = vs_conn_total;
-
+    document.getElementById("vs_detail_row").setAttribute("data-url", `${vs_self_link}`);
+    document.getElementById("vs_detail_row").setAttribute("data-id", `${result_index}`);
 
 
 
