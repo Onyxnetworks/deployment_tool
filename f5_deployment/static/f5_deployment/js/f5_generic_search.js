@@ -2,7 +2,7 @@ var frm = $('#f5_search');
 var rslt = $('#f5_results');
 
 function build_detailed_table(results, result_index) {
-
+    console.log('Building Detailed Data');
     document.getElementById("vs_data").scrollIntoView();
     document.getElementById("nodes_body").innerHTML = "";
     //var result_index = $(this).data('url');
@@ -306,6 +306,7 @@ function node_control_on_off(action) {
                                 console.log('Search Task ID: ' + data.task_id);
                                 console.log(f5_selected_items_index)
                                 get_task_info(data.task_id);
+                                console.log(data);
                                 var results = data.result.data;
                                 build_detailed_table(results, f5_selected_items_index)
                             }},
