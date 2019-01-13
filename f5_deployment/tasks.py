@@ -310,6 +310,7 @@ def f5_disable_enable(base_urls, request_type, action, f5_selected_items, userna
         if action == 'enable' and request_type == 'vs':
             print('test 4')
             enable_response = vs_disable_enable_force(selflink, auth_token, vs_enabled_json)
+            print(enable_response)
 
 
 
