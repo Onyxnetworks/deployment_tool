@@ -432,7 +432,12 @@ function get_task_info(task_id) {
 
                 var results = data.result.data;
                 $(".clickable-row").click(function() {
-                    $(".checkbox").prop('checked');
+                    $('.nodes_table:checked').each(function() {
+                        console.log('test')
+                        $(this).prop('checked');
+                    });
+
+
                     result_index = $(this).data('id');
                     window.f5_selected_items_index = ($(this).data('id'));
                     build_detailed_table(results, result_index)
