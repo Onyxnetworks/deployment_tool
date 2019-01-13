@@ -45,7 +45,7 @@ function get_refresh_task_info(task_id, f5_selected_items_index) {
 
                 $(".clickable-row").click(function() {
                     result_index = $(this).data('id');
-                    window.f5_selected_items_index = ($(this).parents('tr').data('id'));
+                    window.f5_selected_items_index = ($(this).data('id'));
                     build_detailed_table(results, result_index)
                 });
 
