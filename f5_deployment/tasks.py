@@ -284,8 +284,8 @@ def f5_disable_enable(base_urls, request_type, action, f5_selected_items, userna
     node_forced_offline_json = {"state": "user-down", "session": "user-disabled"}
     node_disabled_json = {"state": "user-up", "session": "user-disabled"}
     node_enabled_json = {"state": "user-up", "session": "user-enabled"}
-    vs_disabled_json = {"disabled": "true"}
-    vs_enabled_json = {"enabled": "true"}
+    vs_disabled_json = {"disabled": True}
+    vs_enabled_json = {"enabled": True}
     # Loop through items and disable them on thee respective F5.
     for selflink in f5_selected_items:
         print(selflink)
