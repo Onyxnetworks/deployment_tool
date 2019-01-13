@@ -247,7 +247,8 @@ def virtual_server_dashboard(url_list, request_type, search_string, username, pa
                     pool_requests_total = pool_values['nestedStats']['entries']['totRequests']['value']
                     pool_requests_depth = pool_values['nestedStats']['entries']['connqAll.depth']['value']
                     pool_requests_max_age = pool_values['nestedStats']['entries']['connqAll.ageMax']['value']
-                    results.append({'location': location, 'vs_name': vs_name, 'vs_state': vs_state,
+                    results.append({'location': location, 'vs_selfLink': selfLink,
+                                    'vs_name': vs_name, 'vs_state': vs_state,
                                     'vs_admin_state': vs_admin_state, 'vs_state_reason': vs_state_reason,
                                     'vs_ip': vs_ip, 'vs_port': vs_port, 'vs_stats': {'vs_bits_in': vs_bits_in,
                                                                                      'vs_bits_out': vs_bits_out,
@@ -275,7 +276,7 @@ def virtual_server_dashboard(url_list, request_type, search_string, username, pa
                                     'vs_nodes': node_details
                                     })
             except:
-                results.append({'location': location, 'vs_name': vs_name, 'vs_state': vs_state,
+                results.append({'location': location, 'vs_selfLink': selfLink, 'vs_name': vs_name, 'vs_state': vs_state,
                                 'vs_admin_state': vs_admin_state, 'vs_state_reason': vs_state_reason,
                                 'vs_ip': vs_ip, 'vs_port': vs_port, 'vs_stats': {'vs_bits_in': vs_bits_in,
                                                                                  'vs_bits_out': vs_bits_out,
