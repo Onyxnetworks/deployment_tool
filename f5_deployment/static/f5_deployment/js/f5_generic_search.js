@@ -45,6 +45,7 @@ function get_refresh_task_info(task_id, f5_selected_items_index) {
 
                 $(".clickable-row").click(function() {
                     result_index = $(this).data('id');
+                    window.f5_selected_items_index = ($(this).parents('tr').data('id'));
                     build_detailed_table(results, result_index)
                 });
 
@@ -326,7 +327,6 @@ function node_control_on_off(action) {
         // Add selected items to the selected_items list.
         //console.log($(this).parents('tr').data('url'));
         f5_selected_items.push($(this).parents('tr').data('url'));
-        window.f5_selected_items_index = ($(this).parents('tr').data('id'));
     });
     if (!checkedItems.length) {
         console.log('Nothing Checked')
@@ -422,6 +422,7 @@ function get_task_info(task_id) {
                 var results = data.result.data;
                 $(".clickable-row").click(function() {
                     result_index = $(this).data('id');
+                    window.f5_selected_items_index = ($(this).parents('tr').data('id'));
                     build_detailed_table(results, result_index)
                 });
 
