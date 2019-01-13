@@ -130,6 +130,7 @@ def f5_disable_enable_push(request):
 
         action = data['action']
         f5_selected_items = data['f5_selected_items']
+        request_type = data['request_type']
 
         environment = request.session.get('environment')
         if environment == 'Production':
@@ -148,7 +149,7 @@ def f5_disable_enable_push(request):
         # Get base url to use
         base_urls = get_base_url(environment)
 
-        task = f5_disable_enable.delay(base_urls, action, f5_selected_items, username, password)
+        task = f5_disable_enable.delay(base_urls, request_type, action, f5_selected_items, username, password)
 
         # Return task id back to client for ajax use.
         return HttpResponse(json.dumps({'task_id': task.id}), content_type='application/json')
