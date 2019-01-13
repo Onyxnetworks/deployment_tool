@@ -10,14 +10,20 @@ function get_refresh_task_info(task_id, f5_selected_items_index) {
             rslt.html('');
             if (data.state == 'PENDING') {
                 var loader = `<img src='/static/index/svg/spinner.svg'/>`;
-                document.getElementById("loader").style.display = "block";
-                document.getElementById("loader").innerHTML = loader;
+                //document.getElementById("loader").style.display = "block";
+                //document.getElementById("loader").innerHTML = loader;
                 rslt.html('Updating Result Data...');
             }
             else if (data.state == 'SUCCESS') {
                 build_result_table(data);
                 var results = data.result.data;
-                build_detailed_table(results, f5_selected_items_index)
+                build_detailed_table(results, f5_selected_items_index);
+
+                $(".clickable-row").click(function() {
+                    result_index = $(this).data('id');
+                    build_detailed_table(results, result_index)
+                });
+
             }
             if (data.state != 'SUCCESS') {
                 setTimeout(function () {
