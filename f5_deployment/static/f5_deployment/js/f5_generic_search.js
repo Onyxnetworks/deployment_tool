@@ -219,6 +219,7 @@ function build_detailed_table(results, result_index) {
         document.getElementById("pool_detail_requests_max_age").innerHTML = '';
         var pool_status_img = '';
     }
+    document.getElementById("vs_checkbox").innerHTML = `<input type="checkbox" class="checkbox">`
     document.getElementById("vs_data").style.visibility = "visible";
     document.getElementById("vs_detail_status").innerHTML = vs_status_img;
     document.getElementById("vs_detail_name").innerHTML = vs_name;

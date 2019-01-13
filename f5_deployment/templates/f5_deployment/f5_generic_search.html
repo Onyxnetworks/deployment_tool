@@ -120,7 +120,7 @@
                                             </thead>
                                             <tbody>
                                             <tr id="vs_detail_row">
-                                                <td style="text-align: center; vertical-align: middle;"><input type="checkbox" class="checkbox"></td>
+                                                <td id="vs_checkbox" style="text-align: center; vertical-align: middle;"></td>
                                                 <td id="vs_detail_status" style="vertical-align: middle;"></td>
                                                 <td id="vs_detail_name"></td>
                                                 <td id="vs_detail_destination"></td>
@@ -136,7 +136,7 @@
                                             </tbody>
                                         </table>
                                         <div id="buttons" class="text-center">
-                                            <button id="enable_btn" type="button" onclick="set_status('enable', 'vs');" class="btn btn-sm">Enable</button>
+                                            <button id="enable_btn" type="submit" onclick="set_status('enable', 'vs');" class="btn btn-sm">Enable</button>
                                             <button id="disable_btn" type="submit" onclick="set_status('disable', 'vs');" class="btn btn-sm">Disable</button>
                                             <button id="disable_btn" type="submit" onclick="refresh_search_info();" class="btn btn-sm">Refresh</button>
                                         </div>
@@ -222,7 +222,7 @@
                                             </tbody>
                                         </table>
                                         <div id="buttons" class="text-center">
-                                            <button id="enable_btn" type="button" onclick="set_status('enable', 'node');" class="btn btn-sm">Enable</button>
+                                            <button id="enable_btn" type="submit" onclick="set_status('enable', 'node');" class="btn btn-sm">Enable</button>
                                             <button id="disable_btn" type="submit" onclick="set_status('disable', 'node');" class="btn btn-sm">Disable</button>
                                             <button id="disable_btn" type="submit" onclick="refresh_search_info();" class="btn btn-sm">Refresh</button>
                                         </div>
