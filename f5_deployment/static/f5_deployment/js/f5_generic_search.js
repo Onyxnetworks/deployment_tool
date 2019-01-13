@@ -329,22 +329,22 @@ function set_status(action, request_type) {
     // Create empty list
     console.log('start')
     console.log(f5_selected_items)
-    f5_selected_items = [];
-    if (request_type == 'node')
+    var f5_selected_items = [];
+    if (request_type == 'node'){
         var checkedItems = $('#nodes_table input[type="checkbox"]:checked').each(function() {
 
             // Add selected items to the selected_items list.
             //console.log($(this).parents('tr').data('url'));
             f5_selected_items.push($(this).parents('tr').data('url'));
-        });
-    if (request_type == 'vs')
+        });}
+    if (request_type == 'vs'){
         var checkedItems = $('#vs_table input[type="checkbox"]:checked').each(function() {
 
             // Add selected items to the selected_items list.
             //console.log($(this).parents('tr').data('url'));
             alert($(this).parents('tr').data('url'));
             f5_selected_items.push($(this).parents('tr').data('url'));
-        });
+        });}
     console.log(f5_selected_items);
     if (!checkedItems.length) {
         console.log('Nothing Checked')
