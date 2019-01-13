@@ -225,7 +225,7 @@ function build_detailed_table(results, result_index) {
     vs_tr.setAttribute("data-id", `${result_index}`);
     var vs_table_tr = 'vs_table_tr';
     var vs_checkbox = `<input type="checkbox" class="checkbox" id="checkbox">`;
-    vs_tr.setAttribute("id", 'vs_tr');
+    vs_tr.setAttribute("id", vs_table_tr);
     document.getElementById("vs_body").appendChild(vs_tr);
     console.log('build data');
     console.log(vs_table_tr);
