@@ -434,7 +434,7 @@ function get_task_info(task_id) {
                 $(".clickable-row").click(function() {
                     $('.checkbox:checked').each(function() {
                         console.log('test')
-                        $(this).prop('checked');
+                        $(this).prop('checked', false);
                     });
 
 
