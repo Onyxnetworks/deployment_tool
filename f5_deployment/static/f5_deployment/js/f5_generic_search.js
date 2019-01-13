@@ -68,6 +68,7 @@ function build_detailed_table(results, result_index) {
     console.log('Building Detailed Data');
     document.getElementById("vs_data").scrollIntoView();
     document.getElementById("nodes_body").innerHTML = "";
+    document.getElementById("vs_body").innerHTML = "";
     //var result_index = $(this).data('url');
     var vs_self_link = results[result_index].vs_selfLink;
     var f5_location = results[result_index].location;
