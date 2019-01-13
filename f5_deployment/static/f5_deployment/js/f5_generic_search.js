@@ -328,7 +328,8 @@ function build_result_table(data) {
 function set_status(action, request_type) {
     // Create empty list
     console.log('start')
-    var f5_selected_items = [];
+    console.log(f5_selected_items)
+    f5_selected_items = [];
     if (request_type == 'node')
         var checkedItems = $('#nodes_table input[type="checkbox"]:checked').each(function() {
 
