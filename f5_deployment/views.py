@@ -131,6 +131,7 @@ def f5_disable_enable_push(request):
         action = data['action']
         f5_selected_items = data['f5_selected_items']
         request_type = data['request_type']
+        print(f5_selected_items)
 
         environment = request.session.get('environment')
         if environment == 'Production':
