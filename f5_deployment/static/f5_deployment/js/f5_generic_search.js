@@ -310,7 +310,7 @@ function node_control_on_off(action) {
                                 $.ajax({
                                     type: 'get',
                                     url: '/get_task_info/',
-                                    data: {'task_id': task_id},
+                                    data: {'task_id': data.task_id},
                                     success: function (data) {
                                         rslt.html('');
                                         if (data.state == 'PENDING') {
