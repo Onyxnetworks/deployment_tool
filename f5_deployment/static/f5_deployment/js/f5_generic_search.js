@@ -223,11 +223,12 @@ function build_detailed_table(results, result_index) {
     var vs_tr = document.createElement("TR");
     vs_tr.setAttribute("data-url", `${vs_self_link}`);
     vs_tr.setAttribute("data-id", `${result_index}`);
-    var vs_table_tr = 'vs_table_tr' + ni;
+    var vs_table_tr = 'vs_table_tr';
     var vs_checkbox = `<input type="checkbox" class="checkbox" id="checkbox">`;
     vs_tr.setAttribute("id", vs_tr);
     document.getElementById("vs_body").appendChild(vs_tr);
     console.log('build data')
+    console.log(vs_table_tr)
     var vs_details = [vs_checkbox, vs_status_img, vs_name, vs_ip, vs_port, vs_bits_in, vs_bits_out, vs_packets_in, vs_packets_out, vs_conn_current, vs_conn_max, vs_conn_total]
     vs_details.forEach(function(items) {
         var vs_table_td = document.createElement("TD");
