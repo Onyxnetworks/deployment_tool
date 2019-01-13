@@ -339,6 +339,7 @@ function set_status(action, request_type) {
 
             // Add selected items to the selected_items list.
             //console.log($(this).parents('tr').data('url'));
+            alert($(this).parents('tr').data('url'));
             f5_selected_items.push($(this).parents('tr').data('url'));
         });
     console.log(f5_selected_items);
