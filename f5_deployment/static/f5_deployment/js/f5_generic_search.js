@@ -231,6 +231,7 @@ function build_detailed_table(results, result_index) {
             var node_tr = document.createElement("TR");
             node_tr.setAttribute("data-url", `${node_self_link}`);
             node_tr.setAttribute("data-id", `${result_index}`);
+            node_tr.setAttribute("data-name", `${node_name}`);
             var node_table_tr = 'node_table_tr' + ni;
             var checkbox_id = 'node_checkbox_' + ni;
             var node_checkbox = `<input type="checkbox" class="checkbox" id="checkbox">`;
@@ -265,6 +266,7 @@ function build_detailed_table(results, result_index) {
     var vs_tr = document.createElement("TR");
     vs_tr.setAttribute("data-url", `${vs_self_link}`);
     vs_tr.setAttribute("data-id", `${result_index}`);
+    vs_tr.setAttribute("data-name", `${vs_name}`);
     var vs_table_tr = 'vs_table_tr';
     var vs_checkbox = `<input type="checkbox" class="checkbox" id="checkbox">`;
     vs_tr.setAttribute("id", vs_table_tr);
@@ -391,24 +393,22 @@ function set_status(action, request_type) {
     // Create empty list
     console.log('Action Button pressed.');
     var f5_selected_items = [];
+    var f5_selected_items_name = [];
     if (request_type == 'node'){
         var checkedItems = $('#nodes_table input[type="checkbox"]:checked').each(function() {
 
             // Add selected items to the selected_items list.
-
-            // Need to add statement to present confirmation in alert window.
             f5_selected_items.push($(this).parents('tr').data('url'));
+            f5_selected_items_name.push($(this).parents('tr').data('name'));
         });
     }
     if (request_type == 'vs'){
         checkedItems = $('#vs_table input[type="checkbox"]:checked').each(function() {
 
             // Add selected items to the selected_items list.
-            if (action == 'disable'){
-                alert('Are you sure you want to disable the following: ' + $(this).parents('tr').data('url'));
-            }
-            // Need to add statement to present confirmation in alert window.
             f5_selected_items.push($(this).parents('tr').data('url'));
+            f5_selected_items_name.push($(this).parents('tr').data('name'));
+
         });
     }
 
@@ -418,7 +418,6 @@ function set_status(action, request_type) {
     // Nothing was checked
     }
     else {
-        f5_selected_items_name = 'test';
         JSconfirm(action, request_type, f5_selected_items, f5_selected_items_name);
     }
 }
