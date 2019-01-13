@@ -219,7 +219,7 @@ function build_detailed_table(results, result_index) {
         document.getElementById("pool_detail_requests_max_age").innerHTML = '';
         var pool_status_img = '';
     }
-
+    console.log('vs_build')
     var vs_tr = document.createElement("TR");
     vs_tr.setAttribute("data-url", `${node_self_link}`);
     vs_tr.setAttribute("data-id", `${result_index}`);
@@ -228,7 +228,7 @@ function build_detailed_table(results, result_index) {
     var vs_checkbox = `<input type="checkbox" class="checkbox" id="checkbox">`;
     vs_tr.setAttribute("id", vs_tr);
     document.getElementById("vs_body").appendChild(vs_tr);
-    var vs_details = [vs_checkbox, vs_status_img, vs_name, vs_ip, vs_port, vs_bits_in, vs_bits_out, vs_packets_in, vs_packets_out, vs_conn_current, vs_conn_max, vs_conn_total];
+    var vs_details = [vs_checkbox, vs_status_img, vs_name, vs_ip, vs_port, vs_bits_in, vs_bits_out, vs_packets_in, vs_packets_out, vs_conn_current, vs_conn_max, vs_conn_total]
     vs_details.forEach(function(items) {
         var vs_table_td = document.createElement("TD");
         vs_table_td.setAttribute("style", "text-align: center; vertical-align: middle;");
