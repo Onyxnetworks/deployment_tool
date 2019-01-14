@@ -70,7 +70,7 @@
             <div class="navbar-default sidebar" role="navigation">
                 <div class="sidebar-nav navbar-collapse">
                     <ul class="nav" id="side-menu">
-                        {% if environment != 'Pre-Production' %}
+                        {% if environment != 'Pre-Production' or role != 'F5_Operator' %}
                         <li>
                             <a href="#"><i class="fa fa-sitemap fa-fw"></i> ACI Tools<span class="fa arrow"></span></a>
                             <ul class="nav nav-second-level">
