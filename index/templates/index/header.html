@@ -99,6 +99,19 @@
                             </ul>
                             <!-- /.nav-second-level -->
                         </li>
+                        {%  if url_list|length > 0 %}
+                        <li>
+                            <a href="#"><i class="fa fa-files-o fa-fw"></i> External Links<span class="fa arrow"></span></a>
+                            <ul class="nav nav-second-level collapse">
+                                {% for url in url_list  %}
+                                <li>
+                                    <a href="{{ url.url }}">{{ url.name }}</a>
+                                </li>
+                                {%  endfor %}
+                            </ul>
+                            <!-- /.nav-second-level -->
+                        </li>
+                        {% endif %}
                     </ul>
                 </div>
                 <!-- /.sidebar-collapse -->

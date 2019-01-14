@@ -3,7 +3,7 @@ from django.http import HttpResponse
 
 from .tasks import *
 from index.scripts.baseline import get_base_url
-
+from index.scripts.external_links import *
 
 def vs_deployment(request):
     # Present file upload to screen and give options to user
@@ -47,7 +47,7 @@ def vs_deployment(request):
     location_list = list(url_dict.keys())
 
 
-    content = {'environment': environment, 'locations': location_list}
+    content = {'environment': environment, 'locations': location_list, 'url_list': url_list}
     return render(request, 'f5_deployment/f5_vs_deployment.html', content)
 
 
@@ -119,7 +119,7 @@ def generic_search(request):
 
 
     environment = request.session.get('environment')
-    content = {'environment': environment}
+    content = {'environment': environment, 'url_list': url_list}
     return render(request, 'f5_deployment/f5_generic_search.html', content)
 
 def f5_disable_enable_push(request):

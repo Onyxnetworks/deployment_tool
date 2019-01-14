@@ -17,7 +17,7 @@ function JSconfirm(action, request_type, f5_selected_items, f5_selected_items_na
     function(isConfirm){
         if (isConfirm)
     {
-        set_status_deploy(action, request_type, f5_selected_items)
+        set_status_deploy(action, request_type, f5_selected_items);
         swal('Changes being deployed.');
         }
         else {

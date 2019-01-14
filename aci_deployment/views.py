@@ -3,6 +3,7 @@ from django.http import HttpResponse
 
 from .tasks import *
 from index.scripts.baseline import get_base_url
+from index.scripts.external_links import *
 
 
 def endpoint_search(request):
@@ -41,7 +42,7 @@ def endpoint_search(request):
     location_list = list(url_dict.keys())
 
 
-    content = {'environment': environment, 'locations': location_list}
+    content = {'environment': environment, 'locations': location_list, 'url_list': url_list}
     return render(request, 'aci_deployment/aci_endpoint_search.html', content)
 
 
@@ -87,7 +88,7 @@ def external_epg_deployment(request):
     location_list = list(url_dict.keys())
 
 
-    content = {'environment': environment, 'locations': location_list}
+    content = {'environment': environment, 'locations': location_list, 'url_list': url_list}
     return render(request, 'aci_deployment/aci_external_epg_deployment.html', content)
 
 
@@ -169,7 +170,7 @@ def contract_deployment(request):
     location_list = list(url_dict.keys())
 
 
-    content = {'environment': environment, 'locations': location_list}
+    content = {'environment': environment, 'locations': location_list, 'url_list': url_list}
     return render(request, 'aci_deployment/aci_contract_deployment.html', content)
 
 

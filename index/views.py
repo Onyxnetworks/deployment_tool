@@ -6,7 +6,7 @@ from celery.result import AsyncResult
 from aci_deployment.scripts.baseline import APIC_LOGIN
 from f5_deployment.scripts.baseline import bigip_login
 from index.scripts.baseline import get_base_url
-
+from index.scripts.external_links import *
 # Function to get task state and results to be used by ajax.
 def get_task_info(request):
     task_id = request.GET.get('task_id', None)
@@ -86,7 +86,7 @@ def login(request):
 def index(request):
 
     environment = request.session.get('environment')
-    content = {'environment': environment}
+    content = {'environment': environment, 'url_list': url_list}
     return render(request, 'index/home.html', content)
 
 
