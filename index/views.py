@@ -23,7 +23,7 @@ def get_task_info(request):
         return HttpResponse('No job id given.')
 
 
-def login(request):
+def admin_login(request):
     content = {}
     if request.method == 'POST':
         if 'username' and 'password' in request.POST:
@@ -90,7 +90,7 @@ def index(request):
     return render(request, 'index/home.html', content)
 
 
-def logout(request):
+def admin_logout(request):
     # Delete session data containing user details
     request.session.flush()
-    return redirect(login)
+    return redirect(admin_login)
