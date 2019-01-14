@@ -58,7 +58,7 @@ def admin_login(request):
                 auth_token = False
             if auth_token:
                 request.session['APIC_COOKIE'] = auth_token
-                request.session['role'] = 'Administrator'
+                request.session['role'] = 'F5_Operator'
                 return redirect(index)
             else:
                 content = {'error': True, 'message': 'Unable to authenticate, please check credentials.'}
