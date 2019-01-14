@@ -12,6 +12,8 @@ def vs_deployment(request):
         location = request.POST['location']
 
         environment = request.session.get('environment')
+        role = request.session.get('role')
+
         if environment == 'Production':
             username = request.session.get('prod_username')
             password = request.session.get('prod_password')
@@ -37,28 +39,30 @@ def vs_deployment(request):
         task = vs_deployment_validation.delay(vs_dict, location, url_dict, username, password)
 
         # Return task id.
-        return HttpResponse(json.dumps({'task_id': task.id, 'location': location}),
+        return HttpResponse(json.dumps({'task_id': task.id, 'location': location, 'role': role}),
                             content_type='application/json')
 
     # Get base url to use
     environment = request.session.get('environment')
+    role = request.session.get('role')
     base_urls = get_base_url(environment)
     url_dict = base_urls['F5']
     location_list = list(url_dict.keys())
 
 
-    content = {'environment': environment, 'locations': location_list, 'url_list': url_list}
+    content = {'environment': environment, 'locations': location_list, 'url_list': url_list,  'role': role}
     return render(request, 'f5_deployment/f5_vs_deployment.html', content)
 
 
 def vs_deployment_push(request):
+
+    role = request.session.get('role')
     # Deploy LTM Virtual Server configuration
     if request.method == 'POST':
         response_json = request.body
         data = json.loads(response_json)
         location = data['location']
         vs_dict = data['vs_dict']
-
 
         environment = request.session.get('environment')
         if environment == 'Production':
@@ -89,7 +93,7 @@ def vs_deployment_push(request):
 
 
 def generic_search(request):
-    print(request.POST)
+    role = request.session.get('role')
     # Get data to use for search task.
     if request.method == 'POST' and 'f5_search' in request.POST:
         search_string = request.POST['f5_search']
@@ -119,10 +123,11 @@ def generic_search(request):
 
 
     environment = request.session.get('environment')
-    content = {'environment': environment, 'url_list': url_list}
+    content = {'environment': environment, 'url_list': url_list, 'role': role}
     return render(request, 'f5_deployment/f5_generic_search.html', content)
 
 def f5_disable_enable_push(request):
+    role = request.session.get('role')
     # Get data to use Enable Disable task
     if request.method == 'POST':
         response_json = request.body
@@ -131,7 +136,6 @@ def f5_disable_enable_push(request):
         action = data['action']
         f5_selected_items = data['f5_selected_items']
         request_type = data['request_type']
-        print(f5_selected_items)
 
         environment = request.session.get('environment')
         if environment == 'Production':
