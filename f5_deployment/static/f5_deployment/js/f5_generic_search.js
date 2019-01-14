@@ -89,12 +89,10 @@ function get_refresh_task_info(task_id, f5_selected_items_index) {
     });}
 
 function build_detailed_table(results, result_index) {
-    //document.getElementById("vs_detail_row").removeAttribute("data-url");
     console.log('Building Detailed Data Table');
     document.getElementById("vs_data").scrollIntoView();
     document.getElementById("nodes_body").innerHTML = "";
     document.getElementById("vs_body").innerHTML = "";
-    //var result_index = $(this).data('url');
     var vs_self_link = results[result_index].vs_selfLink;
     var vs_partition = results[result_index].vs_partition;
     var f5_location = results[result_index].location;
@@ -234,7 +232,6 @@ function build_detailed_table(results, result_index) {
             node_tr.setAttribute("data-id", `${result_index}`);
             node_tr.setAttribute("data-name", `${node_name}`);
             var node_table_tr = 'node_table_tr' + ni;
-            var checkbox_id = 'node_checkbox_' + ni;
             var node_checkbox = `<input type="checkbox" class="checkbox" id="checkbox">`;
             node_tr.setAttribute("id", node_table_tr);
             document.getElementById("nodes_body").appendChild(node_tr);
@@ -270,7 +267,15 @@ function build_detailed_table(results, result_index) {
     vs_tr.setAttribute("data-id", `${result_index}`);
     vs_tr.setAttribute("data-name", `${vs_name}`);
     var vs_table_tr = 'vs_table_tr';
-    var vs_checkbox = `<input type="checkbox" class="checkbox" id="checkbox">`;
+    var role = Cookies.get('role')
+    console.log(role)
+    if (role == 'F5_Operator') {
+        vs_checkbox = `<input type="checkbox" style="visibility: hidden;" class="checkbox" id="checkbox">`;
+    }
+    else {
+        vs_checkbox = `<input type="checkbox" class="checkbox" id="checkbox">`;
+
+    }
     vs_tr.setAttribute("id", vs_table_tr);
     document.getElementById("vs_body").appendChild(vs_tr);
     var vs_details = [vs_checkbox, vs_status_img, vs_name, vs_ip, vs_port, vs_bits_in, vs_bits_out, vs_packets_in, vs_packets_out, vs_conn_current, vs_conn_max, vs_conn_total]
