@@ -3,7 +3,6 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from celery.result import AsyncResult
 
-from aci_deployment.scripts.baseline import APIC_LOGIN
 from f5_deployment.scripts.baseline import bigip_login
 from index.scripts.baseline import get_base_url
 from index.scripts.external_links import *
@@ -48,39 +47,22 @@ def admin_login(request):
             base_urls = get_base_url(environment)
 
             # Attempt to authenticate user
-            if environment == 'Production' or 'Lab':
-                # Get a value from the dictionary to use for login URL.
-                base_url = next(iter(base_urls['ACI'].values()))
-                apic_cookie = APIC_LOGIN(base_url, username, password)
 
-                if apic_cookie:
-                    request.session['APIC_COOKIE'] = apic_cookie
-                    request.session['role'] = 'Administrator'
-                    return redirect(index)
-
-                else:
-                    content = {'error': True, 'message': 'Unable to authenticate, please check credentials.'}
-                    redirect(request.path_info)
-
-            if environment == 'Pre-Production':
-                # Get a value from the dictionary to use for login URL.
-                base_url = next(iter(base_urls['F5'].values()))
-                base_url = next(iter(base_url.values()))
-
-                login_response = bigip_login(base_url, username, password)
-                try:
-                    auth_token = login_response['token']['token']
-                except:
-                    auth_token = False
-
-                if auth_token:
-                    request.session['APIC_COOKIE'] = auth_token
-                    request.session['role'] = 'Administrator'
-                    return redirect(index)
-
-                else:
-                    content = {'error': True, 'message': 'Unable to authenticate, please check credentials.'}
-                    redirect(request.path_info)
+            # Get a value from the dictionary to use for login URL.
+            base_url = next(iter(base_urls['F5'].values()))
+            base_url = next(iter(base_url.values()))
+            login_response = bigip_login(base_url, username, password)
+            try:
+                auth_token = login_response['token']['token']
+            except:
+                auth_token = False
+            if auth_token:
+                request.session['APIC_COOKIE'] = auth_token
+                request.session['role'] = 'Administrator'
+                return redirect(index)
+            else:
+                content = {'error': True, 'message': 'Unable to authenticate, please check credentials.'}
+                redirect(request.path_info)
 
     return render(request, 'index/login.html', content)
 
