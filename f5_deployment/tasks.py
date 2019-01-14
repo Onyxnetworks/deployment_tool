@@ -288,29 +288,22 @@ def f5_disable_enable(base_urls, request_type, action, f5_selected_items, userna
     vs_enabled_json = {"enabled": True}
     # Loop through items and disable them on thee respective F5.
     for selflink in f5_selected_items:
-        print(selflink)
         # get URL got base login (hostname without)
         login_url = selflink.split('/mgmt/')[0]
-        print(login_url)
         bigip_login_response = bigip_login(login_url, username, password)
         auth_token = bigip_login_response['token']['token']
 
         if action == 'disable' and request_type == 'node':
-            print('test 1')
             disable_response = node_disable_enable_force(selflink, auth_token, node_disabled_json)
 
         if action == 'enable' and request_type == 'node':
-            print('test 2')
             enable_response = node_disable_enable_force(selflink, auth_token, node_enabled_json)
 
         if action == 'disable' and request_type == 'vs':
-            print('test 3')
             disable_response = vs_disable_enable_force(selflink, auth_token, vs_disabled_json)
 
         if action == 'enable' and request_type == 'vs':
-            print('test 4')
             enable_response = vs_disable_enable_force(selflink, auth_token, vs_enabled_json)
-            print(enable_response)
 
 
 

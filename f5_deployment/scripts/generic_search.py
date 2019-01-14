@@ -105,7 +105,7 @@ def get_all_vs(base_url, auth_token):
         # Build auth token header
         headers = {'content-type': 'application/json', 'X-F5-Auth-Token': auth_token}
 
-        get_url = base_url + '/mgmt/tm/ltm/virtual/?$select=name,selfLink,pool,destination'
+        get_url = base_url + '/mgmt/tm/ltm/virtual/?$select=name,selfLink,pool,destination,partition'
         try:
             get_response = requests.get(get_url, headers=headers, timeout=5, verify=False)
             payload_response = json.loads(get_response.text)
@@ -165,9 +165,11 @@ def virtual_server_dashboard(url_list, request_type, search_string, username, pa
             selfLink_ver = vs['selfLink'].split('/localhost/')[1]
             selfLink = selfLink_ver.split('?ver=')[0]
             vs_selfLink = base_url + '/' + selfLink
+            vs_partition = vs['partition']
             vs_stats = get_vs_stats(base_url, selfLink, auth_token)
             vs_state_dict = vs_stats['entries'].values()
             for vs_values in vs_state_dict:
+
                 vs_state = vs_values['nestedStats']['entries']['status.availabilityState']['description']
                 vs_admin_state = vs_values['nestedStats']['entries']['status.enabledState']['description']
                 vs_state_reason = vs_values['nestedStats']['entries']['status.statusReason']['description']
@@ -250,6 +252,7 @@ def virtual_server_dashboard(url_list, request_type, search_string, username, pa
                     pool_requests_depth = pool_values['nestedStats']['entries']['connqAll.depth']['value']
                     pool_requests_max_age = pool_values['nestedStats']['entries']['connqAll.ageMax']['value']
                     results.append({'location': location, 'vs_selfLink': vs_selfLink,
+                                    'vs_partition': vs_partition,
                                     'vs_name': vs_name, 'vs_state': vs_state,
                                     'vs_admin_state': vs_admin_state, 'vs_state_reason': vs_state_reason,
                                     'vs_ip': vs_ip, 'vs_port': vs_port, 'vs_stats': {'vs_bits_in': vs_bits_in,
@@ -279,7 +282,8 @@ def virtual_server_dashboard(url_list, request_type, search_string, username, pa
                                     'vs_nodes': node_details
                                     })
             except:
-                results.append({'location': location, 'vs_selfLink': vs_selfLink, 'vs_name': vs_name, 'vs_state': vs_state,
+                results.append({'location': location, 'vs_selfLink': vs_selfLink,
+                                'vs_partition': vs_partition, 'vs_name': vs_name, 'vs_state': vs_state,
                                 'vs_admin_state': vs_admin_state, 'vs_state_reason': vs_state_reason,
                                 'vs_ip': vs_ip, 'vs_port': vs_port, 'vs_stats': {'vs_bits_in': vs_bits_in,
                                                                                  'vs_bits_out': vs_bits_out,

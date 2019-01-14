@@ -96,6 +96,7 @@ function build_detailed_table(results, result_index) {
     document.getElementById("vs_body").innerHTML = "";
     //var result_index = $(this).data('url');
     var vs_self_link = results[result_index].vs_selfLink;
+    var vs_partition = results[result_index].vs_partition;
     var f5_location = results[result_index].location;
     var vs_name = results[result_index].vs_name;
     var vs_ip = results[result_index].vs_ip;
@@ -264,6 +265,7 @@ function build_detailed_table(results, result_index) {
         var pool_status_img = '';
     }
     var vs_tr = document.createElement("TR");
+    vs_tr.setAttribute("data-partition", `${vs_partition}`);
     vs_tr.setAttribute("data-url", `${vs_self_link}`);
     vs_tr.setAttribute("data-id", `${result_index}`);
     vs_tr.setAttribute("data-name", `${vs_name}`);
@@ -446,9 +448,6 @@ function set_status_deploy(action, request_type, f5_selected_items){
     });
 
 }
-
-
-
 
 frm.submit(function () {
     document.getElementById("tablediv").style.visibility = "hidden";
