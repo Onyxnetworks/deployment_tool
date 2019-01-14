@@ -6,6 +6,6 @@ urlpatterns = [
     url(r'^login/', views.admin_login, name='admin_login'),
     url(r'^$', views.login, name='login'),
     url(r'^get_task_info/', views.get_task_info, name='get_task_info'),
-    url(r'^logout/', views.logout, name='logout'),
+    url(r'^logout/', views.admin_logout, name='admin_logout'),
 ]
 
