@@ -55,6 +55,7 @@ def admin_login(request):
 
                 if apic_cookie:
                     request.session['APIC_COOKIE'] = apic_cookie
+                    request.session['role'] = 'Administrator'
                     return redirect(index)
 
                 else:
@@ -74,6 +75,7 @@ def admin_login(request):
 
                 if auth_token:
                     request.session['APIC_COOKIE'] = auth_token
+                    request.session['role'] = 'Administrator'
                     return redirect(index)
 
                 else:
@@ -85,8 +87,9 @@ def admin_login(request):
 
 def index(request):
 
+    role = request.session.get('role')
     environment = request.session.get('environment')
-    content = {'environment': environment, 'url_list': url_list}
+    content = {'environment': environment, 'url_list': url_list, 'role': 'F5_Operator'}
     return render(request, 'index/home.html', content)
 
 
