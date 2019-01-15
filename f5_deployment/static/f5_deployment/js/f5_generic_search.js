@@ -66,7 +66,8 @@ function get_refresh_task_info(task_id, f5_selected_items_index) {
             else if (data.state == 'SUCCESS') {
                 build_result_table(data);
                 var results = data.result.data;
-                build_detailed_table(results, f5_selected_items_index);
+                var role = data.search.role;
+                build_detailed_table(results, role, f5_selected_items_index);
 
                 $(".clickable-row").click(function() {
                     $('.checkbox:checked').each(function() {
@@ -88,7 +89,7 @@ function get_refresh_task_info(task_id, f5_selected_items_index) {
         }
     });}
 
-function build_detailed_table(results, result_index) {
+function build_detailed_table(results, role, result_index) {
     console.log('Building Detailed Data Table');
     document.getElementById("vs_data").scrollIntoView();
     document.getElementById("nodes_body").innerHTML = "";
@@ -267,7 +268,6 @@ function build_detailed_table(results, result_index) {
     vs_tr.setAttribute("data-id", `${result_index}`);
     vs_tr.setAttribute("data-name", `${vs_name}`);
     var vs_table_tr = 'vs_table_tr';
-    var role = results.role;
     console.log(role)
     if (role == 'F5_Operator') {
         vs_checkbox = `<input type="checkbox" style="visibility: hidden;" class="checkbox" id="checkbox">`;
@@ -512,7 +512,7 @@ function get_task_info(task_id) {
                     //var result_index = result_table.row( this ).id().split("_")[2];
                     //alert( 'Clicked row id '+result_index );
                 //} );
-
+                var role = data.search.role;
                 var results = data.result.data;
                 $(".clickable-row").click(function() {
                     $('.checkbox:checked').each(function() {
@@ -522,7 +522,7 @@ function get_task_info(task_id) {
 
                     result_index = $(this).data('id');
                     window.f5_selected_items_index = ($(this).data('id'));
-                    build_detailed_table(results, result_index)
+                    build_detailed_table(results, role, result_index)
                 });
 
             }
