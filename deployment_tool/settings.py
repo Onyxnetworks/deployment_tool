@@ -134,5 +134,5 @@ STATIC_ROOT = '/home/django/deployment_tool/static/'
 STATIC_URL = '/static/'
 
 # Login Config
-LOGIN_URL = '/login/'
+LOGIN_URLS = '/login/'
 LOGIN_REDIRECT_URL = '/index/'
