@@ -7,6 +7,7 @@ from index.scripts.external_links import *
 
 
 def endpoint_search(request):
+    user = request.session.get('user')
     role = request.session.get('role')
     # Get subnet to use for search task.
     if request.method == 'POST' and 'endpoint_search' in request.POST:
@@ -41,11 +42,12 @@ def endpoint_search(request):
     url_dict = base_urls['ACI']
     location_list = list(url_dict.keys())
 
-    content = {'environment': environment, 'locations': location_list, 'url_list': url_list, 'role': role}
+    content = {'environment': environment, 'locations': location_list, 'url_list': url_list, 'role': role, 'user': user}
     return render(request, 'aci_deployment/aci_endpoint_search.html', content)
 
 
 def external_epg_deployment(request):
+    user = request.session.get('user')
     role = request.session.get('role')
     # Present file upload to screen and give options to user
     if request.method == 'POST' and 'file' in request.FILES:
@@ -78,7 +80,7 @@ def external_epg_deployment(request):
         task = EXTERNAL_EPG_VALIDATION.delay(rule_list, location, url_dict, username, password)
 
         # Return task id.
-        return HttpResponse(json.dumps({'task_id': task.id, 'rule_list': rule_list, 'location': location, 'role': role}),
+        return HttpResponse(json.dumps({'task_id': task.id, 'rule_list': rule_list, 'location': location, 'role': role, 'user': user}),
                             content_type='application/json')
 
     # Get base url to use
@@ -87,11 +89,12 @@ def external_epg_deployment(request):
     url_dict = base_urls['ACI']
     location_list = list(url_dict.keys())
 
-    content = {'environment': environment, 'locations': location_list, 'url_list': url_list, 'role': role}
+    content = {'environment': environment, 'locations': location_list, 'url_list': url_list, 'role': role, 'user': user}
     return render(request, 'aci_deployment/aci_external_epg_deployment.html', content)
 
 
 def external_epg_deployment_push(request):
+    user = request.session.get('user')
     role = request.session.get('role')
     # Deploy External EPG configuration
     if request.method == 'POST':
@@ -129,6 +132,7 @@ def external_epg_deployment_push(request):
 
 
 def contract_deployment(request):
+    user = request.session.get('user')
     role = request.session.get('role')
     # Present file upload to screen and give options to user
     if request.method == 'POST' and 'file' in request.FILES:
@@ -161,7 +165,7 @@ def contract_deployment(request):
         task = CONTRACT_DEPLOYMENT_VALIDATION.delay(rule_list, location, url_dict, username, password)
 
         # Return task id.
-        return HttpResponse(json.dumps({'task_id': task.id, 'rule_list': rule_list, 'location': location, 'role': role}),
+        return HttpResponse(json.dumps({'task_id': task.id, 'rule_list': rule_list, 'location': location, 'role': role, 'user': user}),
                             content_type='application/json')
 
     # Get base url to use
@@ -170,11 +174,12 @@ def contract_deployment(request):
     url_dict = base_urls['ACI']
     location_list = list(url_dict.keys())
 
-    content = {'environment': environment, 'locations': location_list, 'url_list': url_list, 'role': role}
+    content = {'environment': environment, 'locations': location_list, 'url_list': url_list, 'role': role, 'user': user}
     return render(request, 'aci_deployment/aci_contract_deployment.html', content)
 
 
 def contract_deployment_push(request):
+    user = request.session.get('user')
     role = request.session.get('role')
     # Deploy External EPG configuration
     if request.method == 'POST':

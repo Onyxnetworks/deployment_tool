@@ -7,6 +7,7 @@ from index.scripts.external_links import *
 
 def vs_deployment(request):
     # Present file upload to screen and give options to user
+    user = request.session.get('user')
     if request.method == 'POST' and 'file' in request.FILES:
         file = request.FILES['file']
         location = request.POST['location']
@@ -39,7 +40,7 @@ def vs_deployment(request):
         task = vs_deployment_validation.delay(vs_dict, location, url_dict, username, password)
 
         # Return task id.
-        return HttpResponse(json.dumps({'task_id': task.id, 'location': location, 'role': role}),
+        return HttpResponse(json.dumps({'task_id': task.id, 'location': location, 'role': role, 'user': user}),
                             content_type='application/json')
 
     # Get base url to use
@@ -50,12 +51,12 @@ def vs_deployment(request):
     location_list = list(url_dict.keys())
 
 
-    content = {'environment': environment, 'locations': location_list, 'url_list': url_list,  'role': role}
+    content = {'environment': environment, 'locations': location_list, 'url_list': url_list,  'role': role, 'user': user}
     return render(request, 'f5_deployment/f5_vs_deployment.html', content)
 
 
 def vs_deployment_push(request):
-
+    user = request.session.get('user')
     role = request.session.get('role')
     # Deploy LTM Virtual Server configuration
     if request.method == 'POST':
@@ -93,6 +94,7 @@ def vs_deployment_push(request):
 
 
 def generic_search(request):
+    user = request.session.get('user')
     role = request.session.get('role')
     # Get data to use for search task.
     if request.method == 'POST' and 'f5_search' in request.POST:
@@ -123,10 +125,11 @@ def generic_search(request):
 
 
     environment = request.session.get('environment')
-    content = {'environment': environment, 'url_list': url_list, 'role': role}
+    content = {'environment': environment, 'url_list': url_list, 'role': role, 'user': user}
     return render(request, 'f5_deployment/f5_generic_search.html', content)
 
 def f5_disable_enable_push(request):
+    user = request.session.get('user')
     role = request.session.get('role')
     # Get data to use Enable Disable task
     if request.method == 'POST':

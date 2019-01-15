@@ -29,6 +29,7 @@ def admin_login(request):
             username = request.POST['username']
             password = request.POST['password']
             environment = request.POST['environment']
+            request.session['user'] = username
 
             request.session['environment'] = environment
             if environment == 'Production':
@@ -70,8 +71,9 @@ def admin_login(request):
 def index(request):
 
     role = request.session.get('role')
+    user = request.session.get('user')
     environment = request.session.get('environment')
-    content = {'environment': environment, 'url_list': url_list, 'role': 'F5_Operator'}
+    content = {'environment': environment, 'url_list': url_list, 'role': 'F5_Operator', 'user': user}
     return render(request, 'index/home.html', content)
 
 
