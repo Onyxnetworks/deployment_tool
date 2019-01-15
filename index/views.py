@@ -22,52 +22,7 @@ def get_task_info(request):
         return HttpResponse('No job id given.')
 
 
-def f5_operator_login(request):
-    content = {}
-    if request.method == 'POST':
-        if 'username' and 'password' in request.POST:
-            username = request.POST['username']
-            password = request.POST['password']
-            environment = request.POST['environment']
-            request.session['user'] = username
-
-            request.session['environment'] = environment
-            if environment == 'Production':
-                request.session['prod_username'] = username
-                request.session['prod_password'] = password
-
-            elif environment == 'Pre-Production':
-                request.session['ppe_username'] = username
-                request.session['ppe_password'] = password
-
-            elif environment == 'Lab':
-                request.session['lab_username'] = username
-                request.session['lab_password'] = password
-
-            # Get base url to use for authentication and scripts and try to login to UKDC1 APIC
-            base_urls = get_base_url(environment)
-
-            # Attempt to authenticate user
-            # Get a value from the dictionary to use for login URL.
-            base_url = next(iter(base_urls['F5'].values()))
-            base_url = next(iter(base_url.values()))
-            login_response = bigip_login(base_url, username, password)
-
-            try:
-                auth_token = login_response['token']['token']
-            except:
-                auth_token = False
-            if auth_token:
-                request.session['APIC_COOKIE'] = auth_token
-                request.session['role'] = 'F5_Operator'
-                return redirect(index)
-            else:
-                content = {'error': True, 'message': 'Unable to authenticate, please check credentials.'}
-                redirect(request.path_info)
-
-    return render(request, 'index/operator_login.html', content)
-
-def admin_login(request):
+def login(request):
     content = {}
     if request.method == 'POST':
         if 'username' and 'password' in request.POST:
@@ -122,7 +77,7 @@ def index(request):
     return render(request, 'index/home.html', content)
 
 
-def admin_logout(request):
+def logout(request):
     # Delete session data containing user details
     request.session.flush()
-    return redirect(admin_login)
+    return redirect(login)

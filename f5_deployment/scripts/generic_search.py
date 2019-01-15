@@ -101,11 +101,11 @@ def get_pool_by_reference(base_url, poolLink, auth_token):
         return error_code
 
 
-def get_all_vs(base_url, auth_token):
+def get_all_vs(base_url, auth_token, search_options):
         # Build auth token header
         headers = {'content-type': 'application/json', 'X-F5-Auth-Token': auth_token}
 
-        get_url = base_url + '/mgmt/tm/ltm/virtual/?$select=name,selfLink,pool,destination,partition'
+        get_url = base_url + '/mgmt/tm/ltm/virtual/?expandSubcollections=true?$select={}'.format(search_options)
         try:
             get_response = requests.get(get_url, headers=headers, timeout=5, verify=False)
             payload_response = json.loads(get_response.text)
@@ -136,7 +136,8 @@ def virtual_server_dashboard(url_list, request_type, search_string, username, pa
         bigip_login_response = bigip_login(base_url, username, password)
         auth_token = bigip_login_response['token']['token']
         # Get all Virtual Servers
-        all_vs = get_all_vs(base_url, auth_token)
+        search_options = 'name,selfLink,pool,destination,partition'
+        all_vs = get_all_vs(base_url, auth_token, search_options)
 
 
         for vs in all_vs['items']:
