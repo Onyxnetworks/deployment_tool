@@ -267,7 +267,7 @@ function build_detailed_table(results, result_index) {
     vs_tr.setAttribute("data-id", `${result_index}`);
     vs_tr.setAttribute("data-name", `${vs_name}`);
     var vs_table_tr = 'vs_table_tr';
-    var role = Cookies.get('role');
+    var role = results.role;
     console.log(role)
     if (role == 'F5_Operator') {
         vs_checkbox = `<input type="checkbox" style="visibility: hidden;" class="checkbox" id="checkbox">`;

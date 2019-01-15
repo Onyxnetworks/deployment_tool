@@ -234,7 +234,7 @@ def virtual_server_deployment(vs_dict, location, url_dict, username, password):
 
 
 @shared_task
-def f5_generic_search(base_urls, request_type, search_string, username, password):
+def f5_generic_search(base_urls, role, request_type, search_string, username, password):
     # Build URL List to search.
     url_list = []
     base_urls = list(base_urls['F5'].values())
@@ -247,7 +247,7 @@ def f5_generic_search(base_urls, request_type, search_string, username, password
         results = []
         virtual_server_dashboard_result = virtual_server_dashboard(url_list, request_type, search_string, username, password)
         if isinstance(virtual_server_dashboard_result, list):
-            results = {'search': {'search_string': search_string, 'request_type': request_type}, 'data': virtual_server_dashboard_result}
+            results = {'search': {'search_string': search_string, 'role': role, 'request_type': request_type}, 'data': virtual_server_dashboard_result}
 
             return results
 

@@ -47,11 +47,11 @@ def admin_login(request):
             base_urls = get_base_url(environment)
 
             # Attempt to authenticate user
-
             # Get a value from the dictionary to use for login URL.
             base_url = next(iter(base_urls['F5'].values()))
             base_url = next(iter(base_url.values()))
             login_response = bigip_login(base_url, username, password)
+
             try:
                 auth_token = login_response['token']['token']
             except:

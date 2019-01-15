@@ -116,7 +116,7 @@ def generic_search(request):
         # Get base url to use
         base_urls = get_base_url(environment)
 
-        task = f5_generic_search.delay(base_urls, request_type, search_string, username, password)
+        task = f5_generic_search.delay(base_urls, role, request_type, search_string, username, password)
 
         # Return task id back to client for ajax use.
         return HttpResponse(json.dumps({'task_id': task.id}), content_type='application/json')
