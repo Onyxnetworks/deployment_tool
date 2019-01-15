@@ -66,7 +66,7 @@ function get_refresh_task_info(task_id, f5_selected_items_index) {
             else if (data.state == 'SUCCESS') {
                 build_result_table(data);
                 var results = data.result.data;
-                var role = data.search.role;
+                var role = data.result.search.role;
                 build_detailed_table(results, role, f5_selected_items_index);
 
                 $(".clickable-row").click(function() {
@@ -512,7 +512,7 @@ function get_task_info(task_id) {
                     //var result_index = result_table.row( this ).id().split("_")[2];
                     //alert( 'Clicked row id '+result_index );
                 //} );
-                var role = data.search.role;
+                var role = data.result.search.role;
                 var results = data.result.data;
                 $(".clickable-row").click(function() {
                     $('.checkbox:checked').each(function() {
