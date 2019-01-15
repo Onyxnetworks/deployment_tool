@@ -65,7 +65,7 @@ def f5_operator_login(request):
                 content = {'error': True, 'message': 'Unable to authenticate, please check credentials.'}
                 redirect(request.path_info)
 
-    return render(request, 'index/login.html', content)
+    return render(request, 'index/operator_login.html', content)
 
 def admin_login(request):
     content = {}
