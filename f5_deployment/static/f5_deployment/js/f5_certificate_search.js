@@ -90,6 +90,10 @@ function build_result_table(data) {
 
 }
 
+// Function to convert intigers to a readable format eg 1000 becomes 1k
+function m(n,d){x=(''+n).length,p=Math.pow,d=p(10,d)
+    x-=x%3
+    return Math.round(n*d/p(10,x))/d+" kMGTPE"[x/3]}
 
 function build_detailed_table(results, result_index) {
     console.log('Building Detailed Data Table');
@@ -114,6 +118,60 @@ function build_detailed_table(results, result_index) {
     document.getElementById("cert_sans").innerHTML = cert_sans;
 
 
+    vs_list = results[result_index].vs_list;
+    for (i = 0, len = vs_list.length, text = ""; i < len; i++) {
+        vs_name = node_results[i].vs_name;
+        vs_state = node_results[i].vs_state;
+        vs_port = node_results[i].vs_port;
+        vs_destination = node_results[i].vs_destination;
+        vs_admin_state = node_results[i].vs_admin_state;
+        vs_state_reason = node_results[i].vs_state_reason;
+        vs_bits_in = m(node_results[i].vs_bits_in, 2);
+        vs_bits_out = m(node_results[i].vs_bits_out, 2);
+        vs_packets_in = m(node_results[i].vs_packets_in, 2);
+        vs_packets_out = m(node_results[i].vs_packets_out, 2);
+        vs_conn_current = m(node_results[i].vs_conn_current, 2);
+        vs_conn_max = m(node_results[i].vs_conn_max, 2);
+        vs_conn_total = m(node_results[i].vs_conn_total, 2);
+
+        if (vs_admin_state.includes('disabled')){
+            if (vs_state.includes('available')) {
+                vs_status_img = `<img src='/static/f5_deployment/img/status_circle_black.png' class='img-responsive center-block' alt='vs_available' title=${vs_state_reason}">`
+            }
+            if (vs_state.includes('offline')) {
+                vs_status_img = `<img src='/static/f5_deployment/img/status_diamond_black.png' class='img-responsive center-block' alt='vs_offline' title="${vs_state_reason}">`
+            }
+            if (vs_state.includes('unknown')) {
+                vs_status_img = `<img src='/static/f5_deployment/img/status_square_black.png' class='img-responsive center-block' alt='vs_unknown' title="${vs_state_reason}">`
+            }
+        }
+        if (vs_admin_state.includes('enabled')){
+            if (vs_state.includes('available')) {
+                vs_status_img = `<img src='/static/f5_deployment/img/status_circle_green.png' class='img-responsive center-block' alt='vs_available' title="${vs_state_reason}">`
+            }
+            if (vs_state.includes('offline')) {
+                vs_status_img = `<img src='/static/f5_deployment/img/status_diamond_red.png' class='img-responsive center-block' alt='vs_offline' title="${vs_state_reason}">`
+            }
+            if (vs_state.includes('unknown')) {
+                vs_status_img = `<img src='/static/f5_deployment/img/status_square_blue.png' class='img-responsive center-block' alt='vs_unknown' title="${vs_state_reason}">`
+            }
+        }
+
+        var vs_tr = document.createElement("TR");
+        var vs_table_tr = 'vs_table_tr' + i;
+        vs_tr.setAttribute("id", vs_table_tr);
+        document.getElementById("vs_body").appendChild(vs_tr);
+        var vs_details = [vs_status_img, vs_name, vs_destination, vs_port, vs_bits_in, vs_bits_out, vs_packets_in, vs_packets_out, vs_conn_current, vs_conn_max, vs_conn_total];
+        vs_details.forEach(function(items) {
+            var vs_table_td = document.createElement("TD");
+            vs_table_td.setAttribute("style", "text-align: center; vertical-align: middle;");
+            vs_table_td.innerHTML = items;
+            document.body.appendChild(vs_table_td);
+            document.getElementById(vs_table_tr).appendChild(vs_table_td);
+        });
+    }    
+    
+    
     // Remove Hidden attribute from table
     document.getElementById("cert_data").style.visibility = "visible";
 
