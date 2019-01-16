@@ -97,6 +97,14 @@ function m(n,d){x=(''+n).length,p=Math.pow,d=p(10,d)
 
 function build_detailed_table(results, result_index) {
     document.getElementById("vs_body").innerHTML = '';
+    document.getElementById("cert_name").innerHTML = '';
+    document.getElementById("cert_common_name").innerHTML = '';
+    document.getElementById("cert_expiration").innerHTML = '';
+    document.getElementById("cert_remaining_days").innerHTML = '';
+    document.getElementById("cert_path").innerHTML = '';
+    document.getElementById("cert_issuer").innerHTML = '';
+    document.getElementById("cert_sans").innerHTML = '';
+
     console.log('Building Detailed Data Table');
     document.getElementById("cert_data").scrollIntoView();
 
