@@ -35,7 +35,7 @@ function build_result_table(data) {
         cert_status_message = results[i].cert_status_message;
         common_name = results[i].common_name;
         vs_list = results[i].vs_list;
-
+        remaining_days = results[i].remaining_days;
         var tr = document.createElement("TR");
         var TABLE_TR = 'TABLE_TR_' + i;
         tr.setAttribute("id", TABLE_TR);
@@ -50,7 +50,7 @@ function build_result_table(data) {
             tr.setAttribute("class", "warning clickable-row");
         }
         document.getElementById("result_table").appendChild(tr);
-        var search_results = [f5_location, cert_name, common_name, cert_expiration, cert_status_message];
+        var search_results = [f5_location, cert_name, common_name, cert_expiration, remaining_days, cert_status_message];
         search_results.forEach(function(items) {
             var td = document.createElement("TD");
             td.setAttribute("style", "text-align: center; vertical-align: middle;");

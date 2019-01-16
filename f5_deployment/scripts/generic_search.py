@@ -406,7 +406,8 @@ def certificate_checker(url_list, request_type, search_string, username, passwor
 
             results.append({'location': location, 'cert_name': cert_name, 'cert_expiration': cert_expiration,
                             'cert_status': cert_status, 'cert_status_message': cert_status_message,
-                            'common_name': common_name, 'san': san, 'vs_list': vs_list })
+                            'remaining_days': datetime_result, 'common_name': common_name,
+                            'san': san, 'vs_list': vs_list })
 
 
     return results
