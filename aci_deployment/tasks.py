@@ -13,15 +13,15 @@ from index.scripts.baseline import get_base_url
 from celery import shared_task
 
 @shared_task
-def ENDPOINT_SEARCH(base_urls, username, password, SUBNET):
+def ENDPOINT_SEARCH(base_urls, filter_default, username, password, SUBNET):
     RESULTS = []
-
+	
     # Build URL List to search.
     url_list = []
     for url in base_urls['ACI']:
         url_list.append(base_urls['ACI'][url])
 
-    ENDPOINT_LIST = GET_ENDPOINTS(url_list, username, password)
+    ENDPOINT_LIST = GET_ENDPOINTS(url_list, filter_default, username, password)
 
 
 
