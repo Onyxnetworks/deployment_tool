@@ -78,6 +78,105 @@
                         <!-- /.panel-body -->
                     </div>
                     <!-- /.panel -->
+                    <div class="panel panel-default" style="visibility: hidden;" id="cert_data">
+                        <div class="panel-heading">
+                            <div class="row">
+                                <div class="col-sm-8">
+                                    <h4 class="panel-title">
+                                        <a data-toggle="collapse" data-parent="#accordion" href="#collapse2">Certificate Information</a>
+                                    </h4>
+                                </div>
+                                <div class="col-sm-4 text-right">
+                                    <a href="#tablediv">
+                                        <span class="glyphicon glyphicon-chevron-up " aria-hidden="true"> </span> Back to results<small></small>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="collapse2" class="panel-collapse collapse in">
+                            <div class="panel-body" id="cert_data_body">
+                                <!-- Nav tabs -->
+                                <ul class="nav nav-tabs">
+                                    <li class="active"><a href="#certificate_tab" data-toggle="tab">Certificate</a>
+                                    </li>
+                                    <li id="vs_li"><a href="#vs_tab" data-toggle="tab">Virtual Server</a>
+                                </ul>
+                                <!-- Tab panes -->
+                                <div class="tab-content">
+                                    <div class="tab-pane fade in active table-responsive" id="certificate_tab">
+                                        <table id="cert_table"  class="table table-striped table-hover table-responsive table-condensed text-center">
+                                            <thead>
+                                            <tr>
+                                                <th rowspan="2" class="text-center">Name</th>
+                                                <th rowspan="2" class="text-center">Name</th>
+                                                <th rowspan="2" class="text-center">Destination</th>
+                                                <th rowspan="2" class="text-center">Port</th>
+                                                <th colspan="2" class="text-center">Bits</th>
+                                                <th colspan="2" class="text-center">Packets</th>
+                                                <th colspan="3" class="text-center">Connections</th>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-center">In</td>
+                                                <td class="text-center">Out</td>
+                                                <td class="text-center">In</td>
+                                                <td class="text-center">Out</td>
+                                                <td class="text-center">Current</td>
+                                                <td class="text-center">Maximum</td>
+                                                <td class="text-center">Total</td>
+                                            </tr>
+                                            </thead>
+                                            <tbody id="vs_body">
+                                            <!-- vs body -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="tab-pane fade table-responsive" id="vs_tab">
+                                        <table class="table table-striped table-hover table-responsive table-condensed text-center">
+                                            <thead>
+                                            <tr>
+                                                <th rowspan="2" class="text-center">Status</th>
+                                                <th rowspan="2" class="text-center">Name</th>
+                                                <th rowspan="2" class="text-center">Destination</th>
+                                                <th colspan="2" class="text-center">Port</th>
+                                                <th colspan="3" class="text-center">Bits</th>
+                                                <th colspan="1" class="text-center">Packets</th>
+                                                <th colspan="2" class="text-center">Connections</th>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-center">In</td>
+                                                <td class="text-center">Out</td>
+                                                <td class="text-center">In</td>
+                                                <td class="text-center">Out</td>
+                                                <td class="text-center">Current</td>
+                                                <td class="text-center">Maximum</td>
+                                                <td class="text-center">Total</td>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <!-- Pool Body -->
+                                            <tr>
+                                                <td id="pool_detail_status" style="vertical-align: middle;"></td>
+                                                <td id="pool_detail_name"></td>
+                                                <td id="pool_detail_members"></td>
+                                                <td id="pool_detail_bits_in"></td>
+                                                <td id="pool_detail_bits_out"></td>
+                                                <td id="pool_detail_packets_in"></td>
+                                                <td id="pool_detail_packets_out"></td>
+                                                <td id="pool_detail_connections_current"></td>
+                                                <td id="pool_detail_connections_maximum"></td>
+                                                <td id="pool_detail_connections_total"></td>
+                                                <td id="pool_detail_requests_total"></td>
+                                                <td id="pool_detail_requests_depth"></td>
+                                                <td id="pool_detail_requests_max_age"></td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
                 <!-- /.col-lg-12 -->

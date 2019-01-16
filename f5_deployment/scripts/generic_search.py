@@ -352,12 +352,16 @@ def certificate_checker(url_list, request_type, search_string, username, passwor
         for cert in get_cert_response['items']:
             vs_list = []
             cert_name = re.split('.crt|/', cert['fullPath'])[-2]
+            cert_fullPath = cert['fullPath']
+
 
             if request_type == 'Certificate Name':
                 if search_string.upper() not in cert_name.upper():
                     continue
 
             cert_expiration = cert['apiRawValues']['expiration']
+            cert_issuer = cert['apiRawValues']['issuer']
+            cert_key_size = cert['apiRawValues']['certificateKeySize']
 
             # Convert Expiration date into datetime format
             datetime_object = datetime.strptime(cert_expiration, '%b %d %H:%M:%S %Y %Z')
@@ -389,20 +393,18 @@ def certificate_checker(url_list, request_type, search_string, username, passwor
                 san = ''
 
             for vs in get_all_vs_response['items']:
+
                 for profiles in vs['profilesReference']['items']:
                     if 'context' in profiles:
                         if profiles['context'] == 'clientside':
                             vs_cert_name = profiles['name']
                             if cert_name == vs_cert_name:
                                 # Cert used by VIP
-                                vs_name = vs['name']
                                 selfLink_ver = vs['selfLink'].split('/localhost/')[1]
                                 selfLink = selfLink_ver.split('?ver=')[0]
-                                vs_selfLink = base_url + '/' + selfLink
 
-                                vs_port = re.split(':|/', vs['destination'])[-1]
-                                vs_destination = re.split(':|/', vs['destination'])[-2]
-                                vs_list.append(vs_selfLink)
+
+                                vs_list.append(selfLink)
 
             if request_type == 'Virtual Server Name':
                 # Convert VS List into upper case
@@ -410,11 +412,39 @@ def certificate_checker(url_list, request_type, search_string, username, passwor
                 search_string = search_string.upper()
                 if not [s for s in vs_selfLink_upper if search_string in s.upper()]:
                     continue
+            vs_list_detail = []
+
+            for vs_details in vs_list:
+                selfLink = vs_details
+                vs_detail_results = get_vs_stats(base_url, selfLink, auth_token)
+                vs_state_dict = vs_detail_results['entries'].values()
+                for vs_values in vs_state_dict:
+                    vs_name = vs_values['nestedStats']['entries']['tmName']['description'].split('/')[-1]
+                    vs_port = re.split(':|/', vs_values['nestedStats']['entries']['destination']['description'])[-1]
+                    vs_destination = re.split(':|/', vs_values['nestedStats']['entries']['destination']['description'])[-2]
+                    vs_state = vs_values['nestedStats']['entries']['status.availabilityState']['description']
+                    vs_admin_state = vs_values['nestedStats']['entries']['status.enabledState']['description']
+                    vs_state_reason = vs_values['nestedStats']['entries']['status.statusReason']['description']
+                    vs_bits_in = vs_values['nestedStats']['entries']['clientside.bitsIn']['value']
+                    vs_bits_out = vs_values['nestedStats']['entries']['clientside.bitsOut']['value']
+                    vs_packets_in = vs_values['nestedStats']['entries']['clientside.pktsIn']['value']
+                    vs_packets_out = vs_values['nestedStats']['entries']['clientside.pktsOut']['value']
+                    vs_conn_current = vs_values['nestedStats']['entries']['clientside.curConns']['value']
+                    vs_conn_max = vs_values['nestedStats']['entries']['clientside.maxConns']['value']
+                    vs_conn_total = vs_values['nestedStats']['entries']['clientside.totConns']['value']
+                    vs_state_reason = vs_state_reason.replace("'", "")
+                    vs_list_detail.append({'vs_name': vs_name, 'vs_state': vs_state, 'vs_port': vs_port,
+                                           'vs_destination': vs_destination, 'vs_admin_state': vs_admin_state,
+                                           'vs_state_reason': vs_state_reason, 'vs_bits_in': vs_bits_in,
+                                           'vs_bits_out': vs_bits_out, 'vs_packets_in': vs_packets_in,
+                                           'vs_packets_out': vs_packets_out, 'vs_conn_current': vs_conn_current,
+                                           'vs_conn_max': vs_conn_max, 'vs_conn_total': vs_conn_total})
 
             results.append({'location': location, 'cert_name': cert_name, 'cert_expiration': cert_expiration,
                             'cert_status': cert_status, 'cert_status_message': cert_status_message,
+                            'cert_fullPath': cert_fullPath, 'cert_issuer': cert_issuer, 'cert_key_size': cert_key_size,
                             'remaining_days': datetime_result, 'common_name': common_name,
-                            'san': san, 'vs_list': vs_list })
+                            'san': san, 'vs_list': vs_list_detail})
 
     # Sort the list by remaining days before returning it.
     results = sorted(results, key=itemgetter('remaining_days'), reverse=False)
