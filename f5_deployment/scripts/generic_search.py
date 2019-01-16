@@ -1,5 +1,6 @@
 import json, requests, re, ipaddress
 from datetime import datetime
+from operator import itemgetter
 from netaddr import IPNetwork, IPAddress
 
 # Ignore SSL Errors
@@ -326,6 +327,7 @@ def virtual_server_dashboard(url_list, request_type, search_string, username, pa
                                 'vs_pool': {'pool_name': 'none', 'pool_state': 'unknown',
                                             'pool_state_reason': 'unknown'}})
 
+    results = sorted(results, key=itemgetter('vs_name'), reverse=True)
     return results
 
 
@@ -411,6 +413,7 @@ def certificate_checker(url_list, request_type, search_string, username, passwor
                             'remaining_days': datetime_result, 'common_name': common_name,
                             'san': san, 'vs_list': vs_list })
 
+    results = sorted(results, key=itemgetter('cert_expiration'), reverse=True)
     return results
 
 
