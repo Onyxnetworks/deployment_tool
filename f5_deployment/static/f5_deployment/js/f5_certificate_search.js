@@ -5,6 +5,8 @@ var rslt = $('#f5_results');
 
 frm_all.submit(function () {
     document.getElementById("tablediv").style.visibility = "hidden";
+    document.getElementById("cert_data").style.visibility = "hidden";
+
     $.ajax({
         type: frm_all.attr('method'),
         url: frm_all.attr('action'),
@@ -15,6 +17,7 @@ frm_all.submit(function () {
             }},
         error: function (data) {
             document.getElementById("tablediv").style.visibility = "hidden";
+            document.getElementById("cert_data").style.visibility = "hidden";
             console.log("Something went wrong!");
         }
     });
@@ -25,6 +28,7 @@ frm_all.submit(function () {
 
 frm.submit(function () {
     document.getElementById("tablediv").style.visibility = "hidden";
+    document.getElementById("cert_data").style.visibility = "hidden";
     $.ajax({
         type: frm.attr('method'),
         url: frm.attr('action'),
@@ -35,6 +39,7 @@ frm.submit(function () {
             }},
         error: function (data) {
             document.getElementById("tablediv").style.visibility = "hidden";
+            document.getElementById("cert_data").style.visibility = "hidden";
             console.log("Something went wrong!");
         }
     });
@@ -89,7 +94,6 @@ function build_result_table(data) {
 function build_detailed_table(results, result_index) {
     console.log('Building Detailed Data Table');
     document.getElementById("cert_data").scrollIntoView();
-    document.getElementById("cert_body").innerHTML = "";
     document.getElementById("vs_body").innerHTML = "";
 
     cert_name = results[result_index].cert_name;
@@ -101,7 +105,6 @@ function build_detailed_table(results, result_index) {
     cert_key_size = results[result_index].cert_key_size;
     cert_sans = results[result_index].san;
 
-    console.log(cert_common_name, cert_name, cert_expiration, cert_remaining_days, cert_path, cert_issuer, cert_key_size, cert_sans)
     document.getElementById("cert_name").innerHTML = cert_name;
     document.getElementById("cert_common_name").innerHTML = cert_common_name;
     document.getElementById("cert_expiration").innerHTML = cert_expiration;

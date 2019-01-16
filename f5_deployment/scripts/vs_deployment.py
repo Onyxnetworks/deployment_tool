@@ -340,7 +340,6 @@ def compare_ltm_nodes(vs_dict, bigip_url_base, bigip, output_log):
         nodes_on_ltm_ip_address = [{u'kind': 'tm:ltm:node:nodestate'}]
         nodes_on_ltm_name = [{u'kind': 'tm:ltm:node:nodestate'}]
 
-    print(nodes_on_ltm_ip_address)
     nodes_on_ltm_dict = dict(enumerate(nodes_on_ltm_ip_address))
     node_list_a = iter(node_list)
     node_list_b = list(node_list)
@@ -545,7 +544,7 @@ def create_pool_monitor(vs_dict, bigip_url_base, bigip, output_log):
         pool_mon_info['defaultsFrom'] = traffic_type
         pool_mon_info['destination'] = '*:' + str(vs_dict['vs']['V2'])
 
-        https_mon_sent = str(bigip.post('%s/ltm/monitor/%s' % (bigip_url_base, traffic_type),
+        https_mon_sent = str(bigip.post('%s/ltm/%s/monitor/%s' % (bigip_url_base, traffic_type),
                                         data=json.dumps(pool_mon_info)))
 
         if https_mon_sent.__contains__('200'):
