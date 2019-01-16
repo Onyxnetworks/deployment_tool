@@ -338,7 +338,7 @@ def certificate_checker(url_list, request_type, search_string, username, passwor
 
     for base_url in url_list:
         # Authenticate against bigip
-        big_ip_version = 1213
+        big_ip_version = 1310
         location = base_url.split('.')[0][8:]
         bigip_login_response = bigip_login(base_url, username, password)
         auth_token = bigip_login_response['token']['token']
@@ -357,6 +357,7 @@ def certificate_checker(url_list, request_type, search_string, username, passwor
         get_all_vs_response = get_all_vs(base_url, auth_token, search_options)
 
         for cert in get_cert_response['items']:
+            vs_list_detail = []
             vs_list = []
             cert_name = re.split('.crt|/', cert['fullPath'])[-2]
             cert_fullPath = cert['fullPath']
@@ -439,10 +440,12 @@ def certificate_checker(url_list, request_type, search_string, username, passwor
             if request_type == 'Virtual Server Name':
                 # Convert VS List into upper case
                 vs_selfLink_upper = [element.upper() for element in vs_list]
+                print(vs_selfLink_upper)
                 search_string = search_string.upper()
                 if not [s for s in vs_selfLink_upper if search_string in s.upper()]:
+                    print('continue')
                     continue
-            vs_list_detail = []
+
 
             for vs_details in vs_list:
                 selfLink = vs_details

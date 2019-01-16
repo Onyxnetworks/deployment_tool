@@ -47,7 +47,7 @@ def GET_ENDPOINTS(url_list, APIC_USERNAME, APIC_PASSWORD):
             ENDPOINT_LIST.append({'Location': LOCATION, 'Tenant': i['fvCEp']['attributes']['dn'].split('/')[1][3:],
                                            'AppProfile': i['fvCEp']['attributes']['dn'].split('/')[2][3:],
                                            'EPG': i['fvCEp']['attributes']['dn'].split('/')[3][4:],
-                                           'Subnet': i['fvCEp']['attributes']['ip'], 'Scope': '', 'Locality': 'Internal'})
+                                           'Subnet': i['fvCEp']['attributes']['ip'] + '/32', 'Scope': '', 'Locality': 'Internal'})
 
     return ENDPOINT_LIST
 
