@@ -1,5 +1,7 @@
 # Base Functions
 import openpyxl
+from operator import itemgetter
+
 
 # Custom Functions
 from aci_deployment.scripts.endpoint_search import *
@@ -29,6 +31,7 @@ def ENDPOINT_SEARCH(base_urls, username, password, SUBNET):
                 {'Subnet': i['Subnet'], 'Locality': i['Locality'], 'Location': i['Location'], 'EPG': i['EPG'],
                  'Scope': i['Scope'], 'AppProfile': i['AppProfile'], 'Tenant': i['Tenant']})
 
+    RESULTS = sorted(RESULTS, key=itemgetter('Subnet'), reverse=True)
     return RESULTS
 
 
