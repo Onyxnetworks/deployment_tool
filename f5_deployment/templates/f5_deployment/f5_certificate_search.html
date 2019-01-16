@@ -1,0 +1,82 @@
+{% extends "index/header.html" %}
+{% load static %}
+{% block head %}
+
+<!-- DataTables CSS -->
+    <link href="{% static 'index/vendor/datatables-plugins/dataTables.bootstrap.css' %}" rel="stylesheet">
+
+    <!-- DataTables Responsive CSS -->
+    <link href="{% static 'index/vendor/datatables-responsive/dataTables.responsive.css' %}" rel="stylesheet">
+{% endblock %}
+{% block content %}
+
+    <div id="page-wrapper">
+        <div class="row">
+            <div class="col-lg-12"><div class="col-md-8">
+                <h1 class="page-header">F5 Certificate Search</h1>
+                <form role="form" class="form-inline" id="f5_search" method="post" enctype="multipart/form-data">{% csrf_token %}
+                    <div class="form-group">
+                        <select class="form-control" name="request_type" id="request_type" required="required" >
+                            <option value="" hidden selected disabled>Select Type</option>
+                            <option>Virtual Server Name</option>
+                            <option>Certificate Name</option>
+                        </select>
+                    </div>
+                    <div class="form-group input-group">
+                        <input type="text" placeholder="" required="required" name="f5_search" class="form-control">
+                        <span class="input-group-btn">
+                            <button class="btn btn-default" type="submit"><i class="fa fa-search"></i></button>
+                        </span>
+                    </div>
+                </form>
+            </div>
+                <!-- /.col-lg-12 -->
+            </div>
+        </div>
+        <p id="f5_results"></p>
+        <div class="row">
+            <div class="col-lg-12">
+                <div id="loader" style="text-align:center;"></div>
+                <div class="panel-group" id="accordion">
+                    <div class="panel panel-default" style="visibility: hidden;" id="tablediv">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" data-parent="#accordion" href="#collapse1" style="text-align: center">SearchResults</a>
+                            </h4>
+                        </div>
+                        <!-- /.panel-heading -->
+                        <div id="collapse1" class="panel-collapse collapse in">
+                            <div class="table" style="padding: 10px">
+                                <table width="100%" class="table table-condensed table-striped table-hover" id="result_table_header">
+                                    <thead>
+                                    <tr>
+                                        <th class="text-center">Location</th>
+                                        <th class="text-center">Certificate Name</th>
+                                        <th class="text-center">Expiration</th>
+                                        <th class="text-center">Common Name</th>
+                                        <th class="text-center">Information</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody id="result_table">
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- /.table-responsive -->
+                        </div>
+                        <!-- /.panel-body -->
+                    </div>
+                    <!-- /.panel -->
+                </div>
+            </div>
+                <!-- /.col-lg-12 -->
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+    <script src="{% static 'index/vendor/datatables/js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'index/vendor/datatables-plugins/dataTables.bootstrap.min.js' %}"></script>
+    <script src="{% static 'index/vendor/datatables-responsive/dataTables.responsive.js' %}"></script>
+    <script src="{% static 'f5_deployment/js/f5_certificate_search.js' %}"></script>
+{% endblock %}

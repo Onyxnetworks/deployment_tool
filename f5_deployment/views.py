@@ -161,3 +161,40 @@ def f5_disable_enable_push(request):
 
         # Return task id back to client for ajax use.
         return HttpResponse(json.dumps({'task_id': task.id}), content_type='application/json')
+
+
+def certificate_search(request):
+    user = request.session.get('user')
+    role = request.session.get('role')
+    # Get data to use for search task.
+    if request.method == 'POST' and 'f5_search' in request.POST:
+        search_string = request.POST['f5_search']
+        request_type = request.POST['request_type']
+
+        environment = request.session.get('environment')
+        if environment == 'Production':
+            username = request.session.get('prod_username')
+            password = request.session.get('prod_password')
+
+        if environment == 'Pre-Production':
+            # Need to put in an error as PPE search wont work!
+            username = request.session.get('ppe_username')
+            password = request.session.get('ppe_password')
+
+        if environment == 'Lab':
+            username = request.session.get('lab_username')
+            password = request.session.get('lab_password')
+
+        # Get base url to use
+        base_urls = get_base_url(environment)
+
+        task = certificate_checker_task.delay(base_urls, role, request_type, search_string, username, password)
+
+        # Return task id back to client for ajax use.
+        return HttpResponse(json.dumps({'task_id': task.id}), content_type='application/json')
+
+
+    environment = request.session.get('environment')
+    content = {'environment': environment, 'url_list': url_list, 'role': role, 'user': user}
+    return render(request, 'f5_deployment/f5_certificate_search.html', content)
+

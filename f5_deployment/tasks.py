@@ -306,7 +306,24 @@ def f5_disable_enable(base_urls, request_type, action, f5_selected_items, userna
             enable_response = vs_disable_enable_force(selflink, auth_token, vs_enabled_json)
 
 
+@shared_task
+def certificate_checker_task(base_urls, role, request_type, search_string, username, password):
+    # Build URL List to search.
+    url_list = []
+    base_urls = list(base_urls['F5'].values())
+    for urls in base_urls:
+        for url in urls.values():
+            url_list.append(url)
 
+
+    results = []
+    certificate_checker_result = certificate_checker(url_list, request_type, search_string, username, password)
+
+    if isinstance(certificate_checker_result, list):
+        results = {'search': {'search_string': search_string, 'role': role, 'request_type': request_type},
+                   'data': certificate_checker_result}
+
+        return results
 
 
 

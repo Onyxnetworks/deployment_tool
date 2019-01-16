@@ -1,10 +1,40 @@
 import json, requests, re, ipaddress
+from datetime import datetime
 from netaddr import IPNetwork, IPAddress
 
 # Ignore SSL Errors
 requests.packages.urllib3.disable_warnings()
 
 from f5_deployment.scripts.baseline import bigip_login
+
+def f5_generic_search(base_url, auth_token, search_options):
+    headers = {'content-type': 'application/json', 'X-F5-Auth-Token': auth_token}
+    get_url = base_url + '{0}'.format(search_options)
+
+    try:
+        get_response = requests.get(get_url, headers=headers, timeout=5, verify=False)
+        payload_response = json.loads(get_response.text)
+
+        if get_response.status_code == 200:
+            return payload_response
+
+    except requests.exceptions.HTTPError as errh:
+        error_code = "Http Error:" + str(errh)
+        return error_code
+
+
+    except requests.exceptions.ConnectionError as errc:
+        error_code = "Error Connecting:" + str(errc)
+        return error_code
+
+    except requests.exceptions.Timeout as errt:
+        error_code = "Timeout Error:" + str(errt)
+        return error_code
+
+    except requests.exceptions.RequestException as err:
+        error_code = "Error:" + str(err)
+        return error_code
+
 
 def get_vs_stats(base_url, selfLink, auth_token):
     headers = {'content-type': 'application/json', 'X-F5-Auth-Token': auth_token}
@@ -105,7 +135,7 @@ def get_all_vs(base_url, auth_token, search_options):
         # Build auth token header
         headers = {'content-type': 'application/json', 'X-F5-Auth-Token': auth_token}
 
-        get_url = base_url + '/mgmt/tm/ltm/virtual/?expandSubcollections=true?$select={}'.format(search_options)
+        get_url = base_url + '/mgmt/tm/ltm/virtual/?expandSubcollections=true&$select={}'.format(search_options)
         try:
             get_response = requests.get(get_url, headers=headers, timeout=5, verify=False)
             payload_response = json.loads(get_response.text)
@@ -297,4 +327,90 @@ def virtual_server_dashboard(url_list, request_type, search_string, username, pa
                                             'pool_state_reason': 'unknown'}})
 
     return results
+
+
+def certificate_checker(url_list, request_type, search_string, username, password):
+    results = []
+    # Get the current Date & Time
+    current_datetime = datetime.now().date()
+
+    for base_url in url_list:
+        # Authenticate against bigip
+        location = base_url.split('.')[0][8:]
+        bigip_login_response = bigip_login(base_url, username, password)
+        auth_token = bigip_login_response['token']['token']
+        # Get all Virtual Certificates
+        search_options = '/mgmt/tm/sys/crypto/cert?expandSubcollections=true'
+        get_cert_response = f5_generic_search(base_url, auth_token, search_options)
+
+        # Get all Virtual Servers
+        search_options = 'name,destination,profilesReference'
+        get_all_vs_response = get_all_vs(base_url, auth_token, search_options)
+
+        for cert in get_cert_response['items']:
+            vs_list = []
+            cert_name = re.split('.crt|/', cert['fullPath'])[-2]
+
+            if request_type == 'Certificate Name':
+                if search_string.upper() not in cert_name.upper():
+                    continue
+
+            cert_expiration = cert['apiRawValues']['expiration']
+
+            # Convert Expiration date into datetime format
+            datetime_object = datetime.strptime(cert_expiration, '%b %d %H:%M:%S %Y %Z')
+
+            # Get difference in dates bny dats.
+            datetime_result = datetime_object.date() - current_datetime
+            datetime_result = datetime_result.days
+
+            if datetime_result <= 90:
+                cert_status = 'warning'
+                cert_status_message = 'Less than 90 Days until expiry.'
+
+            elif datetime_object.date() < current_datetime:
+                cert_status = 'danger'
+                cert_status_message = 'Certificate has expired.'
+
+            else:
+                cert_status = 'success'
+                cert_status_message = 'Certificate has over 90 days until expiry.'
+
+            try:
+                # Check for common name
+                common_name = cert['commonName']
+            except:
+                common_name = ''
+            try:
+                san = cert['subjectAlternativeName'].split()
+            except:
+                san = ''
+
+            for vs in get_all_vs_response['items']:
+                for profiles in vs['profilesReference']['items']:
+                    if 'context' in profiles:
+                        if profiles['context'] == 'clientside':
+                            vs_cert_name = profiles['name']
+                            if cert_name == vs_cert_name:
+                                # Cert used by VIP
+                                vs_name = vs['name']
+
+                                if request_type == 'Virtual Server  Name':
+                                    if search_string.upper() not in vs_name.upper():
+                                        continue
+
+                                vs_port = re.split(':|/', vs['destination'])[-1]
+                                vs_destination = re.split(':|/', vs['destination'])[-2]
+                                vs_list.append({'vs_name': vs_name, 'vs_port': vs_port,
+                                                'vs_destination': vs_destination})
+
+            results.append({'location': location, 'cert_name': cert_name, 'cert_expiration': cert_expiration,
+                            'cert_status': cert_status, 'cert_status_message': cert_status_message,
+                            'common_name': common_name, 'san': san, 'vs_list': vs_list })
+
+
+    return results
+
+
+
 
