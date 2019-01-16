@@ -31,6 +31,7 @@ def ENDPOINT_SEARCH(base_urls, username, password, SUBNET):
                 {'Subnet': i['Subnet'], 'Locality': i['Locality'], 'Location': i['Location'], 'EPG': i['EPG'],
                  'Scope': i['Scope'], 'AppProfile': i['AppProfile'], 'Tenant': i['Tenant']})
 
+    # Sort the list by subnet before returning it.
     RESULTS = sorted(RESULTS, key=itemgetter('Subnet'), reverse=True)
     return RESULTS
 

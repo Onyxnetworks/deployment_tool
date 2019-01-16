@@ -326,7 +326,7 @@ def virtual_server_dashboard(url_list, request_type, search_string, username, pa
                                                                                  'vs_conn_total': vs_conn_total},
                                 'vs_pool': {'pool_name': 'none', 'pool_state': 'unknown',
                                             'pool_state_reason': 'unknown'}})
-
+    # Sort the list by VS Name before returning it.
     results = sorted(results, key=itemgetter('vs_name'), reverse=True)
     return results
 
@@ -346,7 +346,7 @@ def certificate_checker(url_list, request_type, search_string, username, passwor
         get_cert_response = f5_generic_search(base_url, auth_token, search_options)
 
         # Get all Virtual Servers
-        search_options = 'name,destination,profilesReference'
+        search_options = 'name,destination,profilesReference,selfLink'
         get_all_vs_response = get_all_vs(base_url, auth_token, search_options)
 
         for cert in get_cert_response['items']:
@@ -396,16 +396,19 @@ def certificate_checker(url_list, request_type, search_string, username, passwor
                             if cert_name == vs_cert_name:
                                 # Cert used by VIP
                                 vs_name = vs['name']
+                                selfLink_ver = vs['selfLink'].split('/localhost/')[1]
+                                selfLink = selfLink_ver.split('?ver=')[0]
+                                vs_selfLink = base_url + '/' + selfLink
 
                                 vs_port = re.split(':|/', vs['destination'])[-1]
                                 vs_destination = re.split(':|/', vs['destination'])[-2]
-                                vs_list.append(vs_name)
+                                vs_list.append(vs_selfLink)
 
             if request_type == 'Virtual Server Name':
                 # Convert VS List into upper case
-                vs_name_upper = [element.upper() for element in vs_list]
+                vs_selfLink_upper = [element.upper() for element in vs_list]
                 search_string = search_string.upper()
-                if not [s for s in vs_name_upper if search_string in s.upper()]:
+                if not [s for s in vs_selfLink_upper if search_string in s.upper()]:
                     continue
 
             results.append({'location': location, 'cert_name': cert_name, 'cert_expiration': cert_expiration,
@@ -413,6 +416,7 @@ def certificate_checker(url_list, request_type, search_string, username, passwor
                             'remaining_days': datetime_result, 'common_name': common_name,
                             'san': san, 'vs_list': vs_list })
 
+    # Sort the list by remaining days before returning it.
     results = sorted(results, key=itemgetter('remaining_days'), reverse=False)
     return results
 
