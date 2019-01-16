@@ -44,21 +44,13 @@ def check_sync(bigip_url_base, bigip, output_log):
     sync_on_ltm = bigip.get('%s/cm/sync-status' % bigip_url_base)
     sync_on_ltm = json.loads(sync_on_ltm.content)
 
-    sync_on_ltm_0 = sync_on_ltm['entries'][u'https://localhost/mgmt/tm/cm/sync-status/0']['nestedstats']['entries'][
-        'https://localhost/mgmt/tm/cm/syncstatus/0/details']['nestedstats']['entries'][
-        'https://localhost/mgmt/tm/cm/syncstatus/0/details/0']['nestedstats']['entries']['details']['description']
+    sync_on_ltm_0 = sync_on_ltm['entries'][u'https://localhost/mgmt/tm/cm/sync-status/0']['nestedStats']['entries']['https://localhost/mgmt/tm/cm/syncStatus/0/details']['nestedStats']['entries']['https://localhost/mgmt/tm/cm/syncStatus/0/details/0']['nestedStats']['entries']['details']['description']
 
-    sync_on_ltm_1 = sync_on_ltm['entries'][u'https://localhost/mgmt/tm/cm/sync-status/0']['nestedstats']['entries'][
-        'https://localhost/mgmt/tm/cm/syncstatus/0/details']['nestedstats']['entries'][
-        'https://localhost/mgmt/tm/cm/syncstatus/0/details/1']['nestedstats']['entries']['details']['description']
+    sync_on_ltm_1 = sync_on_ltm['entries'][u'https://localhost/mgmt/tm/cm/sync-status/0']['nestedStats']['entries']['https://localhost/mgmt/tm/cm/syncStatus/0/details']['nestedStats']['entries']['https://localhost/mgmt/tm/cm/syncStatus/0/details/1']['nestedStats']['entries']['details']['description']
 
-    sync_on_ltm_2 = sync_on_ltm['entries'][u'https://localhost/mgmt/tm/cm/sync-status/0']['nestedstats']['entries'][
-        'https://localhost/mgmt/tm/cm/syncstatus/0/details']['nestedstats']['entries'][
-        'https://localhost/mgmt/tm/cm/syncstatus/0/details/2']['nestedstats']['entries']['details']['description']
+    sync_on_ltm_2 = sync_on_ltm['entries'][u'https://localhost/mgmt/tm/cm/sync-status/0']['nestedStats']['entries']['https://localhost/mgmt/tm/cm/syncStatus/0/details']['nestedStats']['entries']['https://localhost/mgmt/tm/cm/syncStatus/0/details/2']['nestedStats']['entries']['details']['description']
 
-    sync_on_ltm_3 = sync_on_ltm['entries'][u'https://localhost/mgmt/tm/cm/sync-status/0']['nestedstats']['entries'][
-        'https://localhost/mgmt/tm/cm/syncstatus/0/details']['nestedstats']['entries'][
-        'https://localhost/mgmt/tm/cm/syncstatus/0/details/3']['nestedstats']['entries']['details']['description']
+    sync_on_ltm_3 = sync_on_ltm['entries'][u'https://localhost/mgmt/tm/cm/sync-status/0']['nestedStats']['entries']['https://localhost/mgmt/tm/cm/syncStatus/0/details']['nestedStats']['entries']['https://localhost/mgmt/tm/cm/syncStatus/0/details/3']['nestedStats']['entries']['details']['description']
 
     output_log.append({'Notifications': sync_on_ltm_0})
     output_log.append({'Notifications': sync_on_ltm_1})
@@ -170,7 +162,7 @@ def check_cert(vs_dict, bigip_url_base, bigip, output_log):
     counter = 0
     cert = 0
     chain = 0
-    key = 0
+    key_check = 0
 
     ssl_cert_chain_on_ltm = bigip.get('%s/sys/file/ssl-cert' % bigip_url_base)
     ssl_cert_chain_on_ltm = json.loads(ssl_cert_chain_on_ltm.content)
@@ -197,7 +189,7 @@ def check_cert(vs_dict, bigip_url_base, bigip, output_log):
     for ssl_key_dict in ssl_cert_key_on_ltm:
         for key, value in ssl_key_dict.items():
             if vs_hostname_key == value:
-                key = 1
+                key_check = 1
 
     if cert == 1:
         output_log.append({'NotificationsSuccess': 'SSL Cert : {} present.'.format(vs_hostname_crt)})
@@ -214,8 +206,7 @@ def check_cert(vs_dict, bigip_url_base, bigip, output_log):
         error = True
         output_log.append({'Errors': 'SSL Chain NOT present on LTM.'})      
         counter = counter + 1
-
-    if key == 1:
+    if key_check == 1:
         output_log.append({'NotificationsSuccess': 'SSL Cert Key : {} present.'.format(vs_hostname_key)})
 
     else:
@@ -520,7 +511,6 @@ def create_vs_ssl_profiles(vs_dict, bigip_url_base, bigip, output_log):
 def create_pool_monitor(vs_dict, bigip_url_base, bigip, output_log):
     error = False
     pool_mon_info = {}
-    print(vs_dict['vs']['R2'])
     try:
         traffic_type = vs_dict['vs']['R2']
         traffic_type = (traffic_type.lower())
@@ -544,8 +534,7 @@ def create_pool_monitor(vs_dict, bigip_url_base, bigip, output_log):
         pool_mon_info['defaultsFrom'] = traffic_type
         pool_mon_info['destination'] = '*:' + str(vs_dict['vs']['V2'])
 
-        https_mon_sent = str(bigip.post('%s/ltm/%s/monitor/%s' % (bigip_url_base, traffic_type),
-                                        data=json.dumps(pool_mon_info)))
+        https_mon_sent = str(bigip.post('%s/ltm/monitor/%s' % (bigip_url_base, traffic_type), data=json.dumps(pool_mon_info)))
 
         if https_mon_sent.__contains__('200'):
             output_log.append({'NotificationsInfo': '{} - Monitor Created'.format(vs_dict['vs']['Q2'])})

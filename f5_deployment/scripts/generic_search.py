@@ -440,10 +440,8 @@ def certificate_checker(url_list, request_type, search_string, username, passwor
             if request_type == 'Virtual Server Name':
                 # Convert VS List into upper case
                 vs_selfLink_upper = [element.upper() for element in vs_list]
-                print(vs_selfLink_upper)
                 search_string = search_string.upper()
                 if not [s for s in vs_selfLink_upper if search_string in s.upper()]:
-                    print('continue')
                     continue
 
 
