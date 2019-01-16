@@ -1,5 +1,27 @@
 var frm = $('#f5_search');
+var frm_all = $('#f5_search_all');
 var rslt = $('#f5_results');
+
+
+frm_all.submit(function () {
+    document.getElementById("tablediv").style.visibility = "hidden";
+    $.ajax({
+        type: frm.attr('method'),
+        url: frm.attr('action'),
+        data: frm.serialize(),
+        success: function (data) {
+            if (data.task_id != null) {
+                get_task_info(data.task_id);
+            }},
+        error: function (data) {
+            document.getElementById("tablediv").style.visibility = "hidden";
+            console.log("Something went wrong!");
+        }
+    });
+    return false;
+
+
+});
 
 frm.submit(function () {
     document.getElementById("tablediv").style.visibility = "hidden";
