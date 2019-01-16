@@ -101,7 +101,7 @@ function build_detailed_table(results, result_index) {
     cert_key_size = results[result_index].cert_key_size;
     cert_sans = results[result_index].san;
 
-
+    console.log(cert_common_name, cert_name, cert_expiration, cert_remaining_days, cert_path, cert_issuer, cert_key_size, cert_sans)
     document.getElementById("cert_name").innerHTML = cert_name;
     document.getElementById("cert_common_name").innerHTML = cert_common_name;
     document.getElementById("cert_expiration").innerHTML = cert_expiration;
