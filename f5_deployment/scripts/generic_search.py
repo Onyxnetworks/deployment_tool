@@ -359,9 +359,16 @@ def certificate_checker(url_list, request_type, search_string, username, passwor
                 if search_string.upper() not in cert_name.upper():
                     continue
 
+            # How to Handle Non completed requests
+            try:
+                cert_issuer = cert['apiRawValues']['issuer']
+
+            except:
+                cert_issuer = ''
+
             cert_expiration = cert['apiRawValues']['expiration']
-            cert_issuer = cert['apiRawValues']['issuer']
             cert_key_size = cert['apiRawValues']['certificateKeySize']
+
 
             # Convert Expiration date into datetime format
             datetime_object = datetime.strptime(cert_expiration, '%b %d %H:%M:%S %Y %Z')
