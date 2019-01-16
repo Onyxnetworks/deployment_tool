@@ -6,7 +6,7 @@ from .baseline import APIC_LOGIN
 requests.packages.urllib3.disable_warnings()
 HEADERS = {'content-type': 'application/json'}
 
-def GET_ENDPOINTS(url_list, APIC_USERNAME, APIC_PASSWORD):
+def GET_ENDPOINTS(url_list, filter_default, APIC_USERNAME, APIC_PASSWORD):
     ENDPOINT_LIST = []
     HEADERS = {'content-type': 'application/json'}
     # Loop through URL list and Get Endpoints
@@ -25,6 +25,11 @@ def GET_ENDPOINTS(url_list, APIC_USERNAME, APIC_PASSWORD):
             L3O = i['l3extSubnet']['attributes']['dn'].split('/')[2][4:]
             if Tenant.startswith(('PRD', 'PPE', 'DC1-SBS', 'DC2-SBS', 'DC1-STS', 'DC2-STS', 'DC1-REP', 'DC2-REP', 'DC1-OTV', 'DC2-OTV')) and L3O.endswith('L3O'):
                 continue
+            ext_subnet = i['l3extSubnet']['attributes']['ip']
+            if filter_default == True:
+                if ext_subnet == '0.0.0.0/0':
+                    continue
+            
             IMPORT = ''
             EXPORT = ''
             SECURITY = ''
@@ -47,7 +52,7 @@ def GET_ENDPOINTS(url_list, APIC_USERNAME, APIC_PASSWORD):
             ENDPOINT_LIST.append({'Location': LOCATION, 'Tenant': i['fvCEp']['attributes']['dn'].split('/')[1][3:],
                                            'AppProfile': i['fvCEp']['attributes']['dn'].split('/')[2][3:],
                                            'EPG': i['fvCEp']['attributes']['dn'].split('/')[3][4:],
-                                           'Subnet': i['fvCEp']['attributes']['ip'] + '/32', 'Scope': '', 'Locality': 'Internal'})
+                                           'Subnet': i['fvCEp']['attributes']['ip'], 'Scope': '', 'Locality': 'Internal'})
 
     return ENDPOINT_LIST
 
