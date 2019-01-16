@@ -395,7 +395,7 @@ def certificate_checker(url_list, request_type, search_string, username, passwor
                                 # Cert used by VIP
                                 vs_name = vs['name']
 
-                                if request_type == 'Virtual Server  Name':
+                                if request_type == 'Virtual Server Name':
                                     if search_string.upper() not in vs_name.upper():
                                         continue
 
