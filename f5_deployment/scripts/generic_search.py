@@ -395,20 +395,21 @@ def certificate_checker(url_list, request_type, search_string, username, passwor
                                 # Cert used by VIP
                                 vs_name = vs['name']
 
-                                if request_type == 'Virtual Server Name':
-                                    if search_string.upper() not in vs_name.upper():
-                                        continue
-
                                 vs_port = re.split(':|/', vs['destination'])[-1]
                                 vs_destination = re.split(':|/', vs['destination'])[-2]
-                                vs_list.append({'vs_name': vs_name, 'vs_port': vs_port,
-                                                'vs_destination': vs_destination})
+                                vs_list.append(vs_name)
+
+            if request_type == 'Virtual Server Name':
+                # Convert VS List into upper case
+                vs_name_upper = [element.upper() for element in vs_list]
+                search_string = search_string.upper()
+                if not [s for s in vs_name_upper if search_string in s.upper()]:
+                    continue
 
             results.append({'location': location, 'cert_name': cert_name, 'cert_expiration': cert_expiration,
                             'cert_status': cert_status, 'cert_status_message': cert_status_message,
                             'remaining_days': datetime_result, 'common_name': common_name,
                             'san': san, 'vs_list': vs_list })
-
 
     return results
 
