@@ -6,9 +6,9 @@ var rslt = $('#f5_results');
 frm_all.submit(function () {
     document.getElementById("tablediv").style.visibility = "hidden";
     $.ajax({
-        type: frm.attr('method'),
-        url: frm.attr('action'),
-        data: frm.serialize(),
+        type: frm_all.attr('method'),
+        url: frm_all.attr('action'),
+        data: frm_all.serialize(),
         success: function (data) {
             if (data.task_id != null) {
                 get_task_info(data.task_id);
