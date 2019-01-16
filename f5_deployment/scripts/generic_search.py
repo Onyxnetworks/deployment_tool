@@ -413,7 +413,7 @@ def certificate_checker(url_list, request_type, search_string, username, passwor
                             'remaining_days': datetime_result, 'common_name': common_name,
                             'san': san, 'vs_list': vs_list })
 
-    results = sorted(results, key=itemgetter('remaining_days'), reverse=True)
+    results = sorted(results, key=itemgetter('remaining_days'), reverse=False)
     return results
 
 
