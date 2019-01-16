@@ -117,8 +117,8 @@ function build_detailed_table(results, result_index) {
 
     cert_sans.forEach(function(items) {
 
-        sre = `items<br>`
-        document.getElementById("cert_sans").insertAdjacentHTML( 'beforeend', str );
+        san_str = items + `<br>`
+        document.getElementById("cert_sans").insertAdjacentHTML( 'beforeend', san_str );
         });
 
 
