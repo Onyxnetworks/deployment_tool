@@ -338,12 +338,19 @@ def certificate_checker(url_list, request_type, search_string, username, passwor
 
     for base_url in url_list:
         # Authenticate against bigip
+        big_ip_version = 1213
         location = base_url.split('.')[0][8:]
         bigip_login_response = bigip_login(base_url, username, password)
         auth_token = bigip_login_response['token']['token']
         # Get all Virtual Certificates
-        search_options = '/mgmt/tm/sys/crypto/cert?expandSubcollections=true'
-        get_cert_response = f5_generic_search(base_url, auth_token, search_options)
+
+        if big_ip_version > 1215:
+            search_options = '/mgmt/tm/sys/crypto/cert?expandSubcollections=true'
+            get_cert_response = f5_generic_search(base_url, auth_token, search_options)
+
+        if big_ip_version < 1215:
+            search_options = '/mgmt/tm/sys/file/ssl-cert'
+            get_cert_response = f5_generic_search(base_url, auth_token, search_options)
 
         # Get all Virtual Servers
         search_options = 'name,destination,profilesReference,selfLink'
@@ -361,13 +368,24 @@ def certificate_checker(url_list, request_type, search_string, username, passwor
 
             # How to Handle Non completed requests
             try:
-                cert_issuer = cert['apiRawValues']['issuer']
+                if big_ip_version > 1215:
+                    cert_issuer = cert['apiRawValues']['issuer']
+
+                if big_ip_version < 1215:
+                    cert_issuer = cert['issuer']
 
             except:
                 cert_issuer = ''
 
-            cert_expiration = cert['apiRawValues']['expiration']
-            cert_key_size = cert['apiRawValues']['certificateKeySize']
+
+            if big_ip_version > 1215:
+                cert_expiration = cert['apiRawValues']['expiration']
+                cert_key_size = cert['apiRawValues']['certificateKeySize']
+
+            if big_ip_version < 1215:
+                cert_expiration = cert['expirationString']
+                cert_key_size = cert['certificateKeySize']
+
 
 
             # Convert Expiration date into datetime format
@@ -391,7 +409,12 @@ def certificate_checker(url_list, request_type, search_string, username, passwor
 
             try:
                 # Check for common name
-                common_name = cert['commonName']
+                if big_ip_version > 1215:
+                    common_name = cert['commonName']
+
+                if big_ip_version < 1215:
+                    common_name = cert['subject']
+                    common_name = re.match(r'CN=.*?,', common_name)
             except:
                 common_name = ''
             try:
