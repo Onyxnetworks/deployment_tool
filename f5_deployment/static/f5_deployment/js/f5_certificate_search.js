@@ -136,10 +136,8 @@ function get_task_info(task_id) {
                 build_result_table(data)
 
                 $(".clickable-row").click(function() {
-                    console.log('click')
                     result_index = $(this).data('id');
-                    console.log(result_index)
-                    build_detailed_table(data.result, result_index)
+                    build_detailed_table(data.result.data, result_index)
                 });
 
             }
