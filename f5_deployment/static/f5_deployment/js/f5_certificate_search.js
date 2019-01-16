@@ -86,6 +86,38 @@ function build_result_table(data) {
 }
 
 
+function build_detailed_table(results, role, result_index) {
+    console.log('Building Detailed Data Table');
+    document.getElementById("cert_data").scrollIntoView();
+    document.getElementById("cert_body").innerHTML = "";
+    document.getElementById("vs_body").innerHTML = "";
+
+    cert_name = results[result_index].cert_name;
+    cert_common_name = results[result_index].common_name;
+    cert_expiration = results[result_index].cert_expiration;
+    cert_remaining_days = results[result_index].remaining_days;
+    cert_path = results[result_index].cert_fullPath;
+    cert_issuer = results[result_index].cert_issuer;
+    cert_key_size = results[result_index].cert_key_size;
+    cert_sans = results[result_index].san;
+
+
+    document.getElementById("cert_name").innerHTML = cert_name;
+    document.getElementById("cert_common_name").innerHTML = cert_common_name;
+    document.getElementById("cert_expiration").innerHTML = cert_expiration;
+    document.getElementById("cert_remaining_days").innerHTML = cert_remaining_days;
+    document.getElementById("cert_path").innerHTML = cert_path;
+    document.getElementById("cert_issuer").innerHTML = cert_issuer;
+    document.getElementById("cert_key_size").innerHTML = cert_key_size;
+    document.getElementById("cert_sans").innerHTML = cert_sans;
+
+
+    // Remove Hidden attribute from table
+    document.getElementById("vs_data").style.visibility = "visible";
+
+}
+
+
 function get_task_info(task_id) {
     $.ajax({
         type: 'get',
@@ -102,6 +134,12 @@ function get_task_info(task_id) {
             }
             else if (data.state == 'SUCCESS') {
                 build_result_table(data)
+
+                $(".clickable-row").click(function() {
+                    result_index = $(this).data('id');
+                    build_detailed_table(data.result, result_index)
+                });
+
             }
 
             if (data.state != 'SUCCESS') {

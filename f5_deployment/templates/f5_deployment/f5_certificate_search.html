@@ -20,8 +20,8 @@
                     <div class="form-group">
                         <select class="form-control" name="request_type" id="request_type" required="required" >
                             <option value="" hidden selected disabled>Select Type</option>
-                            <option>Virtual Server Name</option>
                             <option>Certificate Name</option>
+                            <option>Virtual Server Name</option>
                         </select>
                     </div>
                     <div class="form-group input-group">
@@ -125,8 +125,18 @@
                                                 <td class="text-center">Total</td>
                                             </tr>
                                             </thead>
-                                            <tbody id="vs_body">
-                                            <!-- vs body -->
+                                            <tbody id="cert_body">
+                                            <!-- cert body -->
+                                            <tr>
+                                                <td id="cert_name"></td>
+                                                <td id="cert_common_name"></td>
+                                                <td id="cert_expiration"></td>
+                                                <td id="cert_remaining_days"></td>
+                                                <td id="cert_path"></td>
+                                                <td id="cert_issuer"></td>
+                                                <td id="cert_key_size"></td>
+                                                <td id="cert_sans"></td>
+                                            </tr>
                                             </tbody>
                                         </table>
                                     </div>
@@ -152,23 +162,8 @@
                                                 <td class="text-center">Total</td>
                                             </tr>
                                             </thead>
-                                            <tbody>
-                                            <!-- Pool Body -->
-                                            <tr>
-                                                <td id="pool_detail_status" style="vertical-align: middle;"></td>
-                                                <td id="pool_detail_name"></td>
-                                                <td id="pool_detail_members"></td>
-                                                <td id="pool_detail_bits_in"></td>
-                                                <td id="pool_detail_bits_out"></td>
-                                                <td id="pool_detail_packets_in"></td>
-                                                <td id="pool_detail_packets_out"></td>
-                                                <td id="pool_detail_connections_current"></td>
-                                                <td id="pool_detail_connections_maximum"></td>
-                                                <td id="pool_detail_connections_total"></td>
-                                                <td id="pool_detail_requests_total"></td>
-                                                <td id="pool_detail_requests_depth"></td>
-                                                <td id="pool_detail_requests_max_age"></td>
-                                            </tr>
+                                            <tbody id="vs_body">
+                                            <!-- VS Body -->
                                             </tbody>
                                         </table>
                                     </div>
