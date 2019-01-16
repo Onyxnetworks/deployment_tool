@@ -86,7 +86,7 @@ function build_result_table(data) {
 }
 
 
-function build_detailed_table(results, role, result_index) {
+function build_detailed_table(results, result_index) {
     console.log('Building Detailed Data Table');
     document.getElementById("cert_data").scrollIntoView();
     document.getElementById("cert_body").innerHTML = "";
@@ -136,7 +136,9 @@ function get_task_info(task_id) {
                 build_result_table(data)
 
                 $(".clickable-row").click(function() {
+                    console.log('click')
                     result_index = $(this).data('id');
+                    console.log(result_index)
                     build_detailed_table(data.result, result_index)
                 });
 
