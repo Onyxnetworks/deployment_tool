@@ -96,6 +96,7 @@ function m(n,d){x=(''+n).length,p=Math.pow,d=p(10,d)
     return Math.round(n*d/p(10,x))/d+" kMGTPE"[x/3]}
 
 function build_detailed_table(results, result_index) {
+    document.getElementById("vs_body").innerHTML = '';
     console.log('Building Detailed Data Table');
     document.getElementById("cert_data").scrollIntoView();
 
