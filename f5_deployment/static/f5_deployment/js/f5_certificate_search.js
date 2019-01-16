@@ -113,7 +113,7 @@ function build_detailed_table(results, result_index) {
 
 
     // Remove Hidden attribute from table
-    document.getElementById("vs_data").style.visibility = "visible";
+    document.getElementById("cert_data").style.visibility = "visible";
 
 }
 
