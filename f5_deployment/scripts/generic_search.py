@@ -364,13 +364,13 @@ def certificate_checker(url_list, request_type, search_string, username, passwor
             datetime_result = datetime_object.date() - current_datetime
             datetime_result = datetime_result.days
 
-            if datetime_result <= 90:
-                cert_status = 'warning'
-                cert_status_message = 'Less than 90 Days until expiry.'
-
-            elif datetime_object.date() < current_datetime:
+            if datetime_object.date() < current_datetime:
                 cert_status = 'danger'
                 cert_status_message = 'Certificate has expired.'
+
+            elif datetime_result <= 90:
+                cert_status = 'warning'
+                cert_status_message = 'Less than 90 Days until expiry.'
 
             else:
                 cert_status = 'success'
