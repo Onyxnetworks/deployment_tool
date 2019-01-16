@@ -120,19 +120,19 @@ function build_detailed_table(results, result_index) {
 
     vs_list = results[result_index].vs_list;
     for (i = 0, len = vs_list.length, text = ""; i < len; i++) {
-        vs_name = node_results[i].vs_name;
-        vs_state = node_results[i].vs_state;
-        vs_port = node_results[i].vs_port;
-        vs_destination = node_results[i].vs_destination;
-        vs_admin_state = node_results[i].vs_admin_state;
-        vs_state_reason = node_results[i].vs_state_reason;
-        vs_bits_in = m(node_results[i].vs_bits_in, 2);
-        vs_bits_out = m(node_results[i].vs_bits_out, 2);
-        vs_packets_in = m(node_results[i].vs_packets_in, 2);
-        vs_packets_out = m(node_results[i].vs_packets_out, 2);
-        vs_conn_current = m(node_results[i].vs_conn_current, 2);
-        vs_conn_max = m(node_results[i].vs_conn_max, 2);
-        vs_conn_total = m(node_results[i].vs_conn_total, 2);
+        vs_name = vs_list[i].vs_name;
+        vs_state = vs_list[i].vs_state;
+        vs_port = vs_list[i].vs_port;
+        vs_destination = vs_list[i].vs_destination;
+        vs_admin_state = vs_list[i].vs_admin_state;
+        vs_state_reason = vs_list[i].vs_state_reason;
+        vs_bits_in = m(vs_list[i].vs_bits_in, 2);
+        vs_bits_out = m(vs_list[i].vs_bits_out, 2);
+        vs_packets_in = m(vs_list[i].vs_packets_in, 2);
+        vs_packets_out = m(vs_list[i].vs_packets_out, 2);
+        vs_conn_current = m(vs_list[i].vs_conn_current, 2);
+        vs_conn_max = m(vs_list[i].vs_conn_max, 2);
+        vs_conn_total = m(vs_list[i].vs_conn_total, 2);
 
         if (vs_admin_state.includes('disabled')){
             if (vs_state.includes('available')) {
