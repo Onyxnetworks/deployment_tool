@@ -106,7 +106,6 @@ function build_detailed_table(results, result_index) {
     cert_remaining_days = results[result_index].remaining_days;
     cert_path = results[result_index].cert_fullPath;
     cert_issuer = results[result_index].cert_issuer;
-    cert_key_size = results[result_index].cert_key_size;
     cert_sans = results[result_index].san;
 
     document.getElementById("cert_name").innerHTML = cert_name;
@@ -115,8 +114,13 @@ function build_detailed_table(results, result_index) {
     document.getElementById("cert_remaining_days").innerHTML = cert_remaining_days;
     document.getElementById("cert_path").innerHTML = cert_path;
     document.getElementById("cert_issuer").innerHTML = cert_issuer;
-    document.getElementById("cert_key_size").innerHTML = cert_key_size;
-    document.getElementById("cert_sans").innerHTML = cert_sans;
+
+    cert_sans.forEach(function(items) {
+
+        sre = `items<br>`
+        document.getElementById("cert_sans").insertAdjacentHTML( 'beforeend', str );
+        });
+
 
 
     vs_list = results[result_index].vs_list;
