@@ -94,7 +94,6 @@ function build_result_table(data) {
 function build_detailed_table(results, result_index) {
     console.log('Building Detailed Data Table');
     document.getElementById("cert_data").scrollIntoView();
-    document.getElementById("vs_body").innerHTML = "";
 
     cert_name = results[result_index].cert_name;
     cert_common_name = results[result_index].common_name;
