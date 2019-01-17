@@ -271,6 +271,13 @@ def compare_snat_on_ltm_excel(vs_dict, partition, bigip_url_base, bigip, output_
 
         key_address_value = str(dict_snat.get('members'))
         key_name_value = str(dict_snat.get('name'))
+        key_partition_value = str(dict_snat.get('partition'))
+
+        if key_partition_value != partition:
+            error = True
+            output_log.append({'Errors': 'SNAT Pool name on LTM and Excel in different partitions.'})
+            snat_pool_present = 1
+            return output_log, error, snat_pool_present
 
         if snat_ip_compare in key_address_value:
 
