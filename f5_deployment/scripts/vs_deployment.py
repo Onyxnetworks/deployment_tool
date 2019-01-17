@@ -65,7 +65,8 @@ def check_sync(bigip_url_base, bigip, output_log):
     
     else:
         return output_log, error
-        
+
+
 def check_httpprofile(vs_dict, bigip_url_base, bigip, output_log):
     error = False
     counter = 0
@@ -103,6 +104,7 @@ def check_httpprofile(vs_dict, bigip_url_base, bigip, output_log):
     if not error:
         output_log.append({'Notifications': 'HTTP(S) Profile {} will be created.'.format(http_profile)})
         return output_log, error
+
 
 def check_ssl_profile(vs_dict, bigip_url_base, bigip, output_log):
     error = False
@@ -215,7 +217,8 @@ def check_cert(vs_dict, bigip_url_base, bigip, output_log):
         counter = counter + 1
 
     return output_log, error 
-    
+
+
 def check_http_mon(vs_dict, bigip_url_base, bigip, output_log):
     
     error = False
@@ -471,7 +474,8 @@ def create_vs_ssl_profiles(vs_dict, bigip_url_base, bigip, output_log):
     ssl_client_profile['cert'] = vs_hostname_crt
     ssl_client_profile['key'] = vs_hostname_key
     ssl_client_profile['chain'] = vs_hostname_chain
-
+    print('SSL Client Profile:')
+    print(ssl_client_profile)
     ssl_client_profile_sent = str(bigip.post('%s/ltm/profile/client-ssl' % bigip_url_base,
                                              data=json.dumps(ssl_client_profile)))
 
@@ -495,7 +499,8 @@ def create_vs_ssl_profiles(vs_dict, bigip_url_base, bigip, output_log):
         ssl_server_profile['kind'] = 'tm:ltm:profile:server-ssl:server-sslstate'
         ssl_server_profile['name'] = vs_dict['vs']['M2']
         ssl_server_profile['defaultsFrom'] = 'serverssl'
-
+        print('SSL Server Profile:')
+        print(ssl_server_profile)
         ssl_server_profile_sent = str(bigip.post('%s/ltm/profile/server-ssl' % bigip_url_base,
                                                  data=json.dumps(ssl_server_profile)))
 
@@ -533,7 +538,8 @@ def create_pool_monitor(vs_dict, bigip_url_base, bigip, output_log):
         pool_mon_info['name'] = vs_dict['vs']['Q2']
         pool_mon_info['defaultsFrom'] = traffic_type
         pool_mon_info['destination'] = '*:' + str(vs_dict['vs']['V2'])
-
+        print('Monitor:')
+        print(pool_mon_info)
         https_mon_sent = str(bigip.post('%s/ltm/monitor/%s' % (bigip_url_base, traffic_type), data=json.dumps(pool_mon_info)))
 
         if https_mon_sent.__contains__('200'):
@@ -561,7 +567,8 @@ def create_vs_profiles_http(vs_dict, bigip_url_base, bigip, output_log):
             http_profile['name'] = vs_dict['vs']['K2']
             http_profile['insertXforwardedFor'] = "enabled"
             http_profile['defaultsFrom'] = http_default_profile
-
+            print('http Profile:')
+            print(http_profile)
             http_profile_sent = str(bigip.post('%s/ltm/profile/http' % bigip_url_base, data=json.dumps(http_profile)))
 
             if http_profile_sent.__contains__('200'):
@@ -606,7 +613,10 @@ def create_snat(vs_dict, bigip_url_base, bigip, output_log):
         snat_timeout['ipIdleTimeout'] = '300'
         snat_timeout['tcpIdleTimeout'] = '300'
         snat_timeout['udpIdleTimeout'] = '60'
-
+        print('Snat Info:')
+        print(snat_info)
+        print('Snat Timeout:')
+        print(snat_timeout)
         snat_timeout_sent = str(bigip.post('%s/ltm/snat-translation' % bigip_url_base, data=json.dumps(snat_timeout)))
 
         snat_info_sent = str(bigip.post('%s/ltm/snatpool' % bigip_url_base, data=json.dumps(snat_info)))
@@ -638,6 +648,8 @@ def create_nodes(node_list, bigip_url_base, bigip, output_log):
         node_info['kind'] = 'tm:ltm:pool:poolstate'
         node_info['name'] = node_name
         node_info['address'] = node_ip
+        print('Node Info')
+        print(node_info)
         node_sent = str(bigip.post('%s/ltm/node' % bigip_url_base, data=json.dumps(node_info)))
 
         if node_sent.__contains__('200'):
@@ -664,6 +676,8 @@ def create_pool(vs_dict, bigip_url_base, bigip, output_log):
     pool_info['monitor'] = vs_dict['vs']['Q2']
     pool_info['members'] = node_list_pool
     pool_info['minActiveMembers'] = str(vs_dict['vs']['AV2'])
+    print('Pool Info')
+    print(pool_info)
 
     pool_sent = str(bigip.post('%s/ltm/pool' % bigip_url_base, data=json.dumps(pool_info)))
 
@@ -731,6 +745,9 @@ def create_vs(vs_dict, bigip_url_base, bigip, output_log):
 
             if vs_dict['vs']['L2']:
                 vs_info['profiles'].append({'kind': 'ltm:virtual:profile', 'name': vs_dict['vs']['L2']})
+
+        print('VS Info:')
+        print(vs_info)
 
         vs_info_sent = str(bigip.post('%s/ltm/virtual' % bigip_url_base, data=json.dumps(vs_info)))
 
