@@ -352,17 +352,27 @@ def compare_ltm_nodes(vs_dict, partition, bigip_url_base, bigip, output_log):
             try:
                 node_name = nodes_on_ltm_dict[new_dict]['name']
                 node_ip = nodes_on_ltm_dict[new_dict]['address']
+                node_partition = nodes_on_ltm_dict[new_dict]['partition']
             except:
                 output_log.append({'Notifications': 'No Nodes configured on LTM'})
                 return output_log, error, node_list, 
 
 
             if node_name == excel_node_name and node_ip == excel_node_ip:
-                output_log.append({'NotificationsWarning': 'Node already present on LTM: {} - {}'
-                                  .format(node_name, node_ip)})
+                if node_partition == partition:
+                    output_log.append({'NotificationsWarning': 'Node already present on LTM: {} - {}'
+                                      .format(node_name, node_ip)})
+                    node_list_b.remove(excel_node_name)
+                    node_list_b.remove(excel_node_ip)
 
-                node_list_b.remove(excel_node_name)
-                node_list_b.remove(excel_node_ip)
+                else:
+                    output_log.append({'NotificationsWarning': 'Node {} in different partition to EXCEL.'
+                                      .format(node_name)})
+                    error = True
+
+
+    if error:
+        return output_log, error
 
     node_list = node_list_b
     node_list_a = iter(node_list)
@@ -420,9 +430,6 @@ def compare_pool(vs_dict, partition, bigip_url_base, bigip, output_log):
         pool_description = str((dict_pool.get('description')))
         pool_partition = str((dict_pool.get('partition')))
         pool_name_value_ltm = str((dict_pool.get('name')))
-        print(pool_name.split('_')[0])
-        print('______')
-        print(pool_name_value_ltm.split('_')[0])
 
         if pool_full_name == pool_path_value_ltm:
             output_log.append({'Errors': '{} - Pool name present on LTM.{}'.format(pool_name, pool_description)})
@@ -432,7 +439,7 @@ def compare_pool(vs_dict, partition, bigip_url_base, bigip, output_log):
         if pool_name.split('_')[0] == pool_name_value_ltm.split('_')[0]:
             if partition != pool_partition:
                 output_log.append({'Errors': 'LTM Pool and Excel Pool in different partitions. '
-                                             'LTM: {0} Excel: {1}'.format(pool_partition, partition)})
+                                             'LTM: {0} EXCEL: {1}'.format(pool_partition, partition)})
                 error = True
                 return output_log, error
 
