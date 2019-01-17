@@ -402,6 +402,7 @@ def compare_ltm_nodes(vs_dict, partition, bigip_url_base, bigip, output_log):
 def compare_pool(vs_dict, partition, bigip_url_base, bigip, output_log):
     error = False
     pool_name = str(vs_dict['vs']['P2'])
+    pool_name = '/{0}/{1}'.format(partition, pool_name)
 
     # Get pool from ltm
     pool_on_ltm = bigip.get('%s/ltm/pool' % bigip_url_base)
@@ -415,11 +416,16 @@ def compare_pool(vs_dict, partition, bigip_url_base, bigip, output_log):
         pool_on_ltm = [{u'kind': 'tm:ltm:pool:poolstate'}]
 
     for dict_pool in pool_on_ltm:
-        pool_name_value_ltm = str((dict_pool.get('name')))
+        pool_name_value_ltm = str((dict_pool.get('fullPath')))
         pool_description = str((dict_pool.get('description')))
+        pool_partition = str((dict_pool.get('partition')))
 
         if pool_name == pool_name_value_ltm:
-            output_log.append({'Errors': '{} - Pool name present on LTM.{}\n'.format(pool_name, pool_description)})
+            output_log.append({'Errors': '{} - Pool name present on LTM.{}'.format(pool_name, pool_description)})
+            error = True
+
+        if partition != pool_partition:
+            output_log.append({'Errors': 'LTM Pool and Excel Pool in different partitions.'.format(pool_name, pool_description)})
             error = True
 
     if not error:
@@ -447,7 +453,6 @@ def compare_vs(vs_dict, partition, bigip_url_base, bigip, output_log):
 
     for dict_vs in vs_on_ltm:
         vs_destination_value = str((dict_vs.get('destination')))
-        vs_destination_value = vs_destination_value
 
         if vs_destination == vs_destination_value:
             output_log.append({'Errors': '{}:Virtual Server name present on LTM.\n'.format(vs_destination)})
