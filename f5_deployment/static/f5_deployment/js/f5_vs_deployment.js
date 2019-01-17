@@ -169,10 +169,11 @@ function get_deployment_task_info(task_id) {$.ajax({
         }
         else if (data.state == 'SUCCESS') {
             <!-- Clear Old  Data -->
+            document.getElementById("loader").style.display = "none";
             document.getElementById("vs_deployment_results").innerHTML = "";
             document.getElementById("resultdiv").style.visibility = "visible";
             var results = data.result;
-            var result_location = document.getElementById("vs_deployment_results")
+            var result_location = document.getElementById("vs_deployment_results");
             var validation_error = false;
             for (i = 0, len = results.length, text = ""; i < len; i++) {
                 if (results[i].Headers) {
