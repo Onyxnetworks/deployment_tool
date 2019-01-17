@@ -460,6 +460,7 @@ def compare_vs(vs_dict, bigip_url_base, bigip, output_log):
 
 def create_vs_ssl_profiles(vs_dict, bigip_url_base, bigip, output_log):
     error = False
+    tenant = 'test'
     output_log.append({'Headers': 'Creating SSL Client Profile.'})
     ssl_client_profile = {}
     vs_hostname_crt = vs_dict['vs']['Y2'] + '.crt'
@@ -515,6 +516,7 @@ def create_vs_ssl_profiles(vs_dict, bigip_url_base, bigip, output_log):
 
 def create_pool_monitor(vs_dict, bigip_url_base, bigip, output_log):
     error = False
+    partition = 'test'
     pool_mon_info = {}
     try:
         traffic_type = vs_dict['vs']['R2']
@@ -538,6 +540,8 @@ def create_pool_monitor(vs_dict, bigip_url_base, bigip, output_log):
         pool_mon_info['name'] = vs_dict['vs']['Q2']
         pool_mon_info['defaultsFrom'] = traffic_type
         pool_mon_info['destination'] = '*:' + str(vs_dict['vs']['V2'])
+        pool_mon_info['partition'] = partition
+
         print('Monitor:')
         print(pool_mon_info)
         https_mon_sent = str(bigip.post('%s/ltm/monitor/%s' % (bigip_url_base, traffic_type), data=json.dumps(pool_mon_info)))
@@ -552,6 +556,7 @@ def create_pool_monitor(vs_dict, bigip_url_base, bigip, output_log):
 
 
 def create_vs_profiles_http(vs_dict, bigip_url_base, bigip, output_log):
+    partition = 'test'
     error = False
     http_profile = {}
     traffic_type = vs_dict['vs']['D2']
@@ -567,6 +572,7 @@ def create_vs_profiles_http(vs_dict, bigip_url_base, bigip, output_log):
             http_profile['name'] = vs_dict['vs']['K2']
             http_profile['insertXforwardedFor'] = "enabled"
             http_profile['defaultsFrom'] = http_default_profile
+            http_profile['partition'] = partition
             print('http Profile:')
             print(http_profile)
             http_profile_sent = str(bigip.post('%s/ltm/profile/http' % bigip_url_base, data=json.dumps(http_profile)))
@@ -594,6 +600,7 @@ def create_vs_profiles_http(vs_dict, bigip_url_base, bigip, output_log):
 
 def create_snat(vs_dict, bigip_url_base, bigip, output_log):
     error = False
+    partition = 'test'
     if vs_dict['vs']['B2']:
         output_log.append({'Headers': 'Creating SNAT Pool.'})
 
@@ -606,6 +613,7 @@ def create_snat(vs_dict, bigip_url_base, bigip, output_log):
         snat_info['kind'] = 'tm:ltm:snatpool:snatpoolstate'
         snat_info['name'] = snat_pool_name
         snat_info['members'] = snat_ip
+        snat_info['partition'] = partition
 
         snat_timeout['kind'] = 'tm:ltm:snat-translation:snat-translationstate'
         snat_timeout['name'] = vs_dict['vs']['B2']
@@ -613,6 +621,7 @@ def create_snat(vs_dict, bigip_url_base, bigip, output_log):
         snat_timeout['ipIdleTimeout'] = '300'
         snat_timeout['tcpIdleTimeout'] = '300'
         snat_timeout['udpIdleTimeout'] = '60'
+        snat_timeout['partition'] = partition
         print('Snat Info:')
         print(snat_info)
         print('Snat Timeout:')
@@ -638,6 +647,7 @@ def create_snat(vs_dict, bigip_url_base, bigip, output_log):
 
 
 def create_nodes(node_list, bigip_url_base, bigip, output_log):
+    partition = 'test'
     error = False
     node_info = {}
     output_log.append({'Headers': 'Creating Nodes.'})
@@ -648,6 +658,7 @@ def create_nodes(node_list, bigip_url_base, bigip, output_log):
         node_info['kind'] = 'tm:ltm:pool:poolstate'
         node_info['name'] = node_name
         node_info['address'] = node_ip
+        node_info['partition'] = partition
         print('Node Info')
         print(node_info)
         node_sent = str(bigip.post('%s/ltm/node' % bigip_url_base, data=json.dumps(node_info)))
@@ -665,6 +676,7 @@ def create_nodes(node_list, bigip_url_base, bigip, output_log):
 
 def create_pool(vs_dict, bigip_url_base, bigip, output_log):
     error = False
+    partition = 'test'
     node_list_pool = vs_dict['node_list_pool']
     pool_info = {}
     output_log.append({'Headers': 'Creating Pool.'})
@@ -676,6 +688,7 @@ def create_pool(vs_dict, bigip_url_base, bigip, output_log):
     pool_info['monitor'] = vs_dict['vs']['Q2']
     pool_info['members'] = node_list_pool
     pool_info['minActiveMembers'] = str(vs_dict['vs']['AV2'])
+    pool_info['partition'] = partition
     print('Pool Info')
     print(pool_info)
 
@@ -697,6 +710,7 @@ def create_pool(vs_dict, bigip_url_base, bigip, output_log):
 
 
 def create_vs(vs_dict, bigip_url_base, bigip, output_log):
+    partition = 'test'
     error = False
     if vs_dict['vs']['A2']:
         output_log.append({'Headers': 'Creating Virtual Server.'})
@@ -718,6 +732,7 @@ def create_vs(vs_dict, bigip_url_base, bigip, output_log):
         vs_info['ipProtocol'] = 'tcp'
         vs_info['pool'] = vs_dict['vs']['P2']
         vs_info['sourceAddressTranslation'] = {'pool': snat_pool_name, 'type': 'snat'}
+        vs_info['partition'] = partition
 
         if int_ext in ['INT']:
             vs_info['profiles'] = [

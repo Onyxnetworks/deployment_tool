@@ -415,7 +415,7 @@ def certificate_checker(url_list, request_type, search_string, username, passwor
 
                 if big_ip_version < 1215:
                     common_name = cert['subject']
-                    common_name = re.match(r'CN=.*?,', common_name).group()[3:]
+                    common_name = re.match(r'CN=.*? ,', common_name).group()[3:]
             except:
                 common_name = ''
             try:
