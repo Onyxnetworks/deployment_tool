@@ -271,8 +271,6 @@ def compare_snat_on_ltm_excel(vs_dict, partition, bigip_url_base, bigip, output_
 
         key_address_value = str(dict_snat.get('members'))
         key_name_value = str(dict_snat.get('name'))
-        print(snat_ip_compare)
-        print(key_address_value)
 
         if snat_ip_compare in key_address_value:
 
@@ -787,6 +785,7 @@ def create_vs(vs_dict, partition, bigip_url_base, bigip, output_log):
 
 def create_advertise_vip(vs_dict, partition, bigip_url_base, bigip, output_log):
 
+    output_log.append({'Headers': 'Advertising Virtual Server IP.'})
     error = False
     vs_ip = str(vs_dict['vs']['B2'])
     patch_url = '{0}/ltm/virtual-address/~{1}~{2}'.format(bigip_url_base, partition, vs_ip)
@@ -798,7 +797,7 @@ def create_advertise_vip(vs_dict, partition, bigip_url_base, bigip, output_log):
 
         if get_response.status_code == 200:
             if payload_response['routeAdvertisement'] == 'enabled':
-                output_log.append({'Notifications': 'Virtual IP already advertised.'})
+                output_log.append({'NotificationsSuccess': 'Virtual IP already advertised.'})
                 return output_log, error
 
         if get_response.status_code == 404:
