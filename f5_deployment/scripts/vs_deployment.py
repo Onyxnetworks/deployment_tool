@@ -67,7 +67,7 @@ def check_sync(bigip_url_base, bigip, output_log):
         return output_log, error
 
 
-def check_httpprofile(vs_dict, bigip_url_base, bigip, output_log):
+def check_httpprofile(vs_dict, partition, bigip_url_base, bigip, output_log):
     error = False
     counter = 0
     httpptofiles_on_ltm = bigip.get('%s/ltm/profile/http' % bigip_url_base)
@@ -106,7 +106,7 @@ def check_httpprofile(vs_dict, bigip_url_base, bigip, output_log):
         return output_log, error
 
 
-def check_ssl_profile(vs_dict, bigip_url_base, bigip, output_log):
+def check_ssl_profile(vs_dict, partition, bigip_url_base, bigip, output_log):
     error = False
     counter = 0
     marker_c = 0
@@ -158,7 +158,7 @@ def check_ssl_profile(vs_dict, bigip_url_base, bigip, output_log):
     return output_log, error
     
     
-def check_cert(vs_dict, bigip_url_base, bigip, output_log):
+def check_cert(vs_dict, partition, bigip_url_base, bigip, output_log):
 
     error = False
     counter = 0
@@ -219,7 +219,7 @@ def check_cert(vs_dict, bigip_url_base, bigip, output_log):
     return output_log, error 
 
 
-def check_http_mon(vs_dict, bigip_url_base, bigip, output_log):
+def check_http_mon(vs_dict, partition, bigip_url_base, bigip, output_log):
     
     error = False
     marker = 0
@@ -252,7 +252,7 @@ def check_http_mon(vs_dict, bigip_url_base, bigip, output_log):
     return output_log, error
 
     
-def compare_snat_on_ltm_excel(vs_dict, bigip_url_base, bigip, output_log):
+def compare_snat_on_ltm_excel(vs_dict, partition, bigip_url_base, bigip, output_log):
     error = False
     snat_ip = (vs_dict['vs']['B2'])
     snat_pool_name = vs_dict['vs']['X2']
@@ -308,7 +308,7 @@ def compare_snat_on_ltm_excel(vs_dict, bigip_url_base, bigip, output_log):
     return  output_log, error, snat_pool_present
     
  
-def compare_ltm_nodes(vs_dict, bigip_url_base, bigip, output_log):
+def compare_ltm_nodes(vs_dict, partition, bigip_url_base, bigip, output_log):
     error = False
     node_list = vs_dict['node_list']
     node_list_priority = vs_dict['node_priority']
@@ -396,7 +396,7 @@ def compare_ltm_nodes(vs_dict, bigip_url_base, bigip, output_log):
     return output_log, error, node_list, node_list_pool
 
 
-def compare_pool(vs_dict, bigip_url_base, bigip, output_log):
+def compare_pool(vs_dict, partition, bigip_url_base, bigip, output_log):
     error = False
     pool_name = str(vs_dict['vs']['P2'])
 
@@ -425,7 +425,7 @@ def compare_pool(vs_dict, bigip_url_base, bigip, output_log):
     return output_log, error
 
 
-def compare_vs(vs_dict, bigip_url_base, bigip, output_log):
+def compare_vs(vs_dict, partition, bigip_url_base, bigip, output_log):
     error = False
     s = ':'
     vs_ip = str(vs_dict['vs']['B2'])
@@ -458,7 +458,7 @@ def compare_vs(vs_dict, bigip_url_base, bigip, output_log):
     return output_log, error
 
 
-def create_vs_ssl_profiles(vs_dict, bigip_url_base, bigip, output_log):
+def create_vs_ssl_profiles(vs_dict, partition, bigip_url_base, bigip, output_log):
     error = False
     tenant = 'test'
     output_log.append({'Headers': 'Creating SSL Client Profile.'})
@@ -514,9 +514,9 @@ def create_vs_ssl_profiles(vs_dict, bigip_url_base, bigip, output_log):
     return output_log, error
 
 
-def create_pool_monitor(vs_dict, bigip_url_base, bigip, output_log):
+def create_pool_monitor(vs_dict, partition, bigip_url_base, bigip, output_log):
     error = False
-    partition = ''
+    
     pool_mon_info = {}
     try:
         traffic_type = vs_dict['vs']['R2']
@@ -555,8 +555,8 @@ def create_pool_monitor(vs_dict, bigip_url_base, bigip, output_log):
     return output_log, error
 
 
-def create_vs_profiles_http(vs_dict, bigip_url_base, bigip, output_log):
-    partition = ''
+def create_vs_profiles_http(vs_dict, partition, bigip_url_base, bigip, output_log):
+    
     error = False
     http_profile = {}
     traffic_type = vs_dict['vs']['D2']
@@ -598,9 +598,9 @@ def create_vs_profiles_http(vs_dict, bigip_url_base, bigip, output_log):
 
 
 
-def create_snat(vs_dict, bigip_url_base, bigip, output_log):
+def create_snat(vs_dict, partition, bigip_url_base, bigip, output_log):
     error = False
-    partition = ''
+    
     if vs_dict['vs']['B2']:
         output_log.append({'Headers': 'Creating SNAT Pool.'})
 
@@ -646,8 +646,8 @@ def create_snat(vs_dict, bigip_url_base, bigip, output_log):
 
 
 
-def create_nodes(node_list, bigip_url_base, bigip, output_log):
-    partition = ''
+def create_nodes(node_list, partition, bigip_url_base, bigip, output_log):
+    
     error = False
     node_info = {}
     output_log.append({'Headers': 'Creating Nodes.'})
@@ -674,9 +674,9 @@ def create_nodes(node_list, bigip_url_base, bigip, output_log):
 
 
 
-def create_pool(vs_dict, bigip_url_base, bigip, output_log):
+def create_pool(vs_dict, partition, bigip_url_base, bigip, output_log):
     error = False
-    partition = ''
+    
     node_list_pool = vs_dict['node_list_pool']
     pool_info = {}
     output_log.append({'Headers': 'Creating Pool.'})
@@ -709,8 +709,8 @@ def create_pool(vs_dict, bigip_url_base, bigip, output_log):
 
 
 
-def create_vs(vs_dict, bigip_url_base, bigip, output_log):
-    partition = ''
+def create_vs(vs_dict, partition, bigip_url_base, bigip, output_log):
+    
     error = False
     if vs_dict['vs']['A2']:
         output_log.append({'Headers': 'Creating Virtual Server.'})
