@@ -302,7 +302,8 @@ def compare_snat_on_ltm_excel(vs_dict, partition, bigip_url_base, bigip, output_
             snat_pool_present = 0
 
     if snat_pool_present == 0:
-        output_log.append({'Notifications': 'SNAT pool {} : {} will be created.'.format(snat_pool_name, snat_ip)})
+        if error == False:
+            output_log.append({'Notifications': 'SNAT pool {} : {} will be created.'.format(snat_pool_name, snat_ip)})
 
     else:
         output_log.append({'Notifications': ' SNAT pool will not be created.'})
