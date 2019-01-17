@@ -516,7 +516,7 @@ def create_vs_ssl_profiles(vs_dict, bigip_url_base, bigip, output_log):
 
 def create_pool_monitor(vs_dict, bigip_url_base, bigip, output_log):
     error = False
-    partition = 'test'
+    partition = ''
     pool_mon_info = {}
     try:
         traffic_type = vs_dict['vs']['R2']
@@ -556,7 +556,7 @@ def create_pool_monitor(vs_dict, bigip_url_base, bigip, output_log):
 
 
 def create_vs_profiles_http(vs_dict, bigip_url_base, bigip, output_log):
-    partition = 'test'
+    partition = ''
     error = False
     http_profile = {}
     traffic_type = vs_dict['vs']['D2']
@@ -600,7 +600,7 @@ def create_vs_profiles_http(vs_dict, bigip_url_base, bigip, output_log):
 
 def create_snat(vs_dict, bigip_url_base, bigip, output_log):
     error = False
-    partition = 'test'
+    partition = ''
     if vs_dict['vs']['B2']:
         output_log.append({'Headers': 'Creating SNAT Pool.'})
 
@@ -647,7 +647,7 @@ def create_snat(vs_dict, bigip_url_base, bigip, output_log):
 
 
 def create_nodes(node_list, bigip_url_base, bigip, output_log):
-    partition = 'test'
+    partition = ''
     error = False
     node_info = {}
     output_log.append({'Headers': 'Creating Nodes.'})
@@ -676,7 +676,7 @@ def create_nodes(node_list, bigip_url_base, bigip, output_log):
 
 def create_pool(vs_dict, bigip_url_base, bigip, output_log):
     error = False
-    partition = 'test'
+    partition = ''
     node_list_pool = vs_dict['node_list_pool']
     pool_info = {}
     output_log.append({'Headers': 'Creating Pool.'})
@@ -710,7 +710,7 @@ def create_pool(vs_dict, bigip_url_base, bigip, output_log):
 
 
 def create_vs(vs_dict, bigip_url_base, bigip, output_log):
-    partition = 'test'
+    partition = ''
     error = False
     if vs_dict['vs']['A2']:
         output_log.append({'Headers': 'Creating Virtual Server.'})
