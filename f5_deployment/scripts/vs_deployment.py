@@ -256,6 +256,7 @@ def compare_snat_on_ltm_excel(vs_dict, partition, bigip_url_base, bigip, output_
     error = False
     snat_ip = (vs_dict['vs']['B2'])
     snat_pool_name = vs_dict['vs']['X2']
+    snat_ip_compare = '/{0}/{1}'.format(partition, snat_ip)
 
     snat_on_ltm = bigip.get('%s/ltm/snatpool' % bigip_url_base)
     snat_on_ltm = json.loads(snat_on_ltm.content)
@@ -269,16 +270,15 @@ def compare_snat_on_ltm_excel(vs_dict, partition, bigip_url_base, bigip, output_
     for dict_snat in snat_on_ltm:
 
         key_address_value = str(dict_snat.get('members'))
-        key_address_value = key_address_value
         key_name_value = str(dict_snat.get('name'))
-        print(snat_ip)
+        print(snat_ip_compare)
         print(key_address_value)
 
-        if snat_ip in key_address_value:
+        if snat_ip_compare in key_address_value:
 
             if snat_pool_name == key_name_value:
                 output_log.append({'NotificationsWarning': 'SNAT IP and SNAT Pool name already present on LTM. {}:{}'
-                                  .format(snat_pool_name, snat_ip)})
+                                  .format(snat_pool_name, snat_ip_compare)})
                 snat_pool_present = 1
                 return output_log, error, snat_pool_present
                     
@@ -286,7 +286,7 @@ def compare_snat_on_ltm_excel(vs_dict, partition, bigip_url_base, bigip, output_
                 snat_pool_present = 1
                 output_log.append({'Errors': 'SNAT IP is already configured on LTM but SNAT Pool name on does '
                                              'not match name on Excel.'})
-                output_log.append({'Errors': 'SNAT IP : {}'.format(snat_ip)})   
+                output_log.append({'Errors': 'SNAT IP : {}'.format(snat_ip_compare)})
                 output_log.append({'Errors': 'Pool name on LTM : {}'.format(key_name_value)})   
                 output_log.append({'Errors': 'SNAT Pool name on Excel : {}'.format(snat_pool_name)})    
                 error = True
@@ -295,7 +295,7 @@ def compare_snat_on_ltm_excel(vs_dict, partition, bigip_url_base, bigip, output_
             snat_pool_present = 1
             output_log.append({'Errors': 'SNAT Pool name is already configured on LTM but SNAT IP does '
                                          'not match name on Excel.'})
-            output_log.append({'Errors': 'SNAT IP on Excel : {}'.format(snat_ip)})  
+            output_log.append({'Errors': 'SNAT IP on Excel : {}'.format(snat_ip_compare)})
             output_log.append({'Errors': 'SNAT IP on LTM : {}'.format(key_address_value)})  
             output_log.append({'Errors': 'SNAT Pool name : {}'.format(snat_pool_name)})         
             error = True
