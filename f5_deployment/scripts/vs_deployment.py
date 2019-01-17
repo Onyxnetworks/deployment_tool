@@ -430,10 +430,9 @@ def compare_pool(vs_dict, partition, bigip_url_base, bigip, output_log):
 
 def compare_vs(vs_dict, partition, bigip_url_base, bigip, output_log):
     error = False
-    s = ':'
     vs_ip = str(vs_dict['vs']['B2'])
     vs_port = str(vs_dict['vs']['C2'])
-    vs_destination = vs_ip + s + vs_port
+    vs_destination = '/{0}/{1}:{2}'.format(partition, vs_ip, vs_port)
 
     # Get vs from ltm
     vs_on_ltm = bigip.get('%s/ltm/virtual' % bigip_url_base)
@@ -448,7 +447,7 @@ def compare_vs(vs_dict, partition, bigip_url_base, bigip, output_log):
 
     for dict_vs in vs_on_ltm:
         vs_destination_value = str((dict_vs.get('destination')))
-        vs_destination_value = vs_destination_value.strip('/Common/')
+        vs_destination_value = vs_destination_value
 
         if vs_destination == vs_destination_value:
             output_log.append({'Errors': '{}:Virtual Server name present on LTM.\n'.format(vs_destination)})
