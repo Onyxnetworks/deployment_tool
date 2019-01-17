@@ -782,3 +782,39 @@ def create_vs(vs_dict, partition, bigip_url_base, bigip, output_log):
             output_log.append({'Errors': '{} - Ubable to create Virtual Server *'.format(vs_dict['vs']['A2'])})
 
     return output_log, error
+
+def create_advertise_vip(vs_dict, partition, bigip_url_base, bigip, output_log):
+
+    error = False
+    vs_ip = str(vs_dict['vs']['B2'])
+    patch_url = '{0}/ltm/virtual-address/~{1}~{2}'.format(bigip_url_base, partition, vs_ip)
+    patch_json = {"routeAdvertisement": "enabled"}
+
+    try:
+        patch_response = bigip.patch(patch_url, data=json.dumps(patch_json), timeout=5)
+        payload_response = json.loads(patch_response.text)
+
+        if patch_response.status_code == 200:
+            output_log.append({'NotificationsInfo': '{} : Virtual Server IP Successfully Advertised'.format(vs_ip)})
+            return output_log, error
+
+    except requests.exceptions.HTTPError as errh:
+        error = True
+        output_log.append({'Errors': 'Http Error: ' + str(errh)})
+        return output_log, error
+
+    except requests.exceptions.ConnectionError as errc:
+        error = True
+        output_log.append({'Errors': 'Error Connecting: ' + str(errc)})
+        return output_log, error
+
+    except requests.exceptions.Timeout as errt:
+        error = True
+        output_log.append({'Errors': 'Timeout Error: ' + str(errt)})
+        return output_log, error
+
+    except requests.exceptions.RequestException as err:
+        error = True
+        output_log.append({'Errors': 'Error: ' + str(err)})
+        return output_log, error
+

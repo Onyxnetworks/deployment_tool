@@ -228,6 +228,11 @@ def virtual_server_deployment(vs_dict, location, url_dict, username, password):
             output_log = create_vs_result[0]
             error = create_vs_result[1]
 
+        if not error:
+
+            create_vs_result = create_advertise_vip(vs_dict, partition, bigip_url_base, bigip, output_log)
+            output_log = create_vs_result[0]
+            error = create_vs_result[1]
 
         if not error:
             output_log.append({'ValidationSuccess': 'Virtual Server deployed successfully.'})
