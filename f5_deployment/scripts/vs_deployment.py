@@ -463,7 +463,6 @@ def compare_vs(vs_dict, partition, bigip_url_base, bigip, output_log):
 
 def create_vs_ssl_profiles(vs_dict, partition, bigip_url_base, bigip, output_log):
     error = False
-    tenant = 'test'
     output_log.append({'Headers': 'Creating SSL Client Profile.'})
     ssl_client_profile = {}
     vs_hostname_crt = vs_dict['vs']['Y2'] + '.crt'
@@ -478,6 +477,8 @@ def create_vs_ssl_profiles(vs_dict, partition, bigip_url_base, bigip, output_log
     ssl_client_profile['cert'] = vs_hostname_crt
     ssl_client_profile['key'] = vs_hostname_key
     ssl_client_profile['chain'] = vs_hostname_chain
+    ssl_client_profile['partition'] = partition
+
     print('SSL Client Profile:')
     print(ssl_client_profile)
     ssl_client_profile_sent = str(bigip.post('%s/ltm/profile/client-ssl' % bigip_url_base,
@@ -503,6 +504,7 @@ def create_vs_ssl_profiles(vs_dict, partition, bigip_url_base, bigip, output_log
         ssl_server_profile['kind'] = 'tm:ltm:profile:server-ssl:server-sslstate'
         ssl_server_profile['name'] = vs_dict['vs']['M2']
         ssl_server_profile['defaultsFrom'] = 'serverssl'
+        ssl_server_profile['partition'] = partition
         print('SSL Server Profile:')
         print(ssl_server_profile)
         ssl_server_profile_sent = str(bigip.post('%s/ltm/profile/server-ssl' % bigip_url_base,
