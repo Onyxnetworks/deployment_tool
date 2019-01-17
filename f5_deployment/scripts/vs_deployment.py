@@ -366,7 +366,7 @@ def compare_ltm_nodes(vs_dict, partition, bigip_url_base, bigip, output_log):
                     node_list_b.remove(excel_node_ip)
 
                 else:
-                    output_log.append({'NotificationsWarning': 'Node {} in different partition to EXCEL.'
+                    output_log.append({'Errors': 'Node {} in different partition to EXCEL.'
                                       .format(node_name)})
                     error = True
 
