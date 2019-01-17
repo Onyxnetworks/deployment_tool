@@ -782,7 +782,7 @@ def create_advertise_vip(vs_dict, partition, bigip_url_base, bigip, output_log):
 
         if get_response.status_code == 200:
             if payload_response['routeAdvertisement'] == 'enabled':
-                output_log.append({'NotificationsSuccess': 'Virtual IP already advertised.'})
+                output_log.append({'NotificationsSuccess': 'Virtual IP already advertised, no modifications will be made.'})
                 return output_log, error
 
         if get_response.status_code == 404:

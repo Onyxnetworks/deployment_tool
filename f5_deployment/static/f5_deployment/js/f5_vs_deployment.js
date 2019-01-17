@@ -163,6 +163,9 @@ function get_deployment_task_info(task_id) {$.ajax({
             rslt.html('Pushing configuration to BigIP...');
             document.getElementById("resultdiv").style.visibility = "hidden";
             document.getElementById("vs_deployment_results").innerHTML = "";
+            var loader = `<img src='/static/index/svg/spinner.svg'/>`;
+            document.getElementById("loader").style.display = "block";
+            document.getElementById("loader").innerHTML = loader;
         }
         else if (data.state == 'SUCCESS') {
             <!-- Clear Old  Data -->
