@@ -269,7 +269,7 @@ def compare_snat_on_ltm_excel(vs_dict, partition, bigip_url_base, bigip, output_
     for dict_snat in snat_on_ltm:
 
         key_address_value = str(dict_snat.get('members'))
-        key_address_value = key_address_value.strip("[u'/Common/").strip("']")
+        key_address_value = key_address_value
         key_name_value = str(dict_snat.get('name'))
         print(snat_ip)
         print(key_address_value)
