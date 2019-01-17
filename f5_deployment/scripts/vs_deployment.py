@@ -284,8 +284,7 @@ def compare_snat_on_ltm_excel(vs_dict, partition, bigip_url_base, bigip, output_
         if snat_ip_compare in key_address_value:
 
             if snat_pool_name == key_name_value:
-                output_log.append({'NotificationsWarning': 'SNAT IP and SNAT Pool name already present on LTM.  {}:{}'
-                                  .format(snat_pool_name, snat_ip_compare)})
+                output_log.append({'NotificationsWarning': 'SNAT IP and SNAT Pool name already present on LTM.'})
                 snat_pool_present = 1
                 return output_log, error, snat_pool_present
                     
