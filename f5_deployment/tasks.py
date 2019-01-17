@@ -44,7 +44,6 @@ def vs_deployment_validation(vs_dict, location, url_dict, username, password):
     vs_name = vs_dict['vs']['A2']
     partition = vs_dict['vs']['E2']
 
-
     if location == 'UKDC1':
         device_group = vs_name.rsplit('-', 10)[0] + '-DGA'
         base_url = url_dict[location][device_group]
@@ -63,7 +62,10 @@ def vs_deployment_validation(vs_dict, location, url_dict, username, password):
         error = True
         output_log.append({'Errors': 'Unable to identify F5 Device group, please check index/baseline.py configuration.'})
   
-   
+    if len(partition) == 0:
+        error = True
+        output_log.append({'Errors': 'No partition specified.'})
+
     if not error:   
         output_log.append({'Headers': 'Creating connection to BigIP.'})
         bigip_connection = create_connection_bigip(base_url, username, password, output_log)

@@ -791,11 +791,17 @@ def create_advertise_vip(vs_dict, partition, bigip_url_base, bigip, output_log):
     patch_json = {"routeAdvertisement": "enabled"}
 
     try:
-        patch_response = bigip.patch(patch_url, data=json.dumps(patch_json), timeout=5)
-        payload_response = json.loads(patch_response.text)
+        get_response = bigip.get(patch_url, timeout=5)
+        payload_response = json.loads(get_response.text)
 
-        if patch_response.status_code == 200:
-            output_log.append({'NotificationsInfo': '{} : Virtual Server IP Successfully Advertised'.format(vs_ip)})
+        if get_response.status_code == 200:
+            if payload_response['routeAdvertisement'] == 'enabled':
+                output_log.append({'Notifications': 'Virtual IP already advertised.'})
+                return output_log, error
+
+        if get_response.status_code == 404:
+            error = True
+            output_log.append({'Errors': 'Unable to locate {0} in Virtual IP List.'.format(vs_ip)})
             return output_log, error
 
     except requests.exceptions.HTTPError as errh:
@@ -817,4 +823,33 @@ def create_advertise_vip(vs_dict, partition, bigip_url_base, bigip, output_log):
         error = True
         output_log.append({'Errors': 'Error: ' + str(err)})
         return output_log, error
+
+    if not error:
+        try:
+            patch_response = bigip.patch(patch_url, data=json.dumps(patch_json), timeout=5)
+            payload_response = json.loads(patch_response.text)
+
+            if patch_response.status_code == 200:
+                output_log.append({'NotificationsInfo': '{} : Virtual Server IP Successfully Advertised'.format(vs_ip)})
+                return output_log, error
+
+        except requests.exceptions.HTTPError as errh:
+            error = True
+            output_log.append({'Errors': 'Http Error: ' + str(errh)})
+            return output_log, error
+
+        except requests.exceptions.ConnectionError as errc:
+            error = True
+            output_log.append({'Errors': 'Error Connecting: ' + str(errc)})
+            return output_log, error
+
+        except requests.exceptions.Timeout as errt:
+            error = True
+            output_log.append({'Errors': 'Timeout Error: ' + str(errt)})
+            return output_log, error
+
+        except requests.exceptions.RequestException as err:
+            error = True
+            output_log.append({'Errors': 'Error: ' + str(err)})
+            return output_log, error
 
