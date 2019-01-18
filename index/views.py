@@ -45,10 +45,6 @@ def login(request):
                 request.session['lab_username'] = username
                 request.session['lab_password'] = password
 
-            else:
-                content = {'environment_list': environments, 'error': True,
-                           'message': 'Unable to locate environment in Django View, please check views.py.'}
-                redirect(request.path_info)
 
             # Get base url to use for authentication and scripts and try to login to UKDC1 APIC
             base_urls = get_base_url(environment)
