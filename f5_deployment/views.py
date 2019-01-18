@@ -11,8 +11,16 @@ def vs_deployment(request):
     if request.method == 'POST' and 'file' in request.FILES:
         file = request.FILES['file']
         location = request.POST['location']
-        routeAdvertisement = request.POST['routeAdvertisement']
-        print(routeAdvertisement)
+
+        # Check for Route Advertisment Tick
+        try:
+            request.POST['routeAdvertisement']
+            routeAdvertisement = True
+        except:
+            routeAdvertisement = False
+
+
+
 
         environment = request.session.get('environment')
         role = request.session.get('role')
@@ -40,9 +48,9 @@ def vs_deployment(request):
 
         # Validate Request names and format
         task = vs_deployment_validation.delay(vs_dict, location, url_dict, username, password)
-
+        content = {'task_id': task.id, 'location': location, 'routeAdvertisement': routeAdvertisement, 'role': role, 'user': user}
         # Return task id.
-        return HttpResponse(json.dumps({'task_id': task.id, 'location': location, 'role': role, 'user': user}),
+        return HttpResponse(json.dumps(content),
                             content_type='application/json')
 
     # Get base url to use
@@ -66,6 +74,7 @@ def vs_deployment_push(request):
         data = json.loads(response_json)
         location = data['location']
         vs_dict = data['vs_dict']
+        routeAdvertisement = data['routeAdvertisement']
 
         environment = request.session.get('environment')
         if environment == 'Production':
@@ -87,7 +96,7 @@ def vs_deployment_push(request):
         url_dict = base_urls['F5']
 
         # Deploy APIC configuration
-        task = virtual_server_deployment.delay(vs_dict, location, url_dict, username, password)
+        task = virtual_server_deployment.delay(vs_dict, location, url_dict, routeAdvertisement, username, password)
 
         # Return task id back to client for ajax use.
         return HttpResponse(json.dumps({'task_id': task.id}), content_type='application/json')
