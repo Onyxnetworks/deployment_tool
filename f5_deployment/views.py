@@ -11,6 +11,8 @@ def vs_deployment(request):
     if request.method == 'POST' and 'file' in request.FILES:
         file = request.FILES['file']
         location = request.POST['location']
+        routeAdvertisement = request.POST['routeAdvertisement']
+        print(routeAdvertisement)
 
         environment = request.session.get('environment')
         role = request.session.get('role')
