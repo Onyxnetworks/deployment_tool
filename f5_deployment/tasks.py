@@ -233,6 +233,7 @@ def virtual_server_deployment(vs_dict, location, url_dict, routeAdvertisement, u
             error = create_vs_result[1]
 
         if not error:
+            print(routeAdvertisement)
             if routeAdvertisement:
                 create_vs_result = create_advertise_vip(vs_dict, partition, bigip_url_base, bigip, output_log)
                 output_log = create_vs_result[0]
