@@ -47,7 +47,7 @@ def login(request):
             else:
                 content = {'environment_list': environments, 'error': True,
                            'message': 'Unable to locate environment in Django View, please check index\views.py.'}
-                redirect(request.path_info)
+                redirect(login)
 
             # Get base url to use for authentication and scripts and try to login to UKDC1 APIC
             base_urls = get_base_url(environment)
