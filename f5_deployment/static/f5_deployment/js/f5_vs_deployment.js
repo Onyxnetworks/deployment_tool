@@ -22,7 +22,7 @@ $.ajax({
 });
 return false;
 });
-function get_validation_task_info(task_id, location, vs_dict) {
+function get_validation_task_info(task_id, location, routeAdvertisement, vs_dict) {
     $.ajax({
         type: 'get',
         url: '/get_task_info/',
@@ -125,7 +125,7 @@ function get_validation_task_info(task_id, location, vs_dict) {
             }
             if (data.state != 'SUCCESS') {
                 setTimeout(function () {
-                    get_validation_task_info(task_id, location, vs_dict)
+                    get_validation_task_info(task_id, location, routeAdvertisement, vs_dict)
                 }, 1000);
             }},
         error: function (data) {
