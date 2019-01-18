@@ -237,8 +237,8 @@ function get_deployment_task_info(task_id) {$.ajax({
                     var validation_error = true
                 }
             }
-            //var deploy_btn = document.getElementById("deploy_btn");
-            document.getElementById("vs_menu").removeChild($('#deploy_btn'));
+            var deploy_btn = document.getElementById("deploy_btn");
+            document.getElementById("vs_menu").removeChild(deploy_btn);
         }
         if (data.state != 'SUCCESS') {
             setTimeout(function () {
