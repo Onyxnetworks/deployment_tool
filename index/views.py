@@ -6,6 +6,7 @@ from celery.result import AsyncResult
 from f5_deployment.scripts.baseline import bigip_login
 from index.scripts.baseline import *
 from index.scripts.external_links import *
+
 # Function to get task state and results to be used by ajax.
 def get_task_info(request):
     task_id = request.GET.get('task_id', None)
@@ -46,8 +47,8 @@ def login(request):
 
             else:
                 content = {'environment_list': environments, 'error': True,
-                           'message': 'Unable to locate environment in Django View, please check index\views.py.'}
-                redirect(login)
+                           'message': 'Unable to locate environment in Django View, please check views.py.'}
+                redirect(request.path_info)
 
             # Get base url to use for authentication and scripts and try to login to UKDC1 APIC
             base_urls = get_base_url(environment)
