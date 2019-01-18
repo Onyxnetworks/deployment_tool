@@ -117,6 +117,7 @@ function get_validation_task_info(task_id, location, vs_dict) {
                     document.getElementById("deploy_btn").style.visibility = "visible";
                     document.getElementById("new_file_btn").style.visibility = "visible";
                     document.getElementById("upload_btn").style.visibility = "hidden";
+                    document.getElementById("routeAdvertisement").style.visibility = "hidden";
                     document.getElementById("location").disabled = true;
                     document.getElementById("file").disabled = true;
                     deploy_configuration(location, vs_dict);
@@ -135,7 +136,7 @@ function get_validation_task_info(task_id, location, vs_dict) {
 }
 function deploy_configuration(location, vs_dict) {
     $("#deploy_btn").click(function(){
-        post_data = JSON.stringify({'location': location, 'vs_dict': vs_dict});
+        post_data = JSON.stringify({'location': location, 'routeAdvertisement': routeAdvertisement, 'vs_dict': vs_dict});
         $.ajax({
             type: 'post',
             url: '/f5/vs_deployment_push/',
