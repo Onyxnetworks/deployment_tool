@@ -48,9 +48,9 @@
                                 <div class="form-group">
                                     <select class="form-control" name="environment" id="environment" required>
                                         <option value="" hidden selected disabled>Select Environment</option>
-                                        <option>Production</option>
-                                        <option>Pre-Production</option>
-                                        <option>Lab</option>
+                                        {%  for environment in environment_list %}
+                                        <option>{{ environment }}</option>
+                                        {%  endfor %}
                                     </select>
                                 </div>
                                 <div class="form-group {% if error %} form-group has-error {% endif %}" id="username_grp">
