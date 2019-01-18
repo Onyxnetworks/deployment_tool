@@ -23,7 +23,7 @@ def get_task_info(request):
 
 
 def login(request):
-    content = {'environment_list': environment}
+    content = {'environment_list': environments}
     if request.method == 'POST':
         if 'username' and 'password' in request.POST:
             username = request.POST['username']
