@@ -237,7 +237,7 @@ function get_deployment_task_info(task_id) {$.ajax({
                     var validation_error = true
                 }
             }
-            document.getElementById("deploy_btn").style.visibility = "hidden";
+            document.removeElement("deploy_btn")
         }
         if (data.state != 'SUCCESS') {
             setTimeout(function () {
