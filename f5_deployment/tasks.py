@@ -62,25 +62,29 @@ def vs_deployment_validation(vs_dict, location, url_dict, username, password):
         output_log.append({'Errors': 'Unable to identify F5 Device group, please check index/baseline.py configuration.'})
         return output_log, vs_dict
 
-    output_log.append({'Headers': 'Validating Partition.'})
-    try:
-        partition = vs_dict['vs']['E2']
-        output_log.append({'Notifications': 'Configuration to be deployed in partition: ' + partition})
-    except:
-        output_log.append(
-            {'Errors': 'Unable to identify partition.'})
-        return output_log, vs_dict
-
     if not error:   
         output_log.append({'Headers': 'Creating connection to BigIP.'})
         bigip_connection = create_connection_bigip(base_url, username, password, output_log)
         output_log = bigip_connection[0]
         error = bigip_connection[1]
-  
+
     if not error:
-        bigip_url_base = bigip_connection[2]
-        bigip = bigip_connection[3]
-        
+        output_log.append({'Headers': 'Validating Partition.'})
+        try:
+            bigip_url_base = bigip_connection[2]
+            bigip = bigip_connection[3]
+            partition = vs_dict['vs']['E2']
+            validate_partition_result = validate_partition(partition, bigip_url_base, bigip, output_log)
+            output_log = validate_partition_result[0]
+            error = validate_partition_result[1]
+
+        except:
+            error = True
+            output_log.append(
+                {'Errors': 'Unable to identify partition.'})
+            return output_log, vs_dict
+
+    if not error:
         output_log.append({'Headers': 'Checking Sync status of F5.'})   
         #check_sync_result  = check_sync(bigip_url_base, bigip, output_log)
         #output_log = check_sync_result[0]

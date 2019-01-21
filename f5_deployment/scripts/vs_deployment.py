@@ -38,6 +38,8 @@ def create_connection_bigip(base_url, username, password, output_log):
         error = True
         return output_log, error        
 
+
+
         
 def check_sync(bigip_url_base, bigip, output_log):
     error = False
@@ -866,3 +868,44 @@ def create_advertise_vip(vs_dict, partition, bigip_url_base, bigip, output_log):
             output_log.append({'Errors': 'Error: ' + str(err)})
             return output_log, error
 
+def validate_partition(partition, bigip_url_base, bigip, output_log):
+    error = True
+    get_url = '{0}/sys/folder/'.format(bigip_url_base)
+
+    try:
+        get_response = bigip.get(get_url, timeout=5)
+        payload_response = json.loads(get_response.text)
+
+        if get_response.status_code == 200:
+                for part in payload_response['items']:
+                    if part['name'] == partition:
+                        # Partition located.
+                        error = False
+
+                if not error:
+                    output_log.append({'Notifications': 'Configuration to be deployed in partition: ' + partition})
+                    return output_log, error
+
+                if error:
+                    output_log.append({'Errors': 'Unable to locate partition: ' + partition + ' on F5.'})
+                    return output_log, error
+
+    except requests.exceptions.HTTPError as errh:
+        error = True
+        output_log.append({'Errors': 'Http Error: ' + str(errh)})
+        return output_log, error
+
+    except requests.exceptions.ConnectionError as errc:
+        error = True
+        output_log.append({'Errors': 'Error Connecting: ' + str(errc)})
+        return output_log, error
+
+    except requests.exceptions.Timeout as errt:
+        error = True
+        output_log.append({'Errors': 'Timeout Error: ' + str(errt)})
+        return output_log, error
+
+    except requests.exceptions.RequestException as err:
+        error = True
+        output_log.append({'Errors': 'Error: ' + str(err)})
+        return output_log, error
