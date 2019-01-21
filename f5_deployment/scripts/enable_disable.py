@@ -6,7 +6,7 @@ def node_disable_enable_force(selflink, auth_token, request_json):
 
     patch_url = selflink
     try:
-        patch_response = requests.patch(patch_url, headers=headers, data=json.dumps(request_json), timeout=5, verify=False)
+        patch_response = requests.patch(patch_url, headers=headers, data=json.dumps(request_json), timeout=30, verify=False)
         payload_response = json.loads(patch_response.text)
 
         if patch_response.status_code == 200:
@@ -34,7 +34,7 @@ def vs_disable_enable_force(selflink, auth_token, request_json):
 
     patch_url = selflink
     try:
-        patch_response = requests.patch(patch_url, headers=headers, data=json.dumps(request_json), timeout=5, verify=False)
+        patch_response = requests.patch(patch_url, headers=headers, data=json.dumps(request_json), timeout=30, verify=False)
         payload_response = json.loads(patch_response.text)
 
         if patch_response.status_code == 200:

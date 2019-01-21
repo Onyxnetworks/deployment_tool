@@ -22,7 +22,7 @@ def create_connection_bigip(base_url, username, password, output_log):
         token = bigip.post(bigip_url_base_token, json.dumps(payload)).json()['token']['token']
         bigip.auth = ('')
         bigip.headers.update({'X-F5-Auth-Token': token})
-        credentials = str(bigip.get('%s/ltm/virtual' % bigip_url_base, timeout=5.0))
+        credentials = str(bigip.get('%s/ltm/virtual' % bigip_url_base, timeout=30.0))
         
     except:
         output_log.append({'Errors': 'Unable to communicate with ' + base_url[8:]})
@@ -806,7 +806,7 @@ def create_advertise_vip(vs_dict, partition, bigip_url_base, bigip, output_log):
     patch_json = {"routeAdvertisement": "enabled"}
 
     try:
-        get_response = bigip.get(patch_url, timeout=5)
+        get_response = bigip.get(patch_url, timeout=30)
         payload_response = json.loads(get_response.text)
 
         if get_response.status_code == 200:
@@ -841,7 +841,7 @@ def create_advertise_vip(vs_dict, partition, bigip_url_base, bigip, output_log):
 
     if not error:
         try:
-            patch_response = bigip.patch(patch_url, data=json.dumps(patch_json), timeout=5)
+            patch_response = bigip.patch(patch_url, data=json.dumps(patch_json), timeout=30)
             payload_response = json.loads(patch_response.text)
 
             if patch_response.status_code == 200:
@@ -873,7 +873,7 @@ def validate_partition(partition, bigip_url_base, bigip, output_log):
     get_url = '{0}/sys/folder/'.format(bigip_url_base)
 
     try:
-        get_response = bigip.get(get_url, timeout=5)
+        get_response = bigip.get(get_url, timeout=30)
         payload_response = json.loads(get_response.text)
 
         if get_response.status_code == 200:
