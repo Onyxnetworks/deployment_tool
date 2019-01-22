@@ -13,7 +13,7 @@ def vs_deployment_excel_open_workbook(file):
     wb = openpyxl.load_workbook(file, data_only=True)
     py_ws = wb.get_sheet_by_name('Tab_Python')
     vs_dict = {}
-    vs_dict['version'] = py_ws['CD1'].value
+    vs_dict['version'] = str(py_ws['CD1'].value)
     vs_dict['vs'] = {}
     vs_dict['node_list'] = []
     vs_dict['node_priority'] = []
