@@ -25,6 +25,8 @@ This is a file that is not stored on GIT and is used to keep your sensitive info
 
 within `/deployment_tool/index/scripts` create a file called `baseline.py`.
 ```python
+environments = ['Production','Pre-Production','Lab']
+
 def get_base_url(environment):
     if environment == 'Production':
         base_urls = {'ACI': {'UKDC1': 'https://ukdc1-aci-url/api', 'UKDC2': 'https://ukdc2-aci-url'}, 'F5': {'UKDC1': {'FUNCTION1': 'https://ukdc1-function1-f5-url', 'FUNCTION2':'https://ukdc1-function2-f5-url'}, 'UKDC2': {'FUNCTION1': 'https://ukdc2-function1-f5-url', 'FUNCTION2':'https://ukdc2-function2-f5-url'}}}

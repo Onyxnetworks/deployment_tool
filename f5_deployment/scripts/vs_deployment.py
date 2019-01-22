@@ -22,7 +22,7 @@ def create_connection_bigip(base_url, username, password, output_log):
         token = bigip.post(bigip_url_base_token, json.dumps(payload)).json()['token']['token']
         bigip.auth = ('')
         bigip.headers.update({'X-F5-Auth-Token': token})
-        credentials = str(bigip.get('%s/ltm/virtual' % bigip_url_base, timeout=5.0))
+        credentials = str(bigip.get('%s/ltm/virtual' % bigip_url_base, timeout=30.0))
         
     except:
         output_log.append({'Errors': 'Unable to communicate with ' + base_url[8:]})
@@ -37,6 +37,8 @@ def create_connection_bigip(base_url, username, password, output_log):
         output_log.append({'Errors': 'Username or password is incorrect.'}) 
         error = True
         return output_log, error        
+
+
 
         
 def check_sync(bigip_url_base, bigip, output_log):
@@ -65,8 +67,9 @@ def check_sync(bigip_url_base, bigip, output_log):
     
     else:
         return output_log, error
-        
-def check_httpprofile(vs_dict, bigip_url_base, bigip, output_log):
+
+
+def check_httpprofile(vs_dict, partition, bigip_url_base, bigip, output_log):
     error = False
     counter = 0
     httpptofiles_on_ltm = bigip.get('%s/ltm/profile/http' % bigip_url_base)
@@ -104,7 +107,8 @@ def check_httpprofile(vs_dict, bigip_url_base, bigip, output_log):
         output_log.append({'Notifications': 'HTTP(S) Profile {} will be created.'.format(http_profile)})
         return output_log, error
 
-def check_ssl_profile(vs_dict, bigip_url_base, bigip, output_log):
+
+def check_ssl_profile(vs_dict, partition, bigip_url_base, bigip, output_log):
     error = False
     counter = 0
     marker_c = 0
@@ -156,7 +160,7 @@ def check_ssl_profile(vs_dict, bigip_url_base, bigip, output_log):
     return output_log, error
     
     
-def check_cert(vs_dict, bigip_url_base, bigip, output_log):
+def check_cert(vs_dict, partition, bigip_url_base, bigip, output_log):
 
     error = False
     counter = 0
@@ -215,8 +219,9 @@ def check_cert(vs_dict, bigip_url_base, bigip, output_log):
         counter = counter + 1
 
     return output_log, error 
-    
-def check_http_mon(vs_dict, bigip_url_base, bigip, output_log):
+
+
+def check_http_mon(vs_dict, partition, bigip_url_base, bigip, output_log):
     
     error = False
     marker = 0
@@ -249,10 +254,11 @@ def check_http_mon(vs_dict, bigip_url_base, bigip, output_log):
     return output_log, error
 
     
-def compare_snat_on_ltm_excel(vs_dict, bigip_url_base, bigip, output_log):
+def compare_snat_on_ltm_excel(vs_dict, partition, bigip_url_base, bigip, output_log):
     error = False
     snat_ip = (vs_dict['vs']['B2'])
     snat_pool_name = vs_dict['vs']['X2']
+    snat_ip_compare = '/{0}/{1}'.format(partition, snat_ip)
 
     snat_on_ltm = bigip.get('%s/ltm/snatpool' % bigip_url_base)
     snat_on_ltm = json.loads(snat_on_ltm.content)
@@ -266,29 +272,38 @@ def compare_snat_on_ltm_excel(vs_dict, bigip_url_base, bigip, output_log):
     for dict_snat in snat_on_ltm:
 
         key_address_value = str(dict_snat.get('members'))
-        key_address_value = key_address_value.strip("[u'/Common/").strip("']")
         key_name_value = str(dict_snat.get('name'))
+        key_partition_value = str(dict_snat.get('partition'))
 
-        if snat_ip == key_address_value:
+        if key_partition_value != partition:
+            if snat_ip in key_address_value:
+                error = True
+                output_log.append({'Errors': 'SNAT Pool on LTM and Excel in different partitions. LTM: {0} EXCEL: {1}'
+                              .format(key_partition_value, partition)})
+                snat_pool_present = 1
+                return output_log, error, snat_pool_present
+
+        if snat_ip_compare in key_address_value:
 
             if snat_pool_name == key_name_value:
-                output_log.append({'NotificationsWarning': 'SNAT IP and SNAT Pool name already present on LTM. {}:{}'
-                                  .format(snat_pool_name, snat_ip)})
+                output_log.append({'NotificationsWarning': 'SNAT IP and SNAT Pool name already present on LTM.'})
                 snat_pool_present = 1
                 return output_log, error, snat_pool_present
                     
             else:
+                snat_pool_present = 1
                 output_log.append({'Errors': 'SNAT IP is already configured on LTM but SNAT Pool name on does '
                                              'not match name on Excel.'})
-                output_log.append({'Errors': 'SNAT IP : {}'.format(snat_ip)})   
+                output_log.append({'Errors': 'SNAT IP : {}'.format(snat_ip_compare)})
                 output_log.append({'Errors': 'Pool name on LTM : {}'.format(key_name_value)})   
                 output_log.append({'Errors': 'SNAT Pool name on Excel : {}'.format(snat_pool_name)})    
                 error = True
 
         if snat_pool_name == key_name_value:
+            snat_pool_present = 1
             output_log.append({'Errors': 'SNAT Pool name is already configured on LTM but SNAT IP does '
                                          'not match name on Excel.'})
-            output_log.append({'Errors': 'SNAT IP on Excel : {}'.format(snat_ip)})  
+            output_log.append({'Errors': 'SNAT IP on Excel : {}'.format(snat_ip_compare)})
             output_log.append({'Errors': 'SNAT IP on LTM : {}'.format(key_address_value)})  
             output_log.append({'Errors': 'SNAT Pool name : {}'.format(snat_pool_name)})         
             error = True
@@ -297,7 +312,8 @@ def compare_snat_on_ltm_excel(vs_dict, bigip_url_base, bigip, output_log):
             snat_pool_present = 0
 
     if snat_pool_present == 0:
-        output_log.append({'Notifications': 'SNAT pool {} : {} will be created.'.format(snat_pool_name, snat_ip)})
+        if error == False:
+            output_log.append({'Notifications': 'SNAT pool {} : {} will be created.'.format(snat_pool_name, snat_ip)})
 
     else:
         output_log.append({'Notifications': ' SNAT pool will not be created.'})
@@ -305,7 +321,7 @@ def compare_snat_on_ltm_excel(vs_dict, bigip_url_base, bigip, output_log):
     return  output_log, error, snat_pool_present
     
  
-def compare_ltm_nodes(vs_dict, bigip_url_base, bigip, output_log):
+def compare_ltm_nodes(vs_dict, partition, bigip_url_base, bigip, output_log):
     error = False
     node_list = vs_dict['node_list']
     node_list_priority = vs_dict['node_priority']
@@ -314,10 +330,11 @@ def compare_ltm_nodes(vs_dict, bigip_url_base, bigip, output_log):
     
     for node_name, node_pg in zip(node_list_priority[0::2], node_list_priority[1::2]):
         node_name_port = str(node_name) + ':' + str(node_port)
-        node_list_pool.extend([{'kind': 'ltm:pool:nodes', 'name': '{}'.format(node_name_port),'prioritygroup': '{}'
+        node_list_pool.extend([{'kind': 'ltm:pool:nodes', 'name': '{}'.format(node_name_port),'priorityGroup': '{}'
                                .format(node_pg)}])
         
-    
+
+
     # check if nodes already exist on ltm
     nodes_on_ltm = bigip.get('%s/ltm/node' % bigip_url_base)
     nodes_on_ltm = json.loads(nodes_on_ltm.content)
@@ -346,17 +363,27 @@ def compare_ltm_nodes(vs_dict, bigip_url_base, bigip, output_log):
             try:
                 node_name = nodes_on_ltm_dict[new_dict]['name']
                 node_ip = nodes_on_ltm_dict[new_dict]['address']
+                node_partition = nodes_on_ltm_dict[new_dict]['partition']
             except:
                 output_log.append({'Notifications': 'No Nodes configured on LTM'})
                 return output_log, error, node_list, 
 
 
             if node_name == excel_node_name and node_ip == excel_node_ip:
-                output_log.append({'NotificationsWarning': 'Node already present on LTM: {} - {}'
-                                  .format(node_name, node_ip)})
+                if node_partition == partition:
+                    output_log.append({'NotificationsWarning': 'Node already present on LTM: {} - {}'
+                                      .format(node_name, node_ip)})
+                    node_list_b.remove(excel_node_name)
+                    node_list_b.remove(excel_node_ip)
 
-                node_list_b.remove(excel_node_name)
-                node_list_b.remove(excel_node_ip)
+                else:
+                    output_log.append({'Errors': 'Node {} in different partition to EXCEL.'
+                                      .format(node_name)})
+                    error = True
+
+
+    if error:
+        return output_log, error
 
     node_list = node_list_b
     node_list_a = iter(node_list)
@@ -393,9 +420,10 @@ def compare_ltm_nodes(vs_dict, bigip_url_base, bigip, output_log):
     return output_log, error, node_list, node_list_pool
 
 
-def compare_pool(vs_dict, bigip_url_base, bigip, output_log):
+def compare_pool(vs_dict, partition, bigip_url_base, bigip, output_log):
     error = False
     pool_name = str(vs_dict['vs']['P2'])
+    pool_full_name = '/{0}/{1}'.format(partition, pool_name)
 
     # Get pool from ltm
     pool_on_ltm = bigip.get('%s/ltm/pool' % bigip_url_base)
@@ -409,12 +437,22 @@ def compare_pool(vs_dict, bigip_url_base, bigip, output_log):
         pool_on_ltm = [{u'kind': 'tm:ltm:pool:poolstate'}]
 
     for dict_pool in pool_on_ltm:
-        pool_name_value_ltm = str((dict_pool.get('name')))
+        pool_path_value_ltm = str((dict_pool.get('fullPath')))
         pool_description = str((dict_pool.get('description')))
+        pool_partition = str((dict_pool.get('partition')))
+        pool_name_value_ltm = str((dict_pool.get('name')))
 
-        if pool_name == pool_name_value_ltm:
-            output_log.append({'Errors': '{} - Pool name present on LTM.{}\n'.format(pool_name, pool_description)})
+        if pool_full_name == pool_path_value_ltm:
+            output_log.append({'Errors': '{} - Pool name present on LTM.{}'.format(pool_name, pool_description)})
             error = True
+            return output_log, error
+
+        if pool_name.split('_')[0] == pool_name_value_ltm.split('_')[0]:
+            if partition != pool_partition:
+                output_log.append({'Errors': 'LTM Pool and Excel Pool in different partitions. '
+                                             'LTM: {0} EXCEL: {1}'.format(pool_partition, partition)})
+                error = True
+                return output_log, error
 
     if not error:
         output_log.append({'Notifications': 'Pool: {} not present on LTM, POOL will be created.'.format(pool_name)})
@@ -422,12 +460,11 @@ def compare_pool(vs_dict, bigip_url_base, bigip, output_log):
     return output_log, error
 
 
-def compare_vs(vs_dict, bigip_url_base, bigip, output_log):
+def compare_vs(vs_dict, partition, bigip_url_base, bigip, output_log):
     error = False
-    s = ':'
     vs_ip = str(vs_dict['vs']['B2'])
     vs_port = str(vs_dict['vs']['C2'])
-    vs_destination = vs_ip + s + vs_port
+    vs_destination = '/{0}/{1}:{2}'.format(partition, vs_ip, vs_port)
 
     # Get vs from ltm
     vs_on_ltm = bigip.get('%s/ltm/virtual' % bigip_url_base)
@@ -442,7 +479,6 @@ def compare_vs(vs_dict, bigip_url_base, bigip, output_log):
 
     for dict_vs in vs_on_ltm:
         vs_destination_value = str((dict_vs.get('destination')))
-        vs_destination_value = vs_destination_value.strip('/Common/')
 
         if vs_destination == vs_destination_value:
             output_log.append({'Errors': '{}:Virtual Server name present on LTM.\n'.format(vs_destination)})
@@ -455,7 +491,7 @@ def compare_vs(vs_dict, bigip_url_base, bigip, output_log):
     return output_log, error
 
 
-def create_vs_ssl_profiles(vs_dict, bigip_url_base, bigip, output_log):
+def create_vs_ssl_profiles(vs_dict, partition, bigip_url_base, bigip, output_log):
     error = False
     output_log.append({'Headers': 'Creating SSL Client Profile.'})
     ssl_client_profile = {}
@@ -471,6 +507,7 @@ def create_vs_ssl_profiles(vs_dict, bigip_url_base, bigip, output_log):
     ssl_client_profile['cert'] = vs_hostname_crt
     ssl_client_profile['key'] = vs_hostname_key
     ssl_client_profile['chain'] = vs_hostname_chain
+    ssl_client_profile['partition'] = partition
 
     ssl_client_profile_sent = str(bigip.post('%s/ltm/profile/client-ssl' % bigip_url_base,
                                              data=json.dumps(ssl_client_profile)))
@@ -495,7 +532,7 @@ def create_vs_ssl_profiles(vs_dict, bigip_url_base, bigip, output_log):
         ssl_server_profile['kind'] = 'tm:ltm:profile:server-ssl:server-sslstate'
         ssl_server_profile['name'] = vs_dict['vs']['M2']
         ssl_server_profile['defaultsFrom'] = 'serverssl'
-
+        ssl_server_profile['partition'] = partition
         ssl_server_profile_sent = str(bigip.post('%s/ltm/profile/server-ssl' % bigip_url_base,
                                                  data=json.dumps(ssl_server_profile)))
 
@@ -508,8 +545,9 @@ def create_vs_ssl_profiles(vs_dict, bigip_url_base, bigip, output_log):
     return output_log, error
 
 
-def create_pool_monitor(vs_dict, bigip_url_base, bigip, output_log):
+def create_pool_monitor(vs_dict, partition, bigip_url_base, bigip, output_log):
     error = False
+    
     pool_mon_info = {}
     try:
         traffic_type = vs_dict['vs']['R2']
@@ -533,6 +571,7 @@ def create_pool_monitor(vs_dict, bigip_url_base, bigip, output_log):
         pool_mon_info['name'] = vs_dict['vs']['Q2']
         pool_mon_info['defaultsFrom'] = traffic_type
         pool_mon_info['destination'] = '*:' + str(vs_dict['vs']['V2'])
+        pool_mon_info['partition'] = partition
 
         https_mon_sent = str(bigip.post('%s/ltm/monitor/%s' % (bigip_url_base, traffic_type), data=json.dumps(pool_mon_info)))
 
@@ -545,7 +584,8 @@ def create_pool_monitor(vs_dict, bigip_url_base, bigip, output_log):
     return output_log, error
 
 
-def create_vs_profiles_http(vs_dict, bigip_url_base, bigip, output_log):
+def create_vs_profiles_http(vs_dict, partition, bigip_url_base, bigip, output_log):
+    
     error = False
     http_profile = {}
     traffic_type = vs_dict['vs']['D2']
@@ -561,6 +601,7 @@ def create_vs_profiles_http(vs_dict, bigip_url_base, bigip, output_log):
             http_profile['name'] = vs_dict['vs']['K2']
             http_profile['insertXforwardedFor'] = "enabled"
             http_profile['defaultsFrom'] = http_default_profile
+            http_profile['partition'] = partition
 
             http_profile_sent = str(bigip.post('%s/ltm/profile/http' % bigip_url_base, data=json.dumps(http_profile)))
 
@@ -585,8 +626,9 @@ def create_vs_profiles_http(vs_dict, bigip_url_base, bigip, output_log):
 
 
 
-def create_snat(vs_dict, bigip_url_base, bigip, output_log):
+def create_snat(vs_dict, partition, bigip_url_base, bigip, output_log):
     error = False
+    
     if vs_dict['vs']['B2']:
         output_log.append({'Headers': 'Creating SNAT Pool.'})
 
@@ -599,6 +641,7 @@ def create_snat(vs_dict, bigip_url_base, bigip, output_log):
         snat_info['kind'] = 'tm:ltm:snatpool:snatpoolstate'
         snat_info['name'] = snat_pool_name
         snat_info['members'] = snat_ip
+        snat_info['partition'] = partition
 
         snat_timeout['kind'] = 'tm:ltm:snat-translation:snat-translationstate'
         snat_timeout['name'] = vs_dict['vs']['B2']
@@ -606,6 +649,7 @@ def create_snat(vs_dict, bigip_url_base, bigip, output_log):
         snat_timeout['ipIdleTimeout'] = '300'
         snat_timeout['tcpIdleTimeout'] = '300'
         snat_timeout['udpIdleTimeout'] = '60'
+        snat_timeout['partition'] = partition
 
         snat_timeout_sent = str(bigip.post('%s/ltm/snat-translation' % bigip_url_base, data=json.dumps(snat_timeout)))
 
@@ -627,7 +671,8 @@ def create_snat(vs_dict, bigip_url_base, bigip, output_log):
 
 
 
-def create_nodes(node_list, bigip_url_base, bigip, output_log):
+def create_nodes(node_list, partition, bigip_url_base, bigip, output_log):
+    
     error = False
     node_info = {}
     output_log.append({'Headers': 'Creating Nodes.'})
@@ -638,6 +683,8 @@ def create_nodes(node_list, bigip_url_base, bigip, output_log):
         node_info['kind'] = 'tm:ltm:pool:poolstate'
         node_info['name'] = node_name
         node_info['address'] = node_ip
+        node_info['partition'] = partition
+
         node_sent = str(bigip.post('%s/ltm/node' % bigip_url_base, data=json.dumps(node_info)))
 
         if node_sent.__contains__('200'):
@@ -651,8 +698,9 @@ def create_nodes(node_list, bigip_url_base, bigip, output_log):
 
 
 
-def create_pool(vs_dict, bigip_url_base, bigip, output_log):
+def create_pool(vs_dict, partition, bigip_url_base, bigip, output_log):
     error = False
+    
     node_list_pool = vs_dict['node_list_pool']
     pool_info = {}
     output_log.append({'Headers': 'Creating Pool.'})
@@ -664,6 +712,7 @@ def create_pool(vs_dict, bigip_url_base, bigip, output_log):
     pool_info['monitor'] = vs_dict['vs']['Q2']
     pool_info['members'] = node_list_pool
     pool_info['minActiveMembers'] = str(vs_dict['vs']['AV2'])
+    pool_info['partition'] = partition
 
     pool_sent = str(bigip.post('%s/ltm/pool' % bigip_url_base, data=json.dumps(pool_info)))
 
@@ -682,7 +731,8 @@ def create_pool(vs_dict, bigip_url_base, bigip, output_log):
 
 
 
-def create_vs(vs_dict, bigip_url_base, bigip, output_log):
+def create_vs(vs_dict, partition, bigip_url_base, bigip, output_log):
+    
     error = False
     if vs_dict['vs']['A2']:
         output_log.append({'Headers': 'Creating Virtual Server.'})
@@ -704,6 +754,7 @@ def create_vs(vs_dict, bigip_url_base, bigip, output_log):
         vs_info['ipProtocol'] = 'tcp'
         vs_info['pool'] = vs_dict['vs']['P2']
         vs_info['sourceAddressTranslation'] = {'pool': snat_pool_name, 'type': 'snat'}
+        vs_info['partition'] = partition
 
         if int_ext in ['INT']:
             vs_info['profiles'] = [
@@ -732,6 +783,7 @@ def create_vs(vs_dict, bigip_url_base, bigip, output_log):
             if vs_dict['vs']['L2']:
                 vs_info['profiles'].append({'kind': 'ltm:virtual:profile', 'name': vs_dict['vs']['L2']})
 
+
         vs_info_sent = str(bigip.post('%s/ltm/virtual' % bigip_url_base, data=json.dumps(vs_info)))
 
         if vs_info_sent.__contains__('200'):
@@ -745,3 +797,116 @@ def create_vs(vs_dict, bigip_url_base, bigip, output_log):
             output_log.append({'Errors': '{} - Ubable to create Virtual Server *'.format(vs_dict['vs']['A2'])})
 
     return output_log, error
+
+def create_advertise_vip(vs_dict, partition, bigip_url_base, bigip, output_log):
+
+    output_log.append({'Headers': 'Advertising Virtual Server IP.'})
+    error = False
+    vs_ip = str(vs_dict['vs']['B2'])
+    patch_url = '{0}/ltm/virtual-address/~{1}~{2}'.format(bigip_url_base, partition, vs_ip)
+    patch_json = {"routeAdvertisement": "enabled"}
+
+    try:
+        get_response = bigip.get(patch_url, timeout=30)
+        payload_response = json.loads(get_response.text)
+
+        if get_response.status_code == 200:
+            if payload_response['routeAdvertisement'] == 'enabled':
+                output_log.append({'NotificationsSuccess': 'Virtual IP already advertised, no modifications will be made.'})
+                return output_log, error
+
+        if get_response.status_code == 404:
+            error = True
+            output_log.append({'Errors': 'Unable to locate {0} in Virtual IP List.'.format(vs_ip)})
+            return output_log, error
+
+    except requests.exceptions.HTTPError as errh:
+        error = True
+        output_log.append({'Errors': 'Http Error: ' + str(errh)})
+        return output_log, error
+
+    except requests.exceptions.ConnectionError as errc:
+        error = True
+        output_log.append({'Errors': 'Error Connecting: ' + str(errc)})
+        return output_log, error
+
+    except requests.exceptions.Timeout as errt:
+        error = True
+        output_log.append({'Errors': 'Timeout Error: ' + str(errt)})
+        return output_log, error
+
+    except requests.exceptions.RequestException as err:
+        error = True
+        output_log.append({'Errors': 'Error: ' + str(err)})
+        return output_log, error
+
+    if not error:
+        try:
+            patch_response = bigip.patch(patch_url, data=json.dumps(patch_json), timeout=30)
+            payload_response = json.loads(patch_response.text)
+
+            if patch_response.status_code == 200:
+                output_log.append({'NotificationsInfo': '{} : Virtual Server IP Successfully Advertised'.format(vs_ip)})
+                return output_log, error
+
+        except requests.exceptions.HTTPError as errh:
+            error = True
+            output_log.append({'Errors': 'Http Error: ' + str(errh)})
+            return output_log, error
+
+        except requests.exceptions.ConnectionError as errc:
+            error = True
+            output_log.append({'Errors': 'Error Connecting: ' + str(errc)})
+            return output_log, error
+
+        except requests.exceptions.Timeout as errt:
+            error = True
+            output_log.append({'Errors': 'Timeout Error: ' + str(errt)})
+            return output_log, error
+
+        except requests.exceptions.RequestException as err:
+            error = True
+            output_log.append({'Errors': 'Error: ' + str(err)})
+            return output_log, error
+
+def validate_partition(partition, bigip_url_base, bigip, output_log):
+    error = True
+    get_url = '{0}/sys/folder/'.format(bigip_url_base)
+
+    try:
+        get_response = bigip.get(get_url, timeout=30)
+        payload_response = json.loads(get_response.text)
+
+        if get_response.status_code == 200:
+                for part in payload_response['items']:
+                    if part['name'] == partition:
+                        # Partition located.
+                        error = False
+
+                if not error:
+                    output_log.append({'Notifications': 'Configuration to be deployed in partition: ' + partition})
+                    return output_log, error
+
+                if error:
+                    output_log.append({'Errors': 'Unable to locate partition: ' + partition + ' on F5.'})
+                    return output_log, error
+
+    except requests.exceptions.HTTPError as errh:
+        error = True
+        output_log.append({'Errors': 'Http Error: ' + str(errh)})
+        return output_log, error
+
+    except requests.exceptions.ConnectionError as errc:
+        error = True
+        output_log.append({'Errors': 'Error Connecting: ' + str(errc)})
+        return output_log, error
+
+    except requests.exceptions.Timeout as errt:
+        error = True
+        output_log.append({'Errors': 'Timeout Error: ' + str(errt)})
+        return output_log, error
+
+    except requests.exceptions.RequestException as err:
+        error = True
+        output_log.append({'Errors': 'Error: ' + str(err)})
+        return output_log, error

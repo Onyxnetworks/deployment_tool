@@ -4,8 +4,9 @@ from django.http import HttpResponse
 from celery.result import AsyncResult
 
 from f5_deployment.scripts.baseline import bigip_login
-from index.scripts.baseline import get_base_url
+from index.scripts.baseline import *
 from index.scripts.external_links import *
+
 # Function to get task state and results to be used by ajax.
 def get_task_info(request):
     task_id = request.GET.get('task_id', None)
@@ -23,7 +24,7 @@ def get_task_info(request):
 
 
 def login(request):
-    content = {}
+    content = {'environment_list': environments}
     if request.method == 'POST':
         if 'username' and 'password' in request.POST:
             username = request.POST['username']
@@ -44,6 +45,7 @@ def login(request):
                 request.session['lab_username'] = username
                 request.session['lab_password'] = password
 
+
             # Get base url to use for authentication and scripts and try to login to UKDC1 APIC
             base_urls = get_base_url(environment)
 
@@ -62,7 +64,8 @@ def login(request):
                 request.session['role'] = 'Administrator'
                 return redirect(index)
             else:
-                content = {'error': True, 'message': 'Unable to authenticate, please check credentials.'}
+                content = {'environment_list': environments, 'error': True,
+                           'message': 'Unable to authenticate, please check credentials.'}
                 redirect(request.path_info)
 
     return render(request, 'index/login.html', content)

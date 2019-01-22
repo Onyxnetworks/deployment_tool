@@ -12,7 +12,7 @@ $.ajax({
     contentType: false,
     success: function (data) {
         if (data.task_id != null) {
-            get_validation_task_info(data.task_id, data.location, data.vs_dict);
+            get_validation_task_info(data.task_id, data.location, data.routeAdvertisement, data.vs_dict);
         }
         },
     error: function (data) {
@@ -22,7 +22,7 @@ $.ajax({
 });
 return false;
 });
-function get_validation_task_info(task_id, location, vs_dict) {
+function get_validation_task_info(task_id, location, routeAdvertisement, vs_dict) {
     $.ajax({
         type: 'get',
         url: '/get_task_info/',
@@ -117,14 +117,15 @@ function get_validation_task_info(task_id, location, vs_dict) {
                     document.getElementById("deploy_btn").style.visibility = "visible";
                     document.getElementById("new_file_btn").style.visibility = "visible";
                     document.getElementById("upload_btn").style.visibility = "hidden";
+                    document.getElementById("routeAdvertisement_div").style.visibility = "hidden";
                     document.getElementById("location").disabled = true;
                     document.getElementById("file").disabled = true;
-                    deploy_configuration(location, vs_dict);
+                    deploy_configuration(location, routeAdvertisement, vs_dict);
                 }
             }
             if (data.state != 'SUCCESS') {
                 setTimeout(function () {
-                    get_validation_task_info(task_id, location, vs_dict)
+                    get_validation_task_info(task_id, location, routeAdvertisement, vs_dict)
                 }, 1000);
             }},
         error: function (data) {
@@ -133,9 +134,9 @@ function get_validation_task_info(task_id, location, vs_dict) {
         }
     });
 }
-function deploy_configuration(location, vs_dict) {
+function deploy_configuration(location, routeAdvertisement, vs_dict) {
     $("#deploy_btn").click(function(){
-        post_data = JSON.stringify({'location': location, 'vs_dict': vs_dict});
+        post_data = JSON.stringify({'location': location, 'routeAdvertisement': routeAdvertisement, 'vs_dict': vs_dict});
         $.ajax({
             type: 'post',
             url: '/f5/vs_deployment_push/',
@@ -163,13 +164,17 @@ function get_deployment_task_info(task_id) {$.ajax({
             rslt.html('Pushing configuration to BigIP...');
             document.getElementById("resultdiv").style.visibility = "hidden";
             document.getElementById("vs_deployment_results").innerHTML = "";
+            var loader = `<img src='/static/index/svg/spinner.svg'/>`;
+            document.getElementById("loader").style.display = "block";
+            document.getElementById("loader").innerHTML = loader;
         }
         else if (data.state == 'SUCCESS') {
             <!-- Clear Old  Data -->
+            document.getElementById("loader").style.display = "none";
             document.getElementById("vs_deployment_results").innerHTML = "";
             document.getElementById("resultdiv").style.visibility = "visible";
             var results = data.result;
-            var result_location = document.getElementById("vs_deployment_results")
+            var result_location = document.getElementById("vs_deployment_results");
             var validation_error = false;
             for (i = 0, len = results.length, text = ""; i < len; i++) {
                 if (results[i].Headers) {
@@ -232,6 +237,8 @@ function get_deployment_task_info(task_id) {$.ajax({
                     var validation_error = true
                 }
             }
+            var deploy_btn = document.getElementById("deploy_btn");
+            document.getElementById("vs_menu").removeChild(deploy_btn);
         }
         if (data.state != 'SUCCESS') {
             setTimeout(function () {

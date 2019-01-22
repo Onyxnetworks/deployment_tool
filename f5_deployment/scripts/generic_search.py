@@ -13,7 +13,7 @@ def f5_generic_search(base_url, auth_token, search_options):
     get_url = base_url + '{0}'.format(search_options)
 
     try:
-        get_response = requests.get(get_url, headers=headers, timeout=5, verify=False)
+        get_response = requests.get(get_url, headers=headers, timeout=30, verify=False)
         payload_response = json.loads(get_response.text)
 
         if get_response.status_code == 200:
@@ -41,7 +41,7 @@ def get_vs_stats(base_url, selfLink, auth_token):
     headers = {'content-type': 'application/json', 'X-F5-Auth-Token': auth_token}
     get_url = base_url + '/{0}/stats'.format(selfLink)
     try:
-        get_response = requests.get(get_url, headers=headers, timeout=5, verify=False)
+        get_response = requests.get(get_url, headers=headers, timeout=30, verify=False)
         payload_response = json.loads(get_response.text)
         if get_response.status_code == 200:
             return payload_response
@@ -55,7 +55,7 @@ def get_node_stats(base_url, nodeLink, auth_token):
     headers = {'content-type': 'application/json', 'X-F5-Auth-Token': auth_token}
     get_url = base_url + '/{0}/stats'.format(nodeLink)
     try:
-        get_response = requests.get(get_url, headers=headers, timeout=5, verify=False)
+        get_response = requests.get(get_url, headers=headers, timeout=30, verify=False)
         payload_response = json.loads(get_response.text)
         if get_response.status_code == 200:
             return payload_response
@@ -81,7 +81,7 @@ def get_pool_stats(base_url, poolLink, auth_token):
     headers = {'content-type': 'application/json', 'X-F5-Auth-Token': auth_token}
     get_url = base_url + '/{0}/stats'.format(poolLink)
     try:
-        get_response = requests.get(get_url, headers=headers, timeout=5, verify=False)
+        get_response = requests.get(get_url, headers=headers, timeout=30, verify=False)
         payload_response = json.loads(get_response.text)
         if get_response.status_code == 200:
             return payload_response
@@ -108,7 +108,7 @@ def get_pool_by_reference(base_url, poolLink, auth_token):
     get_url = base_url +'/{0}?expandSubcollections=true'.format(poolLink)
 
     try:
-        get_response = requests.get(get_url, headers=headers, timeout=5, verify=False)
+        get_response = requests.get(get_url, headers=headers, timeout=30, verify=False)
         payload_response = json.loads(get_response.text)
 
         if get_response.status_code == 200:
@@ -138,7 +138,7 @@ def get_all_vs(base_url, auth_token, search_options):
 
         get_url = base_url + '/mgmt/tm/ltm/virtual/?expandSubcollections=true&$select={}'.format(search_options)
         try:
-            get_response = requests.get(get_url, headers=headers, timeout=5, verify=False)
+            get_response = requests.get(get_url, headers=headers, timeout=30, verify=False)
             payload_response = json.loads(get_response.text)
 
             if get_response.status_code == 200:
@@ -415,7 +415,7 @@ def certificate_checker(url_list, request_type, search_string, username, passwor
 
                 if big_ip_version < 1215:
                     common_name = cert['subject']
-                    common_name = re.match(r'CN=.*?,', common_name).group()[3:]
+                    common_name = re.match(r'CN=.*? ,', common_name).group()[3:]
             except:
                 common_name = ''
             try:
