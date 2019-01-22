@@ -333,7 +333,8 @@ def compare_ltm_nodes(vs_dict, partition, bigip_url_base, bigip, output_log):
         node_list_pool.extend([{'kind': 'ltm:pool:nodes', 'name': '{}'.format(node_name_port),'priorityGroup': '{}'
                                .format(node_pg)}])
         
-    
+
+
     # check if nodes already exist on ltm
     nodes_on_ltm = bigip.get('%s/ltm/node' % bigip_url_base)
     nodes_on_ltm = json.loads(nodes_on_ltm.content)
