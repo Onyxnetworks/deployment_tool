@@ -13,6 +13,7 @@ def vs_deployment_excel_open_workbook(file):
     wb = openpyxl.load_workbook(file, data_only=True)
     py_ws = wb.get_sheet_by_name('Tab_Python')
     vs_dict = {}
+    vs_dict['version'] = py_ws['CD1'].value
     vs_dict['vs'] = {}
     vs_dict['node_list'] = []
     vs_dict['node_priority'] = []
@@ -39,6 +40,18 @@ def vs_deployment_validation(vs_dict, location, url_dict, username, password):
     
     output_log = []
     error = False
+    form_version = vs_dict['version']
+    script_version = '1.4'
+    output_log.append({'Headers': 'Checking Script compatibility.'})
+    if form_version != script_version:
+        error = True
+        output_log.append(
+            {'Errors': 'Script version missmatch. Excel version: {0} | Script version: {1}'.format(form_version, script_version)})
+        return output_log, vs_dict
+    else:
+        output_log.append({'NotificationsSuccess': 'Form version validated successfully.'})
+
+
     output_log.append({'Headers': 'Identifying F5 Device group.'})  
     # Get Virtual Server Name
     vs_name = vs_dict['vs']['A2']
