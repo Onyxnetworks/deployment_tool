@@ -330,7 +330,7 @@ def compare_ltm_nodes(vs_dict, partition, bigip_url_base, bigip, output_log):
     
     for node_name, node_pg in zip(node_list_priority[0::2], node_list_priority[1::2]):
         node_name_port = str(node_name) + ':' + str(node_port)
-        node_list_pool.extend([{'kind': 'ltm:pool:nodes', 'name': '{}'.format(node_name_port),'prioritygroup': '{}'
+        node_list_pool.extend([{'kind': 'ltm:pool:nodes', 'name': '{}'.format(node_name_port),'priorityGroup': '{}'
                                .format(node_pg)}])
         
     

@@ -13,9 +13,9 @@ from index.scripts.baseline import get_base_url
 from celery import shared_task
 
 @shared_task
-def ENDPOINT_SEARCH(base_urls, filter_default, username, password, SUBNET):
+def ENDPOINT_SEARCH(base_urls, filter_default, username, password, search_string):
     RESULTS = []
-	
+
     # Build URL List to search.
     url_list = []
     for url in base_urls['ACI']:
@@ -23,13 +23,23 @@ def ENDPOINT_SEARCH(base_urls, filter_default, username, password, SUBNET):
 
     ENDPOINT_LIST = GET_ENDPOINTS(url_list, filter_default, username, password)
 
-
+    try:
+        network = ipaddress.IPv4Network(subnets)
+        request_type = 'subnet'
+    except:
+        request_type = 'epg_name'
 
     for i in ENDPOINT_LIST:
-        if IPNetwork(SUBNET) in IPNetwork(i['Subnet']) or IPNetwork(i['Subnet']) in IPNetwork(SUBNET):
-            RESULTS.append(
-                {'Subnet': i['Subnet'], 'Locality': i['Locality'], 'Location': i['Location'], 'EPG': i['EPG'],
-                 'Scope': i['Scope'], 'AppProfile': i['AppProfile'], 'Tenant': i['Tenant']})
+        if request_type == 'subnet':
+            if IPNetwork(search_string) in IPNetwork(i['Subnet']) or IPNetwork(i['Subnet']) in IPNetwork(search_string):
+                RESULTS.append({'Subnet': i['Subnet'], 'Locality': i['Locality'], 'Location': i['Location'],
+                                'EPG': i['EPG'],'Scope': i['Scope'], 'AppProfile':
+                                    i['AppProfile'], 'Tenant': i['Tenant']})
+        if request_type == 'epg_name':
+            if search_string in i['EPG']:
+                RESULTS.append({'Subnet': i['Subnet'], 'Locality': i['Locality'], 'Location': i['Location'],
+                                'EPG': i['EPG'], 'Scope': i['Scope'], 'AppProfile':
+                                    i['AppProfile'], 'Tenant': i['Tenant']})
 
     # Sort the list by subnet before returning it.
     RESULTS = sorted(RESULTS, key=itemgetter('Subnet'), reverse=True)
