@@ -24,7 +24,7 @@ def ENDPOINT_SEARCH(base_urls, filter_default, username, password, search_string
     ENDPOINT_LIST = GET_ENDPOINTS(url_list, filter_default, username, password)
 
     try:
-        network = ipaddress.IPv4Network(subnets)
+        network = ipaddress.IPv4Network(search_string)
         request_type = 'subnet'
     except:
         request_type = 'epg_name'
