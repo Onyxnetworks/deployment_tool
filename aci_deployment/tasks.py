@@ -4,6 +4,7 @@ from operator import itemgetter
 
 
 # Custom Functions
+from aci_deployment.scripts.ipg_search import *
 from aci_deployment.scripts.endpoint_search import *
 from aci_deployment.scripts.external_epg_deployment import *
 from aci_deployment.scripts.contract_deployment import *
@@ -71,8 +72,6 @@ def ipg_search(base_urls, username, password, search_string):
                     epg['fvRsPathAtt']['attributes']['dn'].split('/')[2][3:], 'epg':
                     epg['fvRsPathAtt']['attributes']['dn'].split('/')[3][4:],'encap': epg['encap']})
                 i += 1
-
-
 
     return  results
 
