@@ -46,6 +46,7 @@ def ENDPOINT_SEARCH(base_urls, filter_default, username, password, search_string
     RESULTS = sorted(RESULTS, key=itemgetter('Subnet'), reverse=True)
     return RESULTS
 
+
 @shared_task
 def ipg_search(base_urls, username, password, search_string):
     results = []
