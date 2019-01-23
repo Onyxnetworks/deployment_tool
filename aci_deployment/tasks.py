@@ -36,7 +36,7 @@ def ENDPOINT_SEARCH(base_urls, filter_default, username, password, search_string
                                 'EPG': i['EPG'],'Scope': i['Scope'], 'AppProfile':
                                     i['AppProfile'], 'Tenant': i['Tenant']})
         if request_type == 'epg_name':
-            if search_string in i['EPG']:
+            if search_string.upper() in i['EPG'].upper():
                 RESULTS.append({'Subnet': i['Subnet'], 'Locality': i['Locality'], 'Location': i['Location'],
                                 'EPG': i['EPG'], 'Scope': i['Scope'], 'AppProfile':
                                     i['AppProfile'], 'Tenant': i['Tenant']})
