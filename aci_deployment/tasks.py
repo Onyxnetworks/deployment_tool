@@ -46,6 +46,18 @@ def ENDPOINT_SEARCH(base_urls, filter_default, username, password, search_string
     return RESULTS
 
 
+def ipg_search(base_urls, username, password, search_string):
+    results = []
+
+    # Build URL List to search.
+    url_list = []
+    for url in base_urls['ACI']:
+        url_list.append(base_urls['ACI'][url])
+
+
+    return  results
+
+
 def CONTRACT_DEPLOYMENT_EXCEL_OPEN_WORKBOOK(WORKBOOK, LOCATION):
     WB = openpyxl.load_workbook(WORKBOOK, data_only=True)
     if LOCATION == 'UKDC1':
