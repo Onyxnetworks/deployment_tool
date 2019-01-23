@@ -15,7 +15,7 @@
                     <h1 class="page-header">Endpoint Search</h1>
 					<form role="form" id="endpoint_search" method="post" enctype="multipart/form-data">{% csrf_token %}
 					<div class="form-group input-group">
-						<input type="text" placeholder="Enter Subnet" required="required" name="endpoint_search" class="form-control">
+						<input type="text" placeholder="Enter Subnet / EPG Name" required="required" name="endpoint_search" class="form-control" data-toggle="tooltip" data-placement="top" name="endpoint_search" class="form-control" title="Enter Subnet or EPG Name.">
 						<span class="input-group-btn">
 							<button class="btn btn-default" type="submit"><i class="fa fa-search"></i></button>
 						</span>
