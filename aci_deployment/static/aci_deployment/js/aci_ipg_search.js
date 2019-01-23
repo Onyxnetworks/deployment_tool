@@ -1,5 +1,5 @@
-frm = $('#ipg_search');
-rslt = $('#ipg_results');
+var frm = $('#ipg_search');
+var rslt = $('#ipg_results');
 
 
 frm.submit(function () {
