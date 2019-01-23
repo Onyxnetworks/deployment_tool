@@ -59,7 +59,10 @@ def aci_ipg_search(base_urls, username, password, search_string):
     ipg_list = get_ipg(url_list, username, password)
 
     # List all EPG for selected
-    if search_string in ipg_list:
+    # Convert  List into upper case
+    ipg_list_upper = [element.upper() for element in ipg_list]
+    search_string = search_string.upper()
+    if [s for s in ipg_list_upper if search_string in s.upper()]:
 
         fvpathatt_list = get_fvpathatt(url_list, search_string, username, password)
 
