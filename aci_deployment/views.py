@@ -72,7 +72,7 @@ def ipg_search(request):
         base_urls = get_base_url(environment)
 
         # Submit task to celery to process
-        task = ipg_search.delay(base_urls, username, password, search_string)
+        task = aci_ipg_search.delay(base_urls, username, password, search_string)
 
         # Return task id back to client for ajax use.
         return HttpResponse(json.dumps({'task_id': task.id}), content_type='application/json')

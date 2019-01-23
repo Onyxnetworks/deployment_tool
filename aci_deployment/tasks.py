@@ -48,7 +48,7 @@ def ENDPOINT_SEARCH(base_urls, filter_default, username, password, search_string
 
 
 @shared_task
-def ipg_search(base_urls, username, password, search_string):
+def aci_ipg_search(base_urls, username, password, search_string):
     results = []
 
     # Build URL List to search.
