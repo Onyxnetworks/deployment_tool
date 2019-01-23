@@ -11,7 +11,7 @@ def endpoint_search(request):
     role = request.session.get('role')
     # Get subnet to use for search task.
     if request.method == 'POST' and 'endpoint_search' in request.POST:
-        subnet = request.POST['endpoint_search']
+        search_string = request.POST['endpoint_search']
         filter_default = True
         environment = request.session.get('environment')
         if environment == 'Production':
@@ -31,7 +31,7 @@ def endpoint_search(request):
         base_urls = get_base_url(environment)
 
         # Submit task to celery to process
-        task = ENDPOINT_SEARCH.delay(base_urls, filter_default, username, password, subnet)
+        task = ENDPOINT_SEARCH.delay(base_urls, filter_default, username, password, search_string)
 
         # Return task id back to client for ajax use.
         return HttpResponse(json.dumps({'task_id': task.id}), content_type='application/json')        
