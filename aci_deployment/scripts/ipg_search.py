@@ -61,7 +61,7 @@ def get_fvpathatt(url_list, search_string, username, password):
         try:
             get_response = requests.get(mapped_ipg, cookies=apic_cookie, verify=False)
             fvpathatt_response = json.loads(get_response.text)
-            mapped_ipg_list.append({'location:': location, 'response': fvpathatt_response})
+            mapped_ipg_list.append({'location': location, 'response': fvpathatt_response})
 
 
         except:
