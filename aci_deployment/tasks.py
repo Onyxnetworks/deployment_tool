@@ -54,6 +54,25 @@ def ipg_search(base_urls, username, password, search_string):
     for url in base_urls['ACI']:
         url_list.append(base_urls['ACI'][url])
 
+    ipg_list = get_ipg(url_list, username, password)
+
+    # List all EPG for selected
+    if search_string in ipg_list:
+
+        fvpathatt_list = get_fvpathatt(url_list, search_string, username, password)
+
+        # loop through output, print and add EPG's to list
+        i = 0
+        for ipg_location in fvpathatt_list:
+            location = ipg_location['location']
+            for epg in location['response']['imdata']:
+                results.append({'location': location, 'tenant':
+                    epg['fvRsPathAtt']['attributes']['dn'].split('/')[1][3:], 'app_prof':
+                    epg['fvRsPathAtt']['attributes']['dn'].split('/')[2][3:], 'epg':
+                    epg['fvRsPathAtt']['attributes']['dn'].split('/')[3][4:],'encap': epg['encap']})
+                i += 1
+
+
 
     return  results
 
