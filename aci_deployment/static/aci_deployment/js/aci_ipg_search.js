@@ -62,6 +62,7 @@ function get_task_info(task_id) {
                         document.body.appendChild(td);
                         document.getElementById(TABLE_TR).appendChild(td);
                     });}
+
                 $('#ipg_table').DataTable({
                     retrieve: true,
                     responsive: true,
