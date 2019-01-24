@@ -3,7 +3,7 @@ var rslt = $('#contract_results');
 
 
 frm.submit(function () {
-    document.getElementById("tablediv").style.visibility = "hidden";
+    //document.getElementById("tablediv").style.visibility = "hidden";
     $.ajax({
         type: frm.attr('method'),
         url: frm.attr('action'),
@@ -14,7 +14,7 @@ frm.submit(function () {
             }
         },
         error: function (data) {
-            document.getElementById("tablediv").style.visibility = "hidden";
+            //document.getElementById("tablediv").style.visibility = "hidden";
             console.log("Something went wrong!");
         }
     });
@@ -37,8 +37,8 @@ function get_task_info(task_id) {
                 else if (data.state == 'SUCCESS') {
                     console.log('Success')
                     document.getElementById("loader").style.display = "none";
-                    document.getElementById("result_table").innerHTML = "";
-                    document.getElementById("tablediv").style.visibility = "visible";
+                    //document.getElementById("result_table").innerHTML = "";
+                    //document.getElementById("tablediv").style.visibility = "visible";
                     var results = data.result;
                     console.log(results);
                 }
@@ -51,7 +51,7 @@ function get_task_info(task_id) {
             },
 
             error: function (data) {
-                document.getElementById("tablediv").style.visibility = "hidden";
+                //document.getElementById("tablediv").style.visibility = "hidden";
                 document.getElementById("loader").style.display = "none";
                 rslt.html("Something went wrong!");
                 success()
