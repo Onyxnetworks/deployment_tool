@@ -5,7 +5,7 @@ def get_internal_epg(base_url, search_string, apic_cookie):
 
     headers = {'content-type': 'application/json'}
 
-    # Get searched EPG from Fabeic
+    # Get searched EPG from Fabric
     get_epg_url = base_url + 'node/class/fvAEPg.json?query-target-filter=and(eq(fvAEPg.name,"{0}"))'.format(search_string)
 
     try:
@@ -21,7 +21,7 @@ def get_internal_epg(base_url, search_string, apic_cookie):
         return
 
     try:
-        get_contracts_url = BASE_URL + 'node/mo/uni/tn-{0}/ap-{1}/epg-{2}.json?query-target=children'.format(tenant, app_prof, epg)
+        get_contracts_url = base_url + 'node/mo/uni/tn-{0}/ap-{1}/epg-{2}.json?query-target=children'.format(tenant, app_prof, epg)
         get_response = requests.get(get_contracts_url, cookies=apic_cookie, headers=headers, verify=False)
         all_contract_response = json.loads(get_response.text)
 
@@ -50,7 +50,7 @@ def get_external_epg(base_url, search_string, apic_cookie):
         print('Failed to get Info for: ' + base_url)
         return
     try:
-        get_contracts_url = BASE_URL + 'node/mo/uni/tn-{0}/out-{1}/instP-{2}.json?query-target=children'.format(tenant, l3out, epg)
+        get_contracts_url = base_url + 'node/mo/uni/tn-{0}/out-{1}/instP-{2}.json?query-target=children'.format(tenant, l3out, epg)
         get_response = requests.get(get_contracts_url, cookies=apic_cookie, headers=headers, verify=False)
         all_contract_response = json.loads(get_response.text)
 
