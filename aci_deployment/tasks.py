@@ -950,6 +950,7 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, username, pass
             # Check if Internal EPGs Exist
             OUTPUT_LOG.append({'Headers': 'Checking if Internal EPGs are created'})
             EPG_LIST = []
+            DISPLAY_LIST = []
             # Search to validate internal EPG's are created
             for rules in RULE_LIST:
                 if rules['CONSUMER_L3OUT'] == 'INTERNAL':
