@@ -79,7 +79,29 @@ def aci_ipg_search(base_urls, username, password, search_string):
                     epg['fvRsPathAtt']['attributes']['encap']})
                 i += 1
 
-    return  results
+    return results
+
+@shared_task
+def ci_contract_search(base_urls, username, password, request_type, search_string):
+    results = []
+
+    # Build URL List to search.
+    url_list = []
+    for url in base_urls['ACI']:
+        url_list.append(base_urls['ACI'][url])
+
+    # Get results for Internal EPG's
+    if request_type == 'Internal EPG':
+        endpoint_children = get_internal_epg(url_list, search_string, username, password)
+
+    # Get results for External EPG's
+    if request_type == 'External EPG':
+        endpoint_children = get_external_epg_epg(url_list, search_string, username, password)
+
+    # Get results for VRF Level Contracts
+
+
+    return results
 
 
 def CONTRACT_DEPLOYMENT_EXCEL_OPEN_WORKBOOK(WORKBOOK, LOCATION):
@@ -632,6 +654,7 @@ def EXTERNAL_EPG_DEPLOYMENT(RULE_LIST, location, url_dict, username, password):
 
     return OUTPUT_LOG
 
+
 @shared_task
 def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, username, password):
     CONTRACT_LIST = []
@@ -997,6 +1020,7 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, username, pass
         OUTPUT_LOG.append({'ValidationSuccess': 'APIC Configuration validated successfully'})
 
     return OUTPUT_LOG
+
 
 @shared_task
 def CONTRACT_DEPLOYMENT(RULE_LIST, location, url_dict, username, password):

@@ -94,6 +94,7 @@ def contract_search(request):
     if request.method == 'POST' and 'contract_search' in request.POST:
 
         search_string = request.POST['contract_search']
+        request_type = request.POST['request_type']
         environment = request.session.get('environment')
 
         if environment == 'Production':
@@ -113,7 +114,7 @@ def contract_search(request):
         base_urls = get_base_url(environment)
 
         # Submit task to celery to process
-        task = aci_contract_search.delay(base_urls, username, password, search_string)
+        task = aci_contract_search.delay(base_urls, username, password, request_type, search_string)
 
         # Return task id back to client for ajax use.
         return HttpResponse(json.dumps({'task_id': task.id}), content_type='application/json')
