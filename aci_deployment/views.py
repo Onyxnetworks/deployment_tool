@@ -116,7 +116,7 @@ def contract_search(request):
         url_dict = base_urls['ACI']
 
         # Submit task to celery to process
-        task = aci_contract_search.delay(base_urls, location, url_dict, username, password, request_type, search_string)
+        task = aci_contract_search.delay(location, url_dict, username, password, request_type, search_string)
 
         # Return task id back to client for ajax use.
         return HttpResponse(json.dumps({'task_id': task.id}), content_type='application/json')

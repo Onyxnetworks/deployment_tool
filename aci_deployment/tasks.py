@@ -82,23 +82,24 @@ def aci_ipg_search(base_urls, username, password, search_string):
     return results
 
 @shared_task
-def aci_contract_search(base_urls, username, password, request_type, search_string):
+def aci_contract_search(location, url_dict, username, password, request_type, search_string):
     results = []
+    results['consumed'] = []
+    results['provided'] = []
+    results['vzconsumed'] = []
+    results['vzprovided'] = []
 
+    base_url = url_dict[location]
 
-
-    # Build URL List to search.
-    url_list = []
-    for url in base_urls['ACI']:
-        url_list.append(base_urls['ACI'][url])
+    apic_cookie = APIC_LOGIN(base_url, username, password)
 
     # Get results for Internal EPG's
     if request_type == 'Internal EPG':
-        endpoint_children = get_internal_epg(url_list, search_string, username, password)
+        endpoint_children = get_internal_epg(base_url, search_string, apic_cookie)
 
     # Get results for External EPG's
     if request_type == 'External EPG':
-        endpoint_children = get_external_epg_epg(url_list, search_string, username, password)
+        endpoint_children = get_external_epg_epg(base_url, search_string, apic_cookie)
 
     # Get results for VRF Level Contracts
 
@@ -106,22 +107,39 @@ def aci_contract_search(base_urls, username, password, request_type, search_stri
 
 
     #Consumed Contracts
-    for locations in endpoint_children:
-        location = locations['location']
-        for key, value in locations['response']['imdata']:
-            if 'fvRsCons' in key:
-                contract_name = value['fvRsCons']['attributes']['tnVzBrCPName']
-                tenant = value['fvRsCons']['attributes']['tDn'].split('/')[1][3:]
-                port_list = []
-                provider_list = []
-                ip_list = []
+    for key, value in endpoint_children['imdata']:
+        if 'fvRsCons' in key:
+            contract_name = value['fvRsCons']['attributes']['tnVzBrCPName']
+            tenant = value['fvRsCons']['attributes']['tDn'].split('/')[1][3:]
 
-                get_contract_detail_response = get_contract_details(url_list, search_string, username, password)
-                GET_URL = BASE_URL + 'node/mo/uni/tn-{0}/brc-{1}.json?query-target=children'.format(TENANT, CONTRACT_NAME)
-                GET_RESPONSE = requests.get(GET_URL, cookies=APIC_COOKIE, headers=headers, verify=False)
-                CONTRACTS = json.loads(GET_RESPONSE.text)
+            port_list = []
+            provider_list = []
+            ip_list = []
+
+            get_contract_detail_response = get_contract_details(base_url, tenant, contract_name, apic_cookie)
+
+            for subjects in get_contract_detail_response['imdata']:
+                if 'vzSubj' in subjects:
+                    subject_name = subjects['vzSubj']['attributes']['name']
+                    tenant = subjects['vzSubj']['attributes']['dn'].split('/')[1][3:]
+
+                    get_subject_detail_response = get_subject_details(base_url, tenant, contract_name, subject_name,
+                                                                      apic_cookie)
 
 
+                    for filters in get_subject_detail_response['imdata']:
+                        if 'vzRsSubjFiltAtt' in filters:
+                            port_list.append(filters['vzRsSubjFiltAtt']['attributes']['tnVzFilterName'])
+
+                if 'vzRtProv' in subjects:
+                    if subjects['vzRtProv']['attributes']['tDn'].split('/')[3][:3] == 'epg':
+                        provider_list.append(subjects['vzRtProv']['attributes']['tDn'].split('/')[3][4:].encode())
+                        provider_epg_name = subjects['vzRtProv']['attributes']['tDn'].split('/')[3][4:]
+                        provider_epg_tenant = subjects['vzRtProv']['attributes']['tDn'].split('/')[1][3:]
+                        provider_epg_app_prof = subjects['vzRtProv']['attributes']['tDn'].split('/')[2][3:]
+
+
+            results['consumed'].append({'contract_name': contract_name, 'provider_epg': provider_list, 'ports': port_list, 'subnets': ip_list})
 
     return results
 
