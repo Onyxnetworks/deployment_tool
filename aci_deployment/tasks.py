@@ -70,11 +70,13 @@ def aci_ipg_search(base_urls, username, password, search_string):
         i = 0
         for ipg_location in fvpathatt_list:
             location = ipg_location['location']
-            for epg in location['response']['imdata']:
-                results.append({'location': location, 'tenant':
+            for epg in ipg_location['response']['imdata']:
+                results.append({'location': location, 'ipg':
+                    epg['fvRsPathAtt']['attributes']['tDn'].split('/')[-1][8:].strip(']'), 'tenant':
                     epg['fvRsPathAtt']['attributes']['dn'].split('/')[1][3:], 'app_prof':
                     epg['fvRsPathAtt']['attributes']['dn'].split('/')[2][3:], 'epg':
-                    epg['fvRsPathAtt']['attributes']['dn'].split('/')[3][4:],'encap': epg['encap']})
+                    epg['fvRsPathAtt']['attributes']['dn'].split('/')[3][4:],'encap':
+                    epg['fvRsPathAtt']['attributes']['encap']})
                 i += 1
 
     return  results
