@@ -86,6 +86,48 @@ def ipg_search(request):
     content = {'environment': environment, 'locations': location_list, 'url_list': url_list, 'role': role, 'user': user}
     return render(request, 'aci_deployment/aci_ipg_search.html', content)
 
+
+def contract_search(request):
+    user = request.session.get('user')
+    role = request.session.get('role')
+    # Get subnet to use for search task.
+    if request.method == 'POST' and 'contract_search' in request.POST:
+
+        search_string = request.POST['contract_search']
+        environment = request.session.get('environment')
+
+        if environment == 'Production':
+            username = request.session.get('prod_username')
+            password = request.session.get('prod_password')
+
+        elif environment == 'Pre-Production':
+            # Need to put in an error as PPE search wont work!
+            username = request.session.get('ppe_username')
+            password = request.session.get('ppe_password')
+
+        elif environment == 'Lab':
+            username = request.session.get('lab_username')
+            password = request.session.get('lab_password')
+
+        # Get base url to use
+        base_urls = get_base_url(environment)
+
+        # Submit task to celery to process
+        task = aci_contract_search.delay(base_urls, username, password, search_string)
+
+        # Return task id back to client for ajax use.
+        return HttpResponse(json.dumps({'task_id': task.id}), content_type='application/json')
+
+    # Get base url to use
+    environment = request.session.get('environment')
+    base_urls = get_base_url(environment)
+    url_dict = base_urls['ACI']
+    location_list = list(url_dict.keys())
+
+    content = {'environment': environment, 'locations': location_list, 'url_list': url_list, 'role': role, 'user': user}
+    return render(request, 'aci_deployment/aci_contract_search.html', content)
+
+
 def external_epg_deployment(request):
     user = request.session.get('user')
     role = request.session.get('role')

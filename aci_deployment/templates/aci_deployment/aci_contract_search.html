@@ -1,0 +1,211 @@
+{% extends "index/header.html" %}
+{% load static %}
+{% block head %}  
+    
+<!-- DataTables CSS -->
+    <link href="{% static 'index/vendor/datatables-plugins/dataTables.bootstrap.css' %}" rel="stylesheet">
+
+    <!-- DataTables Responsive CSS -->
+    <link href="{% static 'index/vendor/datatables-responsive/dataTables.responsive.css' %}" rel="stylesheet">
+{% endblock %}
+{% block content %}
+        <div id="page-wrapper">
+            <div class="row">
+                <div class="col-lg-12"><div class="col-md-3">
+                    <h1 class="page-header">Contract Search</h1>
+					<form role="form" id="contract_search" method="post" enctype="multipart/form-data">{% csrf_token %}
+					<div class="form-group input-group">
+						<input type="text" placeholder="Enter EPG Name" required="required" name="contract_search" class="form-control" data-toggle="tooltip" data-placement="top" name="contract_search" class="form-control" title="Enter EPG Name.">
+						<span class="input-group-btn">
+							<button class="btn btn-default" type="submit"><i class="fa fa-search"></i></button>
+						</span>
+					</div>
+					</form>
+                </div>
+                <!-- /.col-lg-12 -->
+            </div>
+			</div>
+               <p id="contract_results"></p>
+            <div class="row">
+		<div class="col-lg-12">
+            <div id="loader" style="text-align:center;"></div>
+                    <div class="panel panel-default" style="visibility: visible;" id="vs_data">
+                        <div class="panel-heading">
+                            <div class="row">
+                                <div class="col-sm-8">
+                                    <h4 class="panel-title">
+                                        <a data-toggle="collapse" data-parent="#accordion" href="#collapse2">Virtual Server Data</a>
+                                    </h4>
+                                </div>
+                                <div class="col-sm-4 text-right">
+                                    <a href="#tablediv">
+                                        <span class="glyphicon glyphicon-chevron-up " aria-hidden="true"> </span> Back to results<small></small>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="collapse2" class="panel-collapse collapse in">
+                            <div class="panel-body" id="vs_data_body">
+                                <!-- Nav tabs -->
+                                <ul class="nav nav-tabs">
+                                    <li class="active"><a href="#virtualserver_tab" data-toggle="tab">Virtual Server</a>
+                                    </li>
+                                    <li id="pool_li"><a href="#pool_tab" data-toggle="tab">Pool</a>
+                                    </li>
+                                    <li id="node_li"><a href="#nodes_tab" data-toggle="tab">Nodes</a>
+                                    </li>
+                                </ul>
+                                <!-- Tab panes -->
+                                <div class="tab-content">
+                                    <div class="tab-pane fade in active table-responsive" id="virtualserver_tab">
+                                        <table id="vs_table"  class="table table-striped table-hover table-responsive table-condensed text-center">
+                                            <thead>
+                                            <tr>
+                                                <th rowspan="2" class="text-center" {% if role == 'F5_Operator' %}style="visibility: hidden;"{% endif %}></th>
+                                                <th rowspan="2" class="text-center">Status</th>
+                                                <th rowspan="2" class="text-center">Name</th>
+                                                <th rowspan="2" class="text-center">Destination</th>
+                                                <th rowspan="2" class="text-center">Port</th>
+                                                <th colspan="2" class="text-center">Bits</th>
+                                                <th colspan="2" class="text-center">Packets</th>
+                                                <th colspan="3" class="text-center">Connections</th>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-center">In</td>
+                                                <td class="text-center">Out</td>
+                                                <td class="text-center">In</td>
+                                                <td class="text-center">Out</td>
+                                                <td class="text-center">Current</td>
+                                                <td class="text-center">Maximum</td>
+                                                <td class="text-center">Total</td>
+                                            </tr>
+                                            </thead>
+                                            <tbody id="vs_body">
+                                            <!-- vs body -->
+                                            </tbody>
+                                        </table>
+                                        <div id="buttons" class="text-center">
+                                            {% if role != 'F5_Operator' %}
+                                            <button id="enable_btn" type="submit" onclick="set_status('enable', 'vs');" class="btn btn-sm">Enable</button>
+                                            <button id="disable_btn" type="submit" onclick="set_status('disable', 'vs');" class="btn btn-sm">Disable</button>
+                                            {% endif %}
+                                            <button id="disable_btn" type="submit" onclick="refresh_search_info();" class="btn btn-sm">Refresh</button>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade table-responsive" id="pool_tab">
+                                        <table class="table table-striped table-hover table-responsive table-condensed text-center">
+                                            <thead>
+                                            <tr>
+                                                <th rowspan="2" class="text-center">Status</th>
+                                                <th rowspan="2" class="text-center">Name</th>
+                                                <th rowspan="2" class="text-center">Active Members</th>
+                                                <th colspan="2" class="text-center">Bits</th>
+                                                <th colspan="2" class="text-center">Packets</th>
+                                                <th colspan="3" class="text-center">Connections</th>
+                                                <th colspan="1" class="text-center">Requests</th>
+                                                <th colspan="2" class="text-center">Request Queue</th>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-center">In</td>
+                                                <td class="text-center">Out</td>
+                                                <td class="text-center">In</td>
+                                                <td class="text-center">Out</td>
+                                                <td class="text-center">Current</td>
+                                                <td class="text-center">Maximum</td>
+                                                <td class="text-center">Total</td>
+                                                <td class="text-center">Total</td>
+                                                <td class="text-center">Depth</td>
+                                                <td class="text-center">Maximum Age</td>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <!-- Pool Body -->
+                                            <tr>
+                                                <td id="pool_detail_status" style="vertical-align: middle;"></td>
+                                                <td id="pool_detail_name"></td>
+                                                <td id="pool_detail_members"></td>
+                                                <td id="pool_detail_bits_in"></td>
+                                                <td id="pool_detail_bits_out"></td>
+                                                <td id="pool_detail_packets_in"></td>
+                                                <td id="pool_detail_packets_out"></td>
+                                                <td id="pool_detail_connections_current"></td>
+                                                <td id="pool_detail_connections_maximum"></td>
+                                                <td id="pool_detail_connections_total"></td>
+                                                <td id="pool_detail_requests_total"></td>
+                                                <td id="pool_detail_requests_depth"></td>
+                                                <td id="pool_detail_requests_max_age"></td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                        <div id="buttons" class="text-center">
+                                            <button id="disable_btn" type="submit" onclick="refresh_search_info();" class="btn btn-sm">Refresh</button>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade table-responsive" id="nodes_tab">
+                                        <table id="nodes_table" class="table table-striped table-hover table-responsive table-condensed text-center">
+                                            <thead>
+                                            <tr>
+                                                <th rowspan="2" class="text-center"></th>
+                                                <th rowspan="2" class="text-center">Status</th>
+                                                <th rowspan="2" class="text-center">Name</th>
+                                                <th rowspan="2" class="text-center">Address</th>
+                                                <th colspan="2" class="text-center">Bits</th>
+                                                <th colspan="2" class="text-center">Packets</th>
+                                                <th colspan="3" class="text-center">Connections</th>
+                                                <th colspan="1" class="text-center">Requests</th>
+                                                <th colspan="2" class="text-center">Request Queue</th>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-center">In</td>
+                                                <td class="text-center">Out</td>
+                                                <td class="text-center">In</td>
+                                                <td class="text-center">Out</td>
+                                                <td class="text-center">Current</td>
+                                                <td class="text-center">Maximum</td>
+                                                <td class="text-center">Total</td>
+                                                <td class="text-center">Total</td>
+                                                <td class="text-center">Depth</td>
+                                                <td class="text-center">Maximum Age</td>
+                                            </tr>
+                                            </thead>
+                                            <tbody id="nodes_body">
+                                            <!-- Node Body -->
+                                            </tbody>
+                                        </table>
+                                        <div id="buttons" class="text-center">
+                                            <button id="enable_btn" type="submit" onclick="set_status('enable', 'node');" class="btn btn-sm">Enable</button>
+                                            <button id="disable_btn" type="submit" onclick="set_status('disable', 'node');" class="btn btn-sm">Disable</button>
+                                            <button id="disable_btn" type="submit" onclick="refresh_search_info();" class="btn btn-sm">Refresh</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.panel -->
+                </div>
+                <!-- /.col-lg-12 -->
+            </div>
+		</div>
+{% endblock %}	
+		
+{% block scripts %}
+    	
+    <script src="{% static 'index/vendor/datatables/js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'index/vendor/datatables-plugins/dataTables.bootstrap.min.js' %}"></script>
+    <script src="{% static 'index/vendor/datatables-responsive/dataTables.responsive.js' %}"></script>
+    <script src="{% static 'aci_deployment/js/aci_contract_search.js' %}"></script>
+<!--
+<script>
+    $(document).ready(function() {
+        $('#endpoint_table').DataTable({
+            responsive: true,
+            "language": {
+                "search": "Filter records:"
+            },
+        } );
+    } );
+</script>
+-->
+{% endblock %}
