@@ -4,6 +4,7 @@ from operator import itemgetter
 
 
 # Custom Functions
+from aci_deployment.scripts.ipg_search import *
 from aci_deployment.scripts.endpoint_search import *
 from aci_deployment.scripts.external_epg_deployment import *
 from aci_deployment.scripts.contract_deployment import *
@@ -44,6 +45,41 @@ def ENDPOINT_SEARCH(base_urls, filter_default, username, password, search_string
     # Sort the list by subnet before returning it.
     RESULTS = sorted(RESULTS, key=itemgetter('Subnet'), reverse=True)
     return RESULTS
+
+
+@shared_task
+def aci_ipg_search(base_urls, username, password, search_string):
+    results = []
+
+    # Build URL List to search.
+    url_list = []
+    for url in base_urls['ACI']:
+        url_list.append(base_urls['ACI'][url])
+
+    ipg_list = get_ipg(url_list, username, password)
+
+    # List all EPG for selected
+    # Convert  List into upper case
+    ipg_list_upper = [element.upper() for element in ipg_list]
+    search_string = search_string.upper()
+    if [s for s in ipg_list_upper if search_string in s.upper()]:
+
+        fvpathatt_list = get_fvpathatt(url_list, search_string, username, password)
+
+        # loop through output, print and add EPG's to list
+        i = 0
+        for ipg_location in fvpathatt_list:
+            location = ipg_location['location']
+            for epg in ipg_location['response']['imdata']:
+                results.append({'location': location, 'ipg':
+                    epg['fvRsPathAtt']['attributes']['tDn'].split('/')[-1][8:].strip(']'), 'tenant':
+                    epg['fvRsPathAtt']['attributes']['dn'].split('/')[1][3:], 'app_prof':
+                    epg['fvRsPathAtt']['attributes']['dn'].split('/')[2][3:], 'epg':
+                    epg['fvRsPathAtt']['attributes']['dn'].split('/')[3][4:],'encap':
+                    epg['fvRsPathAtt']['attributes']['encap']})
+                i += 1
+
+    return  results
 
 
 def CONTRACT_DEPLOYMENT_EXCEL_OPEN_WORKBOOK(WORKBOOK, LOCATION):
