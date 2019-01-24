@@ -537,10 +537,10 @@ def create_vs_ssl_profiles(vs_dict, partition, bigip_url_base, bigip, output_log
                                                  data=json.dumps(ssl_server_profile)))
 
         if ssl_server_profile_sent.__contains__('200'):
-            output_log.append({'NotificationsInfo': '{} - SSL Server Profile Created'.format(vs_dict['vs']['K2'])})
+            output_log.append({'NotificationsInfo': '{} - SSL Server Profile Created'.format(vs_dict['vs']['M2'])})
 
         elif ssl_server_profile_sent.__contains__('409'):
-            output_log.append({'NotificationsInfo': '{} - SSL Server Profile Modified*'.format(vs_dict['vs']['K2'])})
+            output_log.append({'NotificationsInfo': '{} - SSL Server Profile Modified*'.format(vs_dict['vs']['M2'])})
 
     return output_log, error
 
