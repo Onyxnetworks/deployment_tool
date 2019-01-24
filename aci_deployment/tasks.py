@@ -4,6 +4,7 @@ from operator import itemgetter
 
 
 # Custom Functions
+from aci_deployment.scripts.contract_search import *
 from aci_deployment.scripts.ipg_search import *
 from aci_deployment.scripts.endpoint_search import *
 from aci_deployment.scripts.external_epg_deployment import *
