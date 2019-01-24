@@ -40,6 +40,7 @@ function get_task_info(task_id) {
                     document.getElementById("result_table").innerHTML = "";
                     document.getElementById("tablediv").style.visibility = "visible";
                     var results = data.result;
+                    console.log(results);
                 }
 
                 if (data.state != 'SUCCESS') {
