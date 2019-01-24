@@ -44,17 +44,17 @@ function get_task_info(task_id) {
                 var results = data.result;
                 for (i = 0, len = results.length, text = ""; i < len; i++) {
                     location = results[i].location;
-                    ipg = results[i].ipg
+                    ipg = results[i].ipg;
                     tenant = results[i].tenant;
                     app_prof = results[i].app_prof;
                     epg = results[i].epg;
                     encap = results[i].encap;
 
                     var tr = document.createElement("TR");
-                    var TABLE_TR = 'TABLE_TR' + i
+                    var TABLE_TR = 'TABLE_TR' + i;
                     tr.setAttribute("id", TABLE_TR);
                     document.getElementById("result_table").appendChild(tr);
-                    var search_results = [location, ipg, tenant, app_prof, epg, encap]
+                    var search_results = [location, ipg, tenant, app_prof, epg, encap];
                     search_results.forEach(function(items) {
                         var td = document.createElement("TD");
                         td.setAttribute("style", "text-align: center; vertical-align: middle;");
