@@ -108,10 +108,10 @@ def aci_contract_search(location, url_dict, username, password, request_type, se
 
 
     #Consumed Contracts
-    for key, value in endpoint_children['imdata']:
-        if 'fvRsCons' in key:
-            contract_name = value['fvRsCons']['attributes']['tnVzBrCPName']
-            tenant = value['fvRsCons']['attributes']['tDn'].split('/')[1][3:]
+    for contracts in endpoint_children['imdata']:
+        if 'fvRsCons' in contracts:
+            contract_name = contracts['fvRsCons']['attributes']['tnVzBrCPName']
+            tenant = contracts['fvRsCons']['attributes']['tDn'].split('/')[1][3:]
 
             port_list = []
             provider_list = []
