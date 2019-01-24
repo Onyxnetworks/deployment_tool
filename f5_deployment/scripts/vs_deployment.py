@@ -530,7 +530,7 @@ def create_vs_ssl_profiles(vs_dict, partition, bigip_url_base, bigip, output_log
         ssl_server_profile = {}
         output_log.append({'Headers': 'Creating SSL Server Profile.'})
         ssl_server_profile['kind'] = 'tm:ltm:profile:server-ssl:server-sslstate'
-        ssl_server_profile['name'] = vs_dict['vs']['M2']
+        ssl_server_profile['name'] = vs_dict['vs']['M2  ']
         ssl_server_profile['defaultsFrom'] = 'serverssl'
         ssl_server_profile['partition'] = partition
         ssl_server_profile_sent = str(bigip.post('%s/ltm/profile/server-ssl' % bigip_url_base,
