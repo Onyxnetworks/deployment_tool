@@ -80,4 +80,11 @@ def get_external_epg(url_list, search_string, username, password):
     return contract_list
 
 
+def get_contract_details(url_list, search_string, username, password):
 
+    return
+
+
+def get_subject_details(url_list, search_string, username, password):
+
+    return

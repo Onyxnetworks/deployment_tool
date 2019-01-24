@@ -82,8 +82,10 @@ def aci_ipg_search(base_urls, username, password, search_string):
     return results
 
 @shared_task
-def ci_contract_search(base_urls, username, password, request_type, search_string):
+def aci_contract_search(base_urls, username, password, request_type, search_string):
     results = []
+
+
 
     # Build URL List to search.
     url_list = []
@@ -99,6 +101,26 @@ def ci_contract_search(base_urls, username, password, request_type, search_strin
         endpoint_children = get_external_epg_epg(url_list, search_string, username, password)
 
     # Get results for VRF Level Contracts
+
+    # Get results for non VRF level Contracts.
+
+
+    #Consumed Contracts
+    for locations in endpoint_children:
+        location = locations['location']
+        for key, value in locations['response']['imdata']:
+            if 'fvRsCons' in key:
+                contract_name = value['fvRsCons']['attributes']['tnVzBrCPName']
+                tenant = value['fvRsCons']['attributes']['tDn'].split('/')[1][3:]
+                port_list = []
+                provider_list = []
+                ip_list = []
+
+                get_contract_detail_response = get_contract_details(url_list, search_string, username, password)
+                GET_URL = BASE_URL + 'node/mo/uni/tn-{0}/brc-{1}.json?query-target=children'.format(TENANT, CONTRACT_NAME)
+                GET_RESPONSE = requests.get(GET_URL, cookies=APIC_COOKIE, headers=headers, verify=False)
+                CONTRACTS = json.loads(GET_RESPONSE.text)
+
 
 
     return results
