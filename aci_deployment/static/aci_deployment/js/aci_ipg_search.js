@@ -26,6 +26,7 @@ function get_task_info(task_id) {
         url: '/get_task_info/',
         data: {'task_id': task_id},
         success: function (data) {
+            console.log('Start')
             rslt.html('');
             if (data.state == 'PENDING') {
                 var loader = `<img src='/static/index/svg/spinner.svg'/>`;
@@ -42,8 +43,9 @@ function get_task_info(task_id) {
                 document.getElementById("result_table").innerHTML = "";
                 document.getElementById("tablediv").style.visibility = "visible";
                 var results = data.result;
+                console.log(results)
                 for (i = 0, len = results.length, text = ""; i < len; i++) {
-                    location = results[i].location;
+                    ipg_location = results[i].location;
                     ipg = results[i].ipg;
                     tenant = results[i].tenant;
                     app_prof = results[i].app_prof;
@@ -54,7 +56,7 @@ function get_task_info(task_id) {
                     var TABLE_TR = 'TABLE_TR' + i;
                     tr.setAttribute("id", TABLE_TR);
                     document.getElementById("result_table").appendChild(tr);
-                    var search_results = [location, ipg, tenant, app_prof, epg, encap];
+                    var search_results = [ipg_location, ipg, tenant, app_prof, epg, encap];
                     search_results.forEach(function(items) {
                         var td = document.createElement("TD");
                         td.setAttribute("style", "text-align: center; vertical-align: middle;");
@@ -70,17 +72,20 @@ function get_task_info(task_id) {
                         "search": "Filter records:"
                     },
                 } );
+                console.log('End')
             }
 
             if (data.state != 'SUCCESS') {
                 setTimeout(function () {
+                    console.log('Get_Task_ID')
                     get_task_info(task_id)
                 }, 1000);
             }},
         error: function (data) {
             document.getElementById("tablediv").style.visibility = "hidden";
             document.getElementById("loader").style.display = "none";
-            rslt.html("Something went wrong!");success()
+            rslt.html("Something went wrong!");
+            success()
         }
     });
 }
