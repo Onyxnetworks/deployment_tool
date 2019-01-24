@@ -134,7 +134,7 @@ def aci_contract_search(location, url_dict, username, password, request_type, se
 
                 if 'vzRtProv' in subjects:
                     if subjects['vzRtProv']['attributes']['tDn'].split('/')[3][:3] == 'epg':
-                        provider_list.append(subjects['vzRtProv']['attributes']['tDn'].split('/')[3][4:].encode())
+                        provider_list.append(subjects['vzRtProv']['attributes']['tDn'].split('/')[3][4:])
                         provider_epg_name = subjects['vzRtProv']['attributes']['tDn'].split('/')[3][4:]
                         provider_epg_tenant = subjects['vzRtProv']['attributes']['tDn'].split('/')[1][3:]
                         provider_epg_app_prof = subjects['vzRtProv']['attributes']['tDn'].split('/')[2][3:]
