@@ -83,7 +83,7 @@ def aci_ipg_search(base_urls, username, password, search_string):
 
 @shared_task
 def aci_contract_search(location, url_dict, username, password, request_type, search_string):
-    results = []
+    results = {}
     results['consumed'] = []
     results['provided'] = []
     results['vzconsumed'] = []
