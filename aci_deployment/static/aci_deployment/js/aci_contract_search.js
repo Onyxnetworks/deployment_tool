@@ -38,11 +38,10 @@ function get_task_info(task_id) {
                     console.log('Success');
                     document.getElementById("loader").style.display = "none";
                     document.getElementById("contract_data").style.visibility = "visible";
-                    console.log(data.result);
 
                     // Build Consumed Contracts Results table.
-                    var consumed_results = data.result.consumed;
-
+                    var consumed_results = [["power_up", "app", "10.193.101.2/32", "[]"], ["power_up", "app", "2222::65:1/32", "[]"], ["power_up", "app", "10.193.102.4/32", "[]"], ["power_up", "app", "10.193.102.2/32", "[]"], ["web", "Web", "10.193.101.3/32", "[]"], ["web", "Web", "2222::66:3/32", "[]"], ["web", "Web", "10.193.102.1/32", "[]"], ["web", "Web", "2222::65:3/32", "[]"], ["web", "Web", "10.193.102.1/32", "[]"], ["web", "Web", "10.193.102.3/32", "[]"], ["web", "Web", "2222::66:3/32", "[]"], ["web", "Web", "2222::66:1/32", "[]"], ["web", "Web", "10.193.101.3/32", "[]"], ["web", "Web", "10.193.102.3/32", "[]"], ["web", "Web", "2222::66:1/32", "[]"], ["web", "Web", "2222::65:3/32", "[]"]];
+                    console.log(consumed_results);
                     var table = $('#consumed_table').DataTable({
 
                         columns: [
