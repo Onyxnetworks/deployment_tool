@@ -49,7 +49,7 @@ function get_task_info(task_id) {
                         ['TEST2', 'TEST2', 'TEST5', 'TEST4'],
                     ];
 
-                    console.log(consumed_results);
+                    console.log(data.result.consumed);
                     var table = $('#consumed_table').DataTable({
 
                         retrieve: true,
@@ -80,7 +80,7 @@ function get_task_info(task_id) {
 
                             },
                         ],
-                        data: consumed_results,
+                        data: data.result.consumed,
                         rowsGroup: [
                             // Always the array (!) of the column-selectors in specified order to which rows groupping is applied
                             // (column-selector could be any of specified in https://datatables.net/reference/type/column-selector)
