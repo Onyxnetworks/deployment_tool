@@ -47,11 +47,11 @@ function get_task_info(task_id) {
                         contract_name = consumed_results[i].contract_name;
                         provider_list = consumed_results[i].provider_list;
                         port_list = consumed_results[i].port_list;
-                        console.log(contract_name, provider_list, port_list)
-                        port_list.forEach(function(items) {
-                            port_str = items + `<br>`
-                            document.getElementById("cert_sans").insertAdjacentHTML( 'beforeend', port_str );
-                        });
+                        console.log(contract_name, provider_list, port_list);
+                        //port_list.forEach(function(items) {
+                        //    port_str = items + `<br>`
+                        //    document.getElementById("cert_sans").insertAdjacentHTML( 'beforeend', port_str );
+                        //});
 
                         contract_port_tr = document.createElement("TR");
                         contract_port_table_tr = 'contract_port_table_tr' + i;
