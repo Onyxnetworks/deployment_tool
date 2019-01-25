@@ -64,19 +64,22 @@ function get_task_info(task_id) {
                             {
                                 name: 'contract',
                                 title: 'Contract Name',
+                                style: 'vertical-align: middle',
                             },
                             {
                                 name: 'epg_name',
                                 title: 'Provider EPG',
+                                style: 'vertical-align: middle',
 
                             },
                             {
                                 title: 'Provider Networks',
-
+                                style: 'vertical-align: middle',
                             },
                             {
                                 name: 'ports',
                                 title: 'Ports',
+                                style: 'vertical-align: middle',
 
                             },
                         ],
