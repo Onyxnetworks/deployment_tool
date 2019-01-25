@@ -52,31 +52,31 @@ function get_task_info(task_id) {
                     console.log(consumed_results);
                     var table = $('#consumed_table').DataTable({
 
-                        columnDefs: [
+                        retrieve: true,
+                        responsive: true,
+                        "lengthMenu": [[25, 50, 100, -1], [25, 50, 100, "All"]],
 
+                        columnDefs: [
+                            { targets: '_all', class: 'text-center', style: 'vertical-align: middle' }
                         ],
 
                         columns: [
                             {
                                 name: 'contract',
                                 title: 'Contract Name',
-                                class: 'text-center',
                             },
                             {
                                 name: 'epg_name',
                                 title: 'Provider EPG',
-                                class: 'text-center',
 
                             },
                             {
                                 title: 'Provider Networks',
-                                class: 'text-center',
 
                             },
                             {
                                 name: 'ports',
                                 title: 'Ports',
-                                class: 'text-center',
 
                             },
                         ],
