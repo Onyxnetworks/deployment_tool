@@ -149,7 +149,7 @@ def aci_contract_search(location, url_dict, username, password, request_type, se
                             if 'fvCEp' in epgs:
                                 provider_subnet = epgs['fvCEp']['attributes']['ip'] + '/32'
 
-                                results['consumed'].append([contract_name, provider_epg_name, provider_subnet, port_list])
+                                results['consumed'].append([contract_name, provider_epg_name, provider_subnet, str(port_list)])
 
 
 
@@ -172,7 +172,7 @@ def aci_contract_search(location, url_dict, username, password, request_type, se
                                     provider_subnet = epgs['l3extSubnet']['attributes']['ip']
 
                                     results['consumed'].append([contract_name, provider_epg_name, provider_subnet,
-                                                               port_list])
+                                                               str(port_list)])
 
 
     return results
