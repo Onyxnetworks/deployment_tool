@@ -83,3 +83,28 @@ def get_subject_details(base_url, tenant, contract_name, subject_name, apic_cook
 
     return all_subject_response
 
+
+def get_internal_epg_detail(base_url, provider_epg_tenant, provider_epg_app_prof, provider_epg_name, apic_cookie):
+
+    headers = {'content-type': 'application/json'}
+
+    get_url = base_url + 'node/mo/uni/tn-{0}/ap-{1}/epg-{2}.json?query-target=children'.format(provider_epg_tenant,
+                                                                                               provider_epg_app_prof,
+                                                                                               provider_epg_name)
+    get_response = requests.get(get_url, cookies=apic_cookie, headers=headers, verify=False)
+    provider_epg_response = json.loads(get_response.text)
+
+    return provider_epg_response
+
+
+def get_external_epg_detail(base_url, provider_epg_tenant, provider_epg_l3out, provider_epg_name, apic_cookie):
+
+    headers = {'content-type': 'application/json'}
+
+    get_url = base_url + 'node/mo/uni/tn-{0}/out-{1}/instP-{2}.json?query-target=children'.format(provider_epg_tenant,
+                                                                                                  provider_epg_l3out,
+                                                                                                  provider_epg_name)
+    get_response = requests.get(get_url, cookies=apic_cookie, headers=headers, verify=False)
+    provider_epg_response = json.loads(get_response.text)
+
+    return provider_epg_response

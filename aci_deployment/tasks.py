@@ -132,15 +132,47 @@ def aci_contract_search(location, url_dict, username, password, request_type, se
                         if 'vzRsSubjFiltAtt' in filters:
                             port_list.append(filters['vzRsSubjFiltAtt']['attributes']['tnVzFilterName'])
 
+                # Get internal Providers
                 if 'vzRtProv' in subjects:
                     if subjects['vzRtProv']['attributes']['tDn'].split('/')[3][:3] == 'epg':
-                        provider_list.append(subjects['vzRtProv']['attributes']['tDn'].split('/')[3][4:])
                         provider_epg_name = subjects['vzRtProv']['attributes']['tDn'].split('/')[3][4:]
                         provider_epg_tenant = subjects['vzRtProv']['attributes']['tDn'].split('/')[1][3:]
                         provider_epg_app_prof = subjects['vzRtProv']['attributes']['tDn'].split('/')[2][3:]
 
+                        # Get Internal Providers IPs
+                        get_internal_epg_detail_responmse = get_internal_epg_detail(base_url, provider_epg_tenant,
+                                                                  provider_epg_app_prof, provider_epg_name, apic_cookie)
 
-            results['consumed'].append({'contract_name': contract_name, 'provider_epg': provider_list, 'ports': port_list, 'subnets': ip_list})
+                        # Clear IP List
+                        ip_list = []
+                        for epgs in get_internal_epg_detail_responmse['imdata']:
+                            if 'fvCEp' in epgs:
+                                ip_list.append(epgs['fvCEp']['attributes']['ip'] + '/32')
+
+                        provider_list.append({'provider_epg': provider_epg_name, 'provider_subnets': ip_list})
+
+                # Get External Providers
+                    elif subjects['vzRtProv']['attributes']['tDn'].split('/')[3][:5] == 'instP':
+                        provider_epg_name = subjects['vzRtProv']['attributes']['tDn'].split('/')[3][6:]
+                        provider_epg_tenant = subjects['vzRtProv']['attributes']['tDn'].split('/')[1][3:]
+                        provider_epg_l3out = subjects['vzRtProv']['attributes']['tDn'].split('/')[2][4:]
+
+                        # Get External Providers IPs
+                        get_external_epg_detail_responmse = get_external_epg_detail(base_url, provider_epg_tenant,
+                                                                                    provider_epg_l3out,
+                                                                                    provider_epg_name, apic_cookie)
+                        # Clear IP List
+                        ip_list = []
+                        for epgs in get_external_epg_detail_responmse['imdata']:
+                            if 'l3extSubnet' in epgs:
+                                scope_list = epgs['l3extSubnet']['attributes']['scope'].split(',')
+                                if 'import-security' in scope_list:
+                                    ip_list.append(epgs['l3extSubnet']['attributes']['ip'])
+
+                        provider_list.append({'provider_epg': provider_epg_name, 'provider_subnets': ip_list})
+
+
+            results['consumed'].append({'contract_name': contract_name, 'provider_list': provider_list, 'port_list': port_list})
 
     return results
 

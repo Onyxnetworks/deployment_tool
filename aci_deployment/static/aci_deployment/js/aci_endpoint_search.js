@@ -83,7 +83,7 @@ function get_task_info(task_id) {
                 $('#endpoint_table').DataTable({
                     retrieve: true,
                     responsive: true,
-                    "lengthMenu": [ 25, 50, 100 ],
+                    "lengthMenu": [[25, 50, 100, -1], [25, 50, 100, "All"]],
                     "language": {
                         "search": "Filter records:"
                     },
