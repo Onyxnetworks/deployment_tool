@@ -45,15 +45,7 @@ function get_task_info(task_id) {
                 }
 
                     // Build Consumed Contracts Results table.
-                    var consumed_results = [
-                        ['TEST1', 'TEST2', 'TEST3', 'TEST4'],
-                        ['TEST1', 'TEST2', 'TEST3', 'TEST4'],
-                        ['TEST1', 'TEST2', 'TEST3', 'TEST4'],
-                        ['TEST2', 'TEST2', 'TEST3', 'TEST4'],
-                        ['TEST2', 'TEST2', 'TEST5', 'TEST4'],
-                        ['TEST2', 'TEST2', 'TEST5', 'TEST4'],
-                    ];
-
+                    var consumed_results = data.result.consumed;
                     console.log(consumed_results);
                     var table = $('#consumed_table').DataTable({
 
