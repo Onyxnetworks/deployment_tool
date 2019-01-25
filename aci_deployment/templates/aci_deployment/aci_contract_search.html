@@ -4,6 +4,12 @@
 
         <!-- DataTables CSS -->
     <link rel="stylesheet" type="text/css" href="{% static 'index/DataTables/datatables.min.css' %}"/>
+        <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+
+    <link href="//datatables.net/download/build/nightly/jquery.dataTables.css" rel="stylesheet" type="text/css" />
+    <script src="//datatables.net/download/build/nightly/jquery.dataTables.js"></script>
+    <script src="//cdn.rawgit.com/ashl1/datatables-rowsgroup/v1.0.0/dataTables.rowsGroup.js"></script>
+
 
 {% endblock %}
 {% block content %}
@@ -158,8 +164,6 @@
 
 {% block scripts %}
 
-    <script type="text/javascript" src="{% static 'index/DataTables/RowGroup-1.1.0/js/dataTables.rowGroup.js' %}"></script>
-    <script type="text/javascript" src="{% static 'index/DataTables/datatables.min.js' %}"></script>
     <script src="{% static 'aci_deployment/js/aci_contract_search.js' %}"></script>
     <!--
     <script>
