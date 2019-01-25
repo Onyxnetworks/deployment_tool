@@ -2,11 +2,9 @@
 {% load static %}
 {% block head %}
 
-    <!-- DataTables CSS -->
-    <link href="{% static 'index/vendor/datatables-plugins/dataTables.bootstrap.css' %}" rel="stylesheet">
+        <!-- DataTables CSS -->
+    <link rel="stylesheet" type="text/css" href="{% static 'index/DataTables/datatables.min.css' %}"/>
 
-    <!-- DataTables Responsive CSS -->
-    <link href="{% static 'index/vendor/datatables-responsive/dataTables.responsive.css' %}" rel="stylesheet">
 {% endblock %}
 {% block content %}
     <div id="page-wrapper">
@@ -159,10 +157,9 @@
 {% endblock %}
 
 {% block scripts %}
-    <script src="{% static 'index/vendor/datatables-rowgroup/dataTables.rowGroup.min.js' %}"></script>
-    <script src="{% static 'index/vendor/datatables/js/jquery.dataTables.min.js' %}"></script>
-    <script src="{% static 'index/vendor/datatables-plugins/dataTables.bootstrap.min.js' %}"></script>
-    <script src="{% static 'index/vendor/datatables-responsive/dataTables.responsive.js' %}"></script>
+
+
+    <script type="text/javascript" src="{% static 'index/DataTables/datatables.min.js' %}"></script>
     <script src="{% static 'aci_deployment/js/aci_contract_search.js' %}"></script>
     <!--
     <script>
