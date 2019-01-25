@@ -147,9 +147,11 @@ def aci_contract_search(location, url_dict, username, password, request_type, se
                         ip_list = []
                         for epgs in get_internal_epg_detail_responmse['imdata']:
                             if 'fvCEp' in epgs:
-                                ip_list.append(epgs['fvCEp']['attributes']['ip'] + '/32')
+                                provider_subnet = epgs['fvCEp']['attributes']['ip'] + '/32'
 
-                        provider_list.append({'provider_epg': provider_epg_name, 'provider_subnets': ip_list})
+                                results['consumed'].append([contract_name, provider_epg_name, provider_subnet, port_list])
+
+
 
                 # Get External Providers
                     elif subjects['vzRtProv']['attributes']['tDn'].split('/')[3][:5] == 'instP':
@@ -167,12 +169,11 @@ def aci_contract_search(location, url_dict, username, password, request_type, se
                             if 'l3extSubnet' in epgs:
                                 scope_list = epgs['l3extSubnet']['attributes']['scope'].split(',')
                                 if 'import-security' in scope_list:
-                                    ip_list.append(epgs['l3extSubnet']['attributes']['ip'])
+                                    provider_subnet = epgs['l3extSubnet']['attributes']['ip']
 
-                        provider_list.append({'provider_epg': provider_epg_name, 'provider_subnets': ip_list})
+                                    results['consumed'].append([contract_name, provider_epg_name, provider_subnet,
+                                                               port_list])
 
-
-            results['consumed'].append({'contract_name': contract_name, 'provider_list': provider_list, 'port_list': port_list})
 
     return results
 

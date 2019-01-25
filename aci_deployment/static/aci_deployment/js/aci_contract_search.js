@@ -42,41 +42,38 @@ function get_task_info(task_id) {
 
                     // Build Consumed Contracts Results table.
                     var consumed_results = data.result.consumed;
-                    for (i = 0, len = consumed_results.length, text = ""; i < len; i++) {
 
-                        contract_name = consumed_results[i].contract_name;
-                        provider_list = consumed_results[i].provider_list;
-                        port_list = consumed_results[i].port_list;
-                        console.log(contract_name, provider_list, port_list);
-                        //port_list.forEach(function(items) {
-                        //    port_str = items + `<br>`
-                        //    document.getElementById("cert_sans").insertAdjacentHTML( 'beforeend', port_str );
-                        //});
+                    var table = $('#consumed_table').DataTable({
 
-                        contract_port_tr = document.createElement("TR");
-                        contract_port_table_tr = 'contract_port_table_tr' + i;
-                        contract_port_tr.setAttribute("id", contract_port_table_tr);
-                        document.getElementById("consumed_body").appendChild(contract_port_tr);
-                        contract_details = [contract_name, port_list];
-
-                        contract_details.forEach(function(items) {
-                            contract_table_td = document.createElement("TD");
-                            contract_table_td.setAttribute("style", "text-align: center; vertical-align: middle;");
-                            contract_table_td.setAttribute("rowspan", provider_list.length);
-                            contract_table_td.innerHTML = items;
-                            document.body.appendChild(contract_table_td);
-                            document.getElementById(contract_port_table_tr).appendChild(contract_table_td);
-
-                            provider_list.provider_epg.forEach(function (items) {
-                                provider_table_td = document.createElement("TD");
-                                provider_table_td.setAttribute("style", "text-align: center; vertical-align: middle;");
-                                provider_table_td.innerHTML = items;
-                                document.body.appendChild(provider_table_td);
-                                document.getElementById(contract_port_table_tr).appendChild(provider_table_td);
-
-                            })
-                        });
-                    }
+                        columns: [
+                            {
+                                name: 'contract',
+                                title: 'Contract Name',
+                            },
+                            {
+                                name: 'epg_name',
+                                title: 'Provider EPG',
+                            },
+                            {
+                                title: 'Provider Networks',
+                            },
+                            {
+                                name: 'ports',
+                                title: 'Ports',
+                            },
+                        ],
+                        data: consumed_results,
+                        rowsGroup: [
+                            // Always the array (!) of the column-selectors in specified order to which rows groupping is applied
+                            // (column-selector could be any of specified in https://datatables.net/reference/type/column-selector)
+                            'contract:name',
+                            'epg_name:name',
+                            'ports:name',
+                            0,
+                            2
+                        ],
+                        pageLength: '20',
+                    });
                 }
 
                 if (data.state != 'SUCCESS') {
