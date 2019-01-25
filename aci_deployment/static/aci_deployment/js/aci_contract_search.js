@@ -3,7 +3,7 @@ var rslt = $('#contract_results');
 
 
 frm.submit(function () {
-    //document.getElementById("tablediv").style.visibility = "hidden";
+    document.getElementById("contract_data").style.visibility = "hidden";
     $.ajax({
         type: frm.attr('method'),
         url: frm.attr('action'),
@@ -14,7 +14,7 @@ frm.submit(function () {
             }
         },
         error: function (data) {
-            //document.getElementById("tablediv").style.visibility = "hidden";
+            document.getElementById("contract_data").style.visibility = "hidden";
             console.log("Something went wrong!");
         }
     });
@@ -35,12 +35,39 @@ function get_task_info(task_id) {
                     rslt.html('Searching Contracts...');
                 }
                 else if (data.state == 'SUCCESS') {
-                    console.log('Success')
+                    console.log('Success');
                     document.getElementById("loader").style.display = "none";
-                    //document.getElementById("result_table").innerHTML = "";
-                    //document.getElementById("tablediv").style.visibility = "visible";
-                    var results = data.result;
+                    document.getElementById("contract_data").style.visibility = "visible";
                     console.log(results);
+
+                    // Build Consumed Contracts Results table.
+                    var consumed_results = data.result.consumed;
+                    for (i = 0, len = consumed_results.length, text = ""; i < len; i++) {
+
+                        contract_name = consumed_results[i].contract_name;
+                        provider_list = consumed_results[i].provider_list;
+                        port_list = consumed_results[i].port_list;
+
+                        port_list.forEach(function(items) {
+                            port_str = items + `<br>`
+                            document.getElementById("cert_sans").insertAdjacentHTML( 'beforeend', port_str );
+                        });
+
+                        contract_port_tr = document.createElement("TR");
+                        contract_port_table_tr = 'contract_port_table_tr' + i;
+                        contract_port_tr.setAttribute("id", contract_port_table_tr);
+                        document.getElementById("consumed_body").appendChild(contract_port_tr);
+                        contract_details = [contract_name, port_list];
+
+                        contract_details.forEach(function(items) {
+                            contract_table_td = document.createElement("TD");
+                            contract_table_td.setAttribute("style", "text-align: center; vertical-align: middle;");
+                            contract_table_td.setAttribute("rowspan", provider_list.length);
+                            contract_table_td.innerHTML = items;
+                            document.body.appendChild(contract_table_td);
+                            document.getElementById(contract_port_table_tr).appendChild(contract_table_td);
+                        });
+                    }
                 }
 
                 if (data.state != 'SUCCESS') {
@@ -51,7 +78,7 @@ function get_task_info(task_id) {
             },
 
             error: function (data) {
-                //document.getElementById("tablediv").style.visibility = "hidden";
+                document.getElementById("contract_data").style.visibility = "hidden";
                 document.getElementById("loader").style.display = "none";
                 rslt.html("Something went wrong!");
                 success()
