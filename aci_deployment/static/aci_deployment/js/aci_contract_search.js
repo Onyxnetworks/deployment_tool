@@ -40,22 +40,15 @@ function get_task_info(task_id) {
                     document.getElementById("contract_data").style.visibility = "visible";
 
                     // Build Consumed Contracts Results table.
-                    var consumed_results = [
-                        ['TEST1', 'TEST2', 'TEST3', 'TEST4'],
-                        ['TEST1', 'TEST2', 'TEST3', 'TEST4'],
-                        ['TEST1', 'TEST2', 'TEST3', 'TEST4'],
-                        ['TEST2', 'TEST2', 'TEST3', 'TEST4'],
-                        ['TEST2', 'TEST2', 'TEST5', 'TEST4'],
-                        ['TEST2', 'TEST2', 'TEST5', 'TEST4'],
-                    ];
+                    var consumed_results = data.result.consumed;
 
-                    console.log(data.result.consumed);
+                    console.log(consumed_results);
                     var table = $('#consumed_table').DataTable({
 
                         retrieve: true,
                         responsive: true,
-                        "lengthMenu": [[25, 50, 100, -1], [25, 50, 100, "All"]],
-
+                        "info": false,
+                        "lengthChange": false
                         columnDefs: [
                             { targets: '_all', class: 'text-center' }
                         ],
@@ -64,23 +57,27 @@ function get_task_info(task_id) {
                             {
                                 name: 'contract',
                                 title: 'Contract Name',
+                                style: 'vertical-align: middle',
                             },
                             {
                                 name: 'epg_name',
                                 title: 'Provider EPG',
+                                style: 'vertical-align: middle',
 
                             },
                             {
                                 title: 'Provider Networks',
+                                style: 'vertical-align: middle',
 
                             },
                             {
                                 name: 'ports',
                                 title: 'Ports',
+                                style: 'vertical-align: middle',
 
                             },
                         ],
-                        data: data.result.consumed,
+                        data: consumed_results,
                         rowsGroup: [
                             // Always the array (!) of the column-selectors in specified order to which rows groupping is applied
                             // (column-selector could be any of specified in https://datatables.net/reference/type/column-selector)
@@ -90,6 +87,7 @@ function get_task_info(task_id) {
                             0,
                             2
                         ],
+                        pageLength: '-1',
                     });
                 }
 

@@ -100,7 +100,7 @@ def aci_contract_search(location, url_dict, username, password, request_type, se
 
     # Get results for External EPG's
     if request_type == 'External EPG':
-        endpoint_children = get_external_epg_epg(base_url, search_string, apic_cookie)
+        endpoint_children = get_external_epg(base_url, search_string, apic_cookie)
 
     # Get results for VRF Level Contracts
 
@@ -149,7 +149,7 @@ def aci_contract_search(location, url_dict, username, password, request_type, se
                             if 'fvCEp' in epgs:
                                 provider_subnet = epgs['fvCEp']['attributes']['ip'] + '/32'
 
-                                results['consumed'].append([contract_name, provider_epg_name, provider_subnet, str(port_list)])
+                                results['consumed'].append([contract_name, provider_epg_name, provider_subnet, port_list])
 
 
 
@@ -171,8 +171,7 @@ def aci_contract_search(location, url_dict, username, password, request_type, se
                                 if 'import-security' in scope_list:
                                     provider_subnet = epgs['l3extSubnet']['attributes']['ip']
 
-                                    results['consumed'].append([contract_name, provider_epg_name, provider_subnet,
-                                                               str(port_list)])
+                                    results['consumed'].append([contract_name, provider_epg_name, provider_subnet, port_list])
 
 
     return results
