@@ -48,7 +48,7 @@ function get_task_info(task_id) {
                         retrieve: true,
                         responsive: true,
                         "info": false,
-                        "lengthChange": false
+                        "lengthChange": false,
                         columnDefs: [
                             { targets: '_all', class: 'text-center' }
                         ],
