@@ -38,7 +38,7 @@ function get_task_info(task_id) {
                     console.log('Success');
                     document.getElementById("loader").style.display = "none";
                     document.getElementById("contract_data").style.visibility = "visible";
-                    console.log(results);
+                    console.log(data.result);
 
                     // Build Consumed Contracts Results table.
                     var consumed_results = data.result.consumed;
@@ -47,7 +47,7 @@ function get_task_info(task_id) {
                         contract_name = consumed_results[i].contract_name;
                         provider_list = consumed_results[i].provider_list;
                         port_list = consumed_results[i].port_list;
-
+                        console.log(contract_name, provider_list, port_list)
                         port_list.forEach(function(items) {
                             port_str = items + `<br>`
                             document.getElementById("cert_sans").insertAdjacentHTML( 'beforeend', port_str );
