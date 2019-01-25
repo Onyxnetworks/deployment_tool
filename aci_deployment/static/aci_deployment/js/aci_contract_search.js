@@ -66,6 +66,15 @@ function get_task_info(task_id) {
                             contract_table_td.innerHTML = items;
                             document.body.appendChild(contract_table_td);
                             document.getElementById(contract_port_table_tr).appendChild(contract_table_td);
+
+                            provider_list.provider_epg.forEach(function (items) {
+                                provider_table_td = document.createElement("TD");
+                                provider_table_td.setAttribute("style", "text-align: center; vertical-align: middle;");
+                                provider_table_td.innerHTML = items;
+                                document.body.appendChild(provider_table_td);
+                                document.getElementById(contract_port_table_tr).appendChild(provider_table_td);
+
+                            })
                         });
                     }
                 }
