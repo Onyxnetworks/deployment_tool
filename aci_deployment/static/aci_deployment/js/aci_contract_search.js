@@ -39,38 +39,44 @@ function get_task_info(task_id) {
                     document.getElementById("loader").style.display = "none";
                     document.getElementById("contract_data").style.visibility = "visible";
 
-                    <!-- Clear Old table Data -->
-                if ($.fn.DataTable.isDataTable("#consumed_table")){
-                    $('#consumed_table').DataTable().clear().destroy();
-                }
-
                     // Build Consumed Contracts Results table.
-                    var consumed_results = data.result.consumed;
+                    var consumed_results = [
+                        ['TEST1', 'TEST2', 'TEST3', 'TEST4'],
+                        ['TEST1', 'TEST2', 'TEST3', 'TEST4'],
+                        ['TEST1', 'TEST2', 'TEST3', 'TEST4'],
+                        ['TEST2', 'TEST2', 'TEST3', 'TEST4'],
+                        ['TEST2', 'TEST2', 'TEST5', 'TEST4'],
+                        ['TEST2', 'TEST2', 'TEST5', 'TEST4'],
+                    ];
+
                     console.log(consumed_results);
                     var table = $('#consumed_table').DataTable({
 
                         retrieve: true,
                         responsive: true,
+                        "lengthMenu": [[25, 50, 100, -1], [25, 50, 100, "All"]],
+
+                        columnDefs: [
+                            { targets: '_all', class: 'text-center' }
+                        ],
+
                         columns: [
                             {
                                 name: 'contract',
                                 title: 'Contract Name',
-                                style: 'vertical-align: middle',
                             },
                             {
                                 name: 'epg_name',
                                 title: 'Provider EPG',
-                                style: 'vertical-align: middle',
 
                             },
                             {
                                 title: 'Provider Networks',
-                                style: 'vertical-align: middle',
+
                             },
                             {
                                 name: 'ports',
                                 title: 'Ports',
-                                style: 'vertical-align: middle',
 
                             },
                         ],
@@ -84,8 +90,6 @@ function get_task_info(task_id) {
                             0,
                             2
                         ],
-                        "lengthMenu": [[25, 50, 100, -1], [25, 50, 100, "All"]],
-
                     });
                 }
 
