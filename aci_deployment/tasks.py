@@ -157,12 +157,12 @@ def aci_contract_search(location, url_dict, username, password, request_type, se
                         for epgs in get_internal_epg_detail_responmse['imdata']:
                             if 'fvCEp' in epgs:
                                 print('Test3')
-                                print(port_string)
+                                print(provider_epg_name, port_string)
                                 provider_subnet = epgs['fvCEp']['attributes']['ip'] + '/32'
 
 
                                 results['consumed'].append([contract_name, provider_epg_name, provider_subnet,
-                                                            'TCP-8000, TCP-8443'])
+                                                            port_string])
 
 
 
@@ -185,11 +185,11 @@ def aci_contract_search(location, url_dict, username, password, request_type, se
                                 scope_list = epgs['l3extSubnet']['attributes']['scope'].split(',')
                                 if 'import-security' in scope_list:
                                     print('Test5')
-                                    print(port_string)
+                                    print(provider_epg_name, port_string)
                                     provider_subnet = epgs['l3extSubnet']['attributes']['ip']
 
                                     results['consumed'].append([contract_name, provider_epg_name, provider_subnet,
-                                                                'TCP-443, TCP-8080'])
+                                                                port_string])
 
 
     return results
