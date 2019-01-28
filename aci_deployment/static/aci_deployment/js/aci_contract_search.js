@@ -40,58 +40,10 @@ function get_task_info(task_id) {
                     document.getElementById("contract_data").style.visibility = "visible";
 
                     // Build Consumed Contracts Results table.
-                    var consumed_results = [
-                        ['TEST1', 'TEST2', 'TEST3', 'TEST4'],
-                        ['TEST1', 'TEST2', 'TEST3', 'TEST4'],
-                        ['TEST1', 'TEST2', 'TEST3', 'TEST4'],
-                        ['TEST2', 'TEST2', 'TEST3', 'TEST4'],
-                        ['TEST2', 'TEST2', 'TEST5', 'TEST4'],
-                        ['TEST2', 'TEST2', 'TEST5', 'TEST4'],
-                    ];
+                    var consumed_results = data.result.consumed;
+                    table_ref = '#consumed_table';
+                    build_data_table(table_ref, consumed_results);
 
-                    console.log(consumed_results);
-                    var table = $('#consumed_table').DataTable({
-
-                        retrieve: true,
-                        responsive: true,
-                        "info": false,
-                        "lengthChange": false
-                        columnDefs: [
-                            { targets: '_all', class: 'text-center' }
-                        ],
-
-                        columns: [
-                            {
-                                name: 'contract',
-                                title: 'Contract Name',
-                            },
-                            {
-                                name: 'epg_name',
-                                title: 'Provider EPG',
-
-                            },
-                            {
-                                title: 'Provider Networks',
-
-                            },
-                            {
-                                name: 'ports',
-                                title: 'Ports',
-
-                            },
-                        ],
-                        data: consumed_results,
-                        rowsGroup: [
-                            // Always the array (!) of the column-selectors in specified order to which rows groupping is applied
-                            // (column-selector could be any of specified in https://datatables.net/reference/type/column-selector)
-                            'contract:name',
-                            'epg_name:name',
-                            'ports:name',
-                            0,
-                            2
-                        ],
-                        pageLength: '-1',
-                    });
                 }
 
                 if (data.state != 'SUCCESS') {
@@ -109,4 +61,45 @@ function get_task_info(task_id) {
             }
         },
     );
+}
+
+
+function build_data_table(table_ref, data) {
+    var table = $(table_ref).DataTable({
+
+        retrieve: true,
+        responsive: true,
+        columnDefs: [
+            { targets: '_all', class: 'text-center' }
+            ],
+
+        columns: [
+            {
+                name: 'contract',
+                title: 'Contract Name',
+            },
+            {
+                name: 'epg_name',
+                title: 'Provider EPG',
+            },
+            {
+                title: 'Provider Networks',
+            },
+            {
+                name: 'ports',
+                title: 'Ports',
+            },
+        ],
+        data: data,
+        rowsGroup: [
+            // Always the array (!) of the column-selectors in specified order to which rows groupping is applied
+            // (column-selector could be any of specified in https://datatables.net/reference/type/column-selector)
+            'contract:name',
+            'epg_name:name',
+            'ports:name',
+            0,
+            2
+        ],
+        pageLength: '25',
+    });
 }

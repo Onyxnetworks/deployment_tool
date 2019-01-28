@@ -130,6 +130,7 @@ def aci_contract_search(location, url_dict, username, password, request_type, se
 
                     for filters in get_subject_detail_response['imdata']:
                         if 'vzRsSubjFiltAtt' in filters:
+                            print(filters['vzRsSubjFiltAtt']['attributes']['tnVzFilterName'])
                             port_list.append(filters['vzRsSubjFiltAtt']['attributes']['tnVzFilterName'])
 
                 port_string = ', '.join(port_list)
