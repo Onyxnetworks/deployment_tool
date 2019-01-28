@@ -114,6 +114,7 @@ def aci_contract_search(location, url_dict, username, password, request_type, se
             tenant = contracts['fvRsCons']['attributes']['tDn'].split('/')[1][3:]
 
             port_list = []
+            port_string = ''
             provider_list = []
             ip_list = []
 
@@ -133,10 +134,9 @@ def aci_contract_search(location, url_dict, username, password, request_type, se
                             print(filters['vzRsSubjFiltAtt']['attributes']['tnVzFilterName'])
                             port_list.append(filters['vzRsSubjFiltAtt']['attributes']['tnVzFilterName'])
 
-                print(port_list)
-                print(''.join(port_list))
-                port_string = ', '.join(port_list)
-                print('String: ' + port_string)
+                    print(port_list)
+                    port_string = ', '.join(port_list)
+                    print('String: ' + port_string)
                 # Get internal Providers
                 if 'vzRtProv' in subjects:
                     if subjects['vzRtProv']['attributes']['tDn'].split('/')[3][:3] == 'epg':
