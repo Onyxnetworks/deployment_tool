@@ -132,6 +132,7 @@ def aci_contract_search(location, url_dict, username, password, request_type, se
                         if 'vzRsSubjFiltAtt' in filters:
                             port_list.append(filters['vzRsSubjFiltAtt']['attributes']['tnVzFilterName'])
 
+                port_string = ', '.join(port_list)
                 # Get internal Providers
                 if 'vzRtProv' in subjects:
                     if subjects['vzRtProv']['attributes']['tDn'].split('/')[3][:3] == 'epg':
@@ -148,7 +149,7 @@ def aci_contract_search(location, url_dict, username, password, request_type, se
                         for epgs in get_internal_epg_detail_responmse['imdata']:
                             if 'fvCEp' in epgs:
                                 provider_subnet = epgs['fvCEp']['attributes']['ip'] + '/32'
-                                port_string = ', '.join(port_list)
+
 
                                 results['consumed'].append([contract_name, provider_epg_name, provider_subnet, port_string])
 
@@ -171,7 +172,6 @@ def aci_contract_search(location, url_dict, username, password, request_type, se
                                 scope_list = epgs['l3extSubnet']['attributes']['scope'].split(',')
                                 if 'import-security' in scope_list:
                                     provider_subnet = epgs['l3extSubnet']['attributes']['ip']
-                                    port_string = ', '.join(port_list)
 
                                     results['consumed'].append([contract_name, provider_epg_name, provider_subnet, port_string])
 

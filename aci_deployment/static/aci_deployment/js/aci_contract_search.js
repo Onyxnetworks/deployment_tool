@@ -40,7 +40,14 @@ function get_task_info(task_id) {
                     document.getElementById("contract_data").style.visibility = "visible";
 
                     // Build Consumed Contracts Results table.
-                    var consumed_results = data.result.consumed;
+                    var consumed_results = [
+                        ['TEST1', 'TEST2', 'TEST3', 'TEST4'],
+                        ['TEST1', 'TEST2', 'TEST3', 'TEST4'],
+                        ['TEST1', 'TEST2', 'TEST3', 'TEST4'],
+                        ['TEST2', 'TEST2', 'TEST3', 'TEST4'],
+                        ['TEST2', 'TEST2', 'TEST5', 'TEST4'],
+                        ['TEST2', 'TEST2', 'TEST5', 'TEST4'],
+                    ];
 
                     console.log(consumed_results);
                     var table = $('#consumed_table').DataTable({
@@ -48,7 +55,7 @@ function get_task_info(task_id) {
                         retrieve: true,
                         responsive: true,
                         "info": false,
-                        "lengthChange": false,
+                        "lengthChange": false
                         columnDefs: [
                             { targets: '_all', class: 'text-center' }
                         ],
@@ -57,23 +64,19 @@ function get_task_info(task_id) {
                             {
                                 name: 'contract',
                                 title: 'Contract Name',
-                                style: 'vertical-align: middle',
                             },
                             {
                                 name: 'epg_name',
                                 title: 'Provider EPG',
-                                style: 'vertical-align: middle',
 
                             },
                             {
                                 title: 'Provider Networks',
-                                style: 'vertical-align: middle',
 
                             },
                             {
                                 name: 'ports',
                                 title: 'Ports',
-                                style: 'vertical-align: middle',
 
                             },
                         ],
