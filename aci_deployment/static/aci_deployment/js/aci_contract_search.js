@@ -42,7 +42,9 @@ function get_task_info(task_id) {
                     // Build Consumed Contracts Results table.
                     var consumed_results = data.result.consumed;
                     table_ref = '#consumed_table';
-                    build_data_table(table_ref, consumed_results);
+                    // Type is the text to put in the Provider/Consumer column.
+                    type = 'Provider';
+                    build_data_table(table_ref, type, consumed_results);
 
                 }
 
@@ -64,7 +66,7 @@ function get_task_info(task_id) {
 }
 
 
-function build_data_table(table_ref, data) {
+function build_data_table(table_ref, type, data) {
     var table = $(table_ref).DataTable({
 
         retrieve: true,
@@ -88,7 +90,7 @@ function build_data_table(table_ref, data) {
             },
             {
                 name: 'ports',
-                title: 'Ports',
+                title: 'Filters',
             },
         ],
         data: data,

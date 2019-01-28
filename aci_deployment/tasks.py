@@ -134,10 +134,11 @@ def aci_contract_search(location, url_dict, username, password, request_type, se
                             print(filters['vzRsSubjFiltAtt']['attributes']['tnVzFilterName'])
                             port_list.append(filters['vzRsSubjFiltAtt']['attributes']['tnVzFilterName'])
 
-                    print(port_list)
                     port_string = ', '.join(port_list)
-                    print('String: ' + port_string)
+
                 # Get internal Providers
+                print('Test1')
+                print(port_string)
                 if 'vzRtProv' in subjects:
                     if subjects['vzRtProv']['attributes']['tDn'].split('/')[3][:3] == 'epg':
                         provider_epg_name = subjects['vzRtProv']['attributes']['tDn'].split('/')[3][4:]
@@ -150,8 +151,13 @@ def aci_contract_search(location, url_dict, username, password, request_type, se
 
                         # Clear IP List
                         ip_list = []
+                        print('Test2')
+                        print(port_string)
+
                         for epgs in get_internal_epg_detail_responmse['imdata']:
                             if 'fvCEp' in epgs:
+                                print('Test3')
+                                print(port_string)
                                 provider_subnet = epgs['fvCEp']['attributes']['ip'] + '/32'
 
 
@@ -169,12 +175,16 @@ def aci_contract_search(location, url_dict, username, password, request_type, se
                         get_external_epg_detail_responmse = get_external_epg_detail(base_url, provider_epg_tenant,
                                                                                     provider_epg_l3out,
                                                                                     provider_epg_name, apic_cookie)
+                        print('Test4')
+                        print(port_string)
                         # Clear IP List
                         ip_list = []
                         for epgs in get_external_epg_detail_responmse['imdata']:
                             if 'l3extSubnet' in epgs:
                                 scope_list = epgs['l3extSubnet']['attributes']['scope'].split(',')
                                 if 'import-security' in scope_list:
+                                    print('Test5')
+                                    print(port_string)
                                     provider_subnet = epgs['l3extSubnet']['attributes']['ip']
 
                                     results['consumed'].append([contract_name, provider_epg_name, provider_subnet, port_string])
