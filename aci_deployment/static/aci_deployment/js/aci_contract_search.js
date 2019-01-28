@@ -69,6 +69,7 @@ function build_data_table(table_ref, data) {
 
         retrieve: true,
         responsive: true,
+        "lengthMenu": [[25, 50, 100, -1], [25, 50, 100, "All"]],
         columnDefs: [
             { targets: '_all', class: 'text-center' }
             ],
@@ -100,6 +101,5 @@ function build_data_table(table_ref, data) {
             0,
             2
         ],
-        pageLength: '25',
     });
 }
