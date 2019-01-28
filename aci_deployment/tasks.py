@@ -134,6 +134,7 @@ def aci_contract_search(location, url_dict, username, password, request_type, se
                             port_list.append(filters['vzRsSubjFiltAtt']['attributes']['tnVzFilterName'])
 
                 print(port_list)
+                print(''.join(port_list))
                 port_string = ', '.join(port_list)
                 print('String: ' + port_string)
                 # Get internal Providers
