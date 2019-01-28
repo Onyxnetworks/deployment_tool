@@ -71,7 +71,7 @@ function build_data_table(table_ref, type, data) {
 
         retrieve: true,
         responsive: true,
-        "lengthMenu": [[25, 50, 100, -1], [25, 50, 100, "All"]],
+        "lengthMenu": [[-1, 25, 50, 100], ["All", 25, 50, 100]],
         columnDefs: [
             { targets: '_all', class: 'text-center' }
             ],
@@ -80,6 +80,7 @@ function build_data_table(table_ref, type, data) {
             {
                 name: 'contract',
                 title: 'Contract Name',
+                style: 'vertical-align: middle'
             },
             {
                 name: 'epg_name',
