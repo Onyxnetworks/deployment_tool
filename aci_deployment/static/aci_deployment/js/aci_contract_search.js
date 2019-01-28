@@ -99,6 +99,7 @@ function build_data_table(table_ref, type, data) {
             // Always the array (!) of the column-selectors in specified order to which rows groupping is applied
             // (column-selector could be any of specified in https://datatables.net/reference/type/column-selector)
             'contract:name',
+            'epg_name:name',
             0,
             2
         ],
