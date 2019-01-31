@@ -220,10 +220,12 @@ def virtual_server_deployment(vs_dict, location, url_dict, routeAdvertisement, u
             output_log = create_vs_ssl_profiles_result[0]
             error = create_vs_ssl_profiles_result[1]
 
-        if not error:
-            create_pool_monitor_result = create_pool_monitor(vs_dict, partition, bigip_url_base, bigip, output_log)
-            output_log = create_pool_monitor_result[0]
-            error = create_pool_monitor_result[1]
+        # Skip Monitor deployment if TCP is the type.
+        if not vs_dict['vs']['Q2'] == 'tcp':
+            if not error:
+                create_pool_monitor_result = create_pool_monitor(vs_dict, partition, bigip_url_base, bigip, output_log)
+                output_log = create_pool_monitor_result[0]
+                error = create_pool_monitor_result[1]
 
         if not error:
             create_vs_profiles_http_result = create_vs_profiles_http(vs_dict, partition, bigip_url_base, bigip, output_log)
