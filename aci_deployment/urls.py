@@ -9,5 +9,5 @@ urlpatterns = [
     url(r'^external_epg_deployment_push/$', views.external_epg_deployment_push, name='external_epg_deployment_push'),
     url(r'^contract_deployment/$', views.contract_deployment, name='contract_deployment'),
     url(r'^contract_deployment_push/$', views.contract_deployment_push, name='contract_deployment_push'),
-
+    url(r'^ipg_deployment/$', views.ipg_deployment, name='ipg_deployment'),
 ]

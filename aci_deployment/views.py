@@ -86,6 +86,7 @@ def ipg_search(request):
     content = {'environment': environment, 'locations': location_list, 'url_list': url_list, 'role': role, 'user': user}
     return render(request, 'aci_deployment/aci_ipg_search.html', content)
 
+
 def external_epg_deployment(request):
     user = request.session.get('user')
     role = request.session.get('role')
@@ -98,7 +99,6 @@ def external_epg_deployment(request):
         if environment == 'Production':
             username = request.session.get('prod_username')
             password = request.session.get('prod_password')
-
 
         elif environment == 'Pre-Production':
             # Need to put in an error as PPE search wont work!
@@ -120,7 +120,8 @@ def external_epg_deployment(request):
         task = EXTERNAL_EPG_VALIDATION.delay(rule_list, location, url_dict, username, password)
 
         # Return task id.
-        return HttpResponse(json.dumps({'task_id': task.id, 'rule_list': rule_list, 'location': location, 'role': role, 'user': user}),
+        return HttpResponse(json.dumps({'task_id': task.id, 'rule_list': rule_list, 'location': location,
+                                        'role': role, 'user': user}),
                             content_type='application/json')
 
     # Get base url to use
@@ -147,7 +148,6 @@ def external_epg_deployment_push(request):
         if environment == 'Production':
             username = request.session.get('prod_username')
             password = request.session.get('prod_password')
-
 
         elif environment == 'Pre-Production':
             # Need to put in an error as PPE search wont work!
@@ -184,7 +184,6 @@ def contract_deployment(request):
             username = request.session.get('prod_username')
             password = request.session.get('prod_password')
 
-
         elif environment == 'Pre-Production':
             # Need to put in an error as PPE search wont work!
             username = request.session.get('ppe_username')
@@ -205,7 +204,8 @@ def contract_deployment(request):
         task = CONTRACT_DEPLOYMENT_VALIDATION.delay(rule_list, location, url_dict, username, password)
 
         # Return task id.
-        return HttpResponse(json.dumps({'task_id': task.id, 'rule_list': rule_list, 'location': location, 'role': role, 'user': user}),
+        return HttpResponse(json.dumps({'task_id': task.id, 'rule_list': rule_list, 'location': location,
+                                        'role': role, 'user': user}),
                             content_type='application/json')
 
     # Get base url to use
@@ -233,7 +233,6 @@ def contract_deployment_push(request):
             username = request.session.get('prod_username')
             password = request.session.get('prod_password')
 
-
         elif environment == 'Pre-Production':
             # Need to put in an error as PPE search wont work!
             username = request.session.get('ppe_username')
@@ -254,3 +253,49 @@ def contract_deployment_push(request):
         return HttpResponse(json.dumps({'task_id': task.id}), content_type='application/json')
 
     return redirect('/contract_deployment/')
+
+
+def ipg_deployment(request):
+    user = request.session.get('user')
+    role = request.session.get('role')
+    # Present file upload to screen and give options to user
+    if request.method == 'POST' and 'file' in request.FILES:
+        file = request.FILES['file']
+        location = request.POST['location']
+
+        environment = request.session.get('environment')
+        if environment == 'Production':
+            username = request.session.get('prod_username')
+            password = request.session.get('prod_password')
+
+        elif environment == 'Pre-Production':
+            # Need to put in an error as PPE search wont work!
+            username = request.session.get('ppe_username')
+            password = request.session.get('ppe_password')
+
+        elif environment == 'Lab':
+            username = request.session.get('lab_username')
+            password = request.session.get('lab_password')
+
+        # Get base url to use
+        base_urls = get_base_url(environment)
+        url_dict = base_urls['ACI']
+
+        # Open workbook and build jason data structure.
+        ipg_list = ipg_deployment_excel_open_workbook(file, location)
+        # Validate Request names and format
+        task = ipg_deployment_validation.delay(ipg_list, location, url_dict, username, password)
+
+        # Return task id.
+        return HttpResponse(json.dumps({'task_id': task.id, 'ipg_list': ipg_list, 'location': location,
+                                        'role': role, 'user': user}),
+                            content_type='application/json')
+
+    # Get base url to use
+    environment = request.session.get('environment')
+    base_urls = get_base_url(environment)
+    url_dict = base_urls['ACI']
+    location_list = list(url_dict.keys())
+
+    content = {'environment': environment, 'locations': location_list, 'url_list': url_list, 'role': role, 'user': user}
+    return render(request, 'aci_deployment/aci_ipg_deployment.html', content)

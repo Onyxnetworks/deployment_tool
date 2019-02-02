@@ -8,6 +8,7 @@ from aci_deployment.scripts.ipg_search import *
 from aci_deployment.scripts.endpoint_search import *
 from aci_deployment.scripts.external_epg_deployment import *
 from aci_deployment.scripts.contract_deployment import *
+from aci_deployment.scripts.ipg_deployment import *
 from aci_deployment.scripts.baseline import APIC_LOGIN
 from index.scripts.baseline import get_base_url
 # Celery Functions
@@ -80,6 +81,491 @@ def aci_ipg_search(base_urls, username, password, search_string):
                 i += 1
 
     return  results
+
+
+def ipg_deployment_excel_open_workbook(file, location):
+    wb = openpyxl.load_workbook(file, data_only=True)
+    if location == 'UKDC1':
+        py_ws = wb['ACI_DC1']
+    elif location == 'UKDC2':
+        py_ws = wb['ACI_DC2']
+    elif location == 'LAB':
+        py_ws = wb['ACI_LAB']
+
+    index = 4
+    ipg_list = []
+
+    # Loops through the rows in the worksheet to build IPG information
+    for row in py_ws.iter_rows(min_row=4, max_col=9):
+        epg_list = []
+
+        # Skip empty cells
+        if row[1].value is None:
+            continue
+
+        environment = row[0].value
+        node_1 = str(row[1].value)
+
+        if row[2].value:
+            node_2 = str(row[2].value)
+        else:
+            node_2 = None
+
+        ports = row[3].value
+        speed = row[4].value
+        if row[5].value is None:
+            vpc = 'NO'
+        else:
+            vpc = row[5].value.upper()
+
+        port_channel_policy = row[6].value
+
+        if not row[8].value is None:
+            epg_list = row[8].value.split(',')
+        else:
+            epg_list = []
+
+        description = row[7].value
+
+        ipg_list.append({'line': index, 'environment': environment, 'node_1': node_1, 'node_2': node_2,
+                         'ports': ports, 'speed': speed, 'vpc': vpc, 'port_channel_policy': port_channel_policy,
+                         'description': description, 'epg_list': epg_list})
+
+        index += 1
+
+    return ipg_list
+
+
+@shared_task
+def ipg_deployment_validation(ipg_list, location, url_dict, username, password):
+    headers = {'content-type': 'application/json'}
+    output_log = []
+    base_url = url_dict[location]
+    error = False
+    vpc_presant = False
+
+
+    output_log.append({'Headers': "Validating Formatting in Workbook."})
+    for ipg in ipg_list:
+
+        if ipg['environment'] is None:
+            error = True
+            output_log.append({'Errors': 'Line: ' + str(ipg['line']) + ' - No environment defined.'})
+
+        if ipg['vpc'] is None:
+            error = True
+            output_log.append({'Errors': 'Line: ' + str(ipg['line']) + ' - VPC Field not defined'})
+            continue
+
+        if ipg['vpc'] == 'YES':
+            # Mark VPC Presant for later in script
+            vpc_presant = True
+            # If VPC = Yes check to make sure both nodes are defined.
+            if ipg['node_2'] is None:
+                error = True
+                output_log.append({'Errors': 'Line: ' + str(ipg['line']) +
+                                             ' - Type VPC selected but Node 2 not defined.'})
+                continue
+
+            # If VPC = Yes check to make sure switches are a VPC pair
+            if int(ipg['node_2']) - int(ipg['node_1']) != 1:
+                error = True
+                output_log.append({'Errors': 'Line: ' + str(ipg['line']) +
+                                             ' - Type VPC selected but switches are not a VPC Pair.'})
+
+            # If VPC = Yes check that a port-channel policy is defined.
+            if ipg['port_channel_policy'] is None:
+                error = True
+                output_log.append({'Errors': 'Line: ' + str(ipg['line']) +
+                                             ' - Type VPC selected but no port-channel policy defined.'})
+        if ipg['vpc'] == 'NO':
+            # If VPC = No check to make sure node_2 has no value
+            if not ipg['node_2'] is None:
+                error = True
+                output_log.append({'Errors': 'Line: ' + str(ipg['line']) +
+                                             ' - Non VPC selected but two switches defined.'})
+            # If VPC = No check to make sure port-channel policy has no value
+            if not ipg['port_channel_policy'] is None:
+                error = True
+                output_log.append({'Errors': 'Line: ' + str(ipg['line']) +
+                                             ' - Non VPC selected but port-channel policy defined.'})
+        # Check to make sure speed is defined.
+        if ipg['speed'] is None:
+            error = True
+            output_log.append({'Errors': 'Line: ' + str(ipg['line']) + ' - Interface speed not defined.'})
+
+        # Check to make sure description is defined.
+        if ipg['description'] is None:
+            error = True
+            output_log.append({'Errors': 'Line: ' + str(ipg['line']) + ' - Description not defined.'})
+
+    if not error:
+        output_log.append({'NotificationsSuccess': 'Workbook validated successfully'})
+
+
+        # Go and check if switches exist on fabric.
+        switch_list = []
+        for switches in ipg_list:
+            switch_list.append(switches['node_1'])
+            if not switches['node_2'] is None:
+                switch_list.append(switches['node_2'])
+
+        excel_switch_list = list(set(switch_list))
+        fabric_switch_list = []
+        # Login to fabric
+        output_log.append({'Headers': 'Connecting to APIC'})
+        apic_cookie = APIC_LOGIN(base_url, username, password)
+        if apic_cookie:
+            output_log.append({'Notifications': 'Successfully generated authentication cookie'})
+            output_log.append({'Headers': 'Checking if nodes presant in fabric.'})
+            get_fabric_nodes_response = get_fabric_nodes(base_url, apic_cookie, headers, output_log)
+            if get_fabric_nodes_response[0]:
+                output_log = get_fabric_nodes_response[1]
+                error = True
+
+            else:
+                for nodes in get_fabric_nodes_response[1]['imdata']:
+                    fabric_switch_list.append(nodes['fabricNode']['attributes']['id'])
+
+                for switch in excel_switch_list:
+                    if switch not in fabric_switch_list:
+                        error = True
+                        output_log.append({'Errors': 'Node ' + switch + ' not found in fabric.'})
+
+            if not error:
+                output_log.append({'NotificationsSuccess': 'Fabric switches validated successfully'})
+
+            # Check if IPG's already exist.
+            if not error:
+                output_log.append({'Headers': "Checking if IPG's presant in fabric."})
+                get_fabric_ipgs_response = get_fabric_ipgs(base_url, apic_cookie, headers, output_log)
+                if get_fabric_ipgs_response[0]:
+                    output_log = get_fabric_ipgs_response[1]
+                    error = True
+
+                else:
+                    for ipg in ipg_list:
+                        if ipg['vpc'] == 'YES':
+                            # Build IPG Name
+                            if location == 'UKDC1':
+                                ipg_prefix = '1'
+                            elif location == 'UKDC2':
+                                ipg_prefix = '2'
+                            elif location == 'LAB':
+                                ipg_prefix = '2'
+                            environment = ipg['environment']
+                            node_1 = ipg['node_1']
+                            node_2 = ipg['node_2']
+                            port = ipg['ports'].split('/')[-1]
+                            # Format the port
+                            if len(port) == 1:
+                                 port = '0' + port
+                            if '-' in port:
+                                # format for multiple Interfaces
+                                port_start = port.split('-')[0]
+                                port_end = port.split('-')[1]
+                                if len(port_start) == 1:
+                                    port_start = '0' + port_start
+                                if len(port_end) == 1:
+                                    port_end = '0' + port_end
+                                port = port_start + '-' + port_end
+
+                            ipg_name = '{0}{1}-VPC-{2}-{3}-P{4}_IPG'.format(environment, ipg_prefix, node_1,
+                                                                            node_2, port)
+                            fabric_ipg_list = []
+                            for fabric_ipg_name in get_fabric_ipgs_response[1]['imdata']:
+                                fabric_ipg_list.append(fabric_ipg_name['infraAccBndlGrp']['attributes']['name'])
+
+                            if ipg_name in fabric_ipg_list:
+                                output_log.append({'NotificationsWarning': 'Line: ' + str(ipg['line']) + ' ' + ipg_name
+                                                                           + " already exists on the fabric and won't "
+                                                                             "be created"})
+                            else:
+                                output_log.append({'Notifications': 'Line: ' + str(ipg['line']) + ' ' + ipg_name +
+                                                                    " will be created"})
+
+            # Checking if VPC domain are correct.
+            if not error:
+                output_log.append({'Headers': 'Checking VPC Pairs.'})
+                get_vpc_domain_response = get_vpc_domain(base_url, apic_cookie, headers, output_log)
+
+                if get_vpc_domain_response[0]:
+                    output_log = get_vpc_domain_response[1]
+                    error = True
+
+                else:
+                    vpc_list = []
+                    for vpc in get_vpc_domain_response[1]['imdata']:
+                        vpc_nodes = []
+                        vpc_name = vpc['fabricExplicitGEp']['attributes']['name']
+
+                        # Get VPC Domain Details
+                        get_vpc_detail_response = get_vpc_domain_detail(base_url, apic_cookie, headers, output_log,
+                                                                        vpc_name)
+                        if get_vpc_detail_response[0]:
+                            output_log = get_vpc_detail_response[1]
+                            error = True
+
+                        else:
+
+                            for node_detail in get_vpc_detail_response[1]['imdata']:
+                                if 'fabricNodePEp' in node_detail:
+                                    node_id = int(node_detail['fabricNodePEp']['attributes']['id'])
+                                    vpc_nodes.append(node_id)
+
+                            vpc_list.append(vpc_nodes)
+
+                    for ipg in ipg_list:
+                        if ipg['vpc'] == 'YES':
+                            form_vpc = [int(ipg['node_1']), int(ipg['node_2'])]
+                            if form_vpc not in vpc_list:
+                                error = True
+                                output_log.append({'Errors': 'Line: ' + str(ipg['line']) + ' Node: ' + ipg['node_1']
+                                                             + ' & ' + ipg['node_2'] + ' not configured for VPC.'})
+            # Check if ports are already in use.
+            if not error:
+                output_log.append({'NotificationsSuccess': "VPC's validated successfully"})
+                output_log.append({'Headers': 'Checking interface availability.'})
+
+                for ipg in ipg_list:
+                    node1 = ipg['node_1']
+                    if ipg['vpc'] == 'YES':
+                        node2 = ipg['node_2']
+
+                        # Format the port
+                        port = ipg['ports'].split('/')[-1]
+
+                        if '-' in port:
+                            # format for multiple Interfaces
+                            start_card = ipg['ports'].split('/')[0]
+                            end_card = ipg['ports'].split('/')[0]
+                            start_port = port.split('-')[0]
+                            end_port = port.split('-')[1]
+
+                        else:
+                            start_card = ipg['ports'].split('/')[0]
+                            end_card = ipg['ports'].split('/')[0]
+                            start_port = port
+                            end_port = port
+
+                        # Get port details from VPC LSP
+                        vpc = True
+                        get_lsp_detail_response = get_lsp_detail(base_url, apic_cookie, headers, output_log, vpc, node_1,
+                                                                 node_2)
+
+                        if get_lsp_detail_response[0]:
+                            output_log = get_lsp_detail_response[1]
+                            error = True
+
+                        else:
+                            for lsp_detail in get_lsp_detail_response[1]['imdata']:
+                                if 'infraHPortS' in lsp_detail:
+                                    # Get Port details
+                                    dn = lsp_detail['infraHPortS']['attributes']['dn']
+
+                                    get_port_detail_response = get_port_detail(base_url, apic_cookie, headers,
+                                                                               output_log, dn)
+
+                                    if get_port_detail_response[0]:
+                                        output_log = get_port_detail_response[1]
+                                        error = True
+
+                                    else:
+                                        for port_detail in get_port_detail_response[1]['imdata']:
+
+
+
+                                            if 'infraPortBlk' in port_detail:
+                                                fromCard = port_detail['infraPortBlk']['attributes']['fromCard']
+                                                fromPort = port_detail['infraPortBlk']['attributes']['fromPort']
+                                                toCard = port_detail['infraPortBlk']['attributes']['toCard']
+                                                toPort = port_detail['infraPortBlk']['attributes']['toPort']
+
+                                            if 'infraRsAccBaseGrp' in port_detail:
+                                                excel_port = ipg['ports'].split('/')[-1]
+                                                # Format the port
+                                                if len(excel_port) == 1:
+                                                    excel_port = '0' + excel_port
+                                                if '-' in excel_port:
+                                                    # format for multiple Interfaces
+                                                    port_start = excel_port.split('-')[0]
+                                                    port_end = excel_port.split('-')[1]
+                                                    if len(port_start) == 1:
+                                                        port_start = '0' + port_start
+                                                    if len(port_end) == 1:
+                                                        port_end = '0' + port_end
+                                                    excel_port = port_start + '-' + port_end
+                                                ipg_name = '{0}{1}-VPC-{2}-{3}-P{4}_IPG'.format(environment, ipg_prefix,
+                                                                                                node_1,
+                                                                                                node_2, excel_port)
+                                                fabric_ipg_name = port_detail['infraRsAccBaseGrp']['attributes']['tDn'].split('accbundle-')[-1]
+                                                if ipg_name != fabric_ipg_name:
+                                                    if start_card == fromCard and start_port == fromPort and end_card == toCard and end_port == toPort:
+                                                        error = True
+                                                        output_log.append({'Errors': 'Line: ' + str(
+                                                            ipg['line']) + ' IPG Name missmatch between the Workbook and Fabric. ' + ipg_name + ' & ' + fabric_ipg_name})
+
+                                                if ipg_name == fabric_ipg_name:
+                                                    if start_card == fromCard and start_port == fromPort and end_card == toCard and end_port == toPort:
+                                                        ipg['presant'] = True
+                                                        output_log.append({'NotificationsWarning': 'Line: ' + str(
+                                                            ipg[
+                                                                'line']) + ' ports already provisioned, no IPG will be configured but any additional EPGs will be pusshed'})
+
+
+                        # Get port details from node_1 LSP
+                        vpc = False
+                        nonvpc_node_1 = ipg['node_1']
+                        nonvpc_node_2 = ''
+                        get_lsp_detail_response_node1 = get_lsp_detail(base_url, apic_cookie, headers, output_log, vpc,
+                                                                       nonvpc_node_1, nonvpc_node_2)
+
+
+                        if get_lsp_detail_response_node1[0]:
+                            output_log = get_lsp_detail_response_node1[1]
+                            error = True
+
+                        else:
+                            for lsp_detail in get_lsp_detail_response_node1[1]['imdata']:
+                                if 'infraHPortS' in lsp_detail:
+                                    # Get Port details
+                                    dn = lsp_detail['infraHPortS']['attributes']['dn']
+
+                                    get_port_detail_response = get_port_detail(base_url, apic_cookie, headers,
+                                                                               output_log, dn)
+
+                                    if get_port_detail_response[0]:
+                                        output_log = get_port_detail_response[1]
+                                        error = True
+
+                                    else:
+                                        for port_detail in get_port_detail_response[1]['imdata']:
+                                            if 'infraPortBlk' in port_detail:
+                                                fromCard = port_detail['infraPortBlk']['attributes']['fromCard']
+                                                fromPort = port_detail['infraPortBlk']['attributes']['fromPort']
+                                                toCard = port_detail['infraPortBlk']['attributes']['toCard']
+                                                toPort = port_detail['infraPortBlk']['attributes']['toPort']
+
+                                                if start_card == fromCard and start_port == fromPort and end_card == toCard and end_port == toPort:
+                                                    error = True
+                                                    output_log.append({'Errors': 'Line: ' + str(ipg['line']) + ' ports already provisioned as non VPC port on LFS' + nonvpc_node_1})
+
+
+                        nonvpc_node_1 = ipg['node_2']
+                        get_lsp_detail_response_node2 = get_lsp_detail(base_url, apic_cookie, headers, output_log, vpc,
+                                                                       nonvpc_node_1, nonvpc_node_2)
+
+                        if get_lsp_detail_response_node2[0]:
+                            output_log = get_lsp_detail_response_node2[1]
+                            error = True
+
+                        else:
+                            for lsp_detail in get_lsp_detail_response_node2[1]['imdata']:
+                                if 'infraHPortS' in lsp_detail:
+                                    # Get Port details
+                                    dn = lsp_detail['infraHPortS']['attributes']['dn']
+
+                                    get_port_detail_response = get_port_detail(base_url, apic_cookie, headers,
+                                                                               output_log, dn)
+
+                                    if get_port_detail_response[0]:
+                                        output_log = get_port_detail_response[1]
+                                        error = True
+
+                                    else:
+                                        for port_detail in get_port_detail_response[1]['imdata']:
+                                            if 'infraPortBlk' in port_detail:
+                                                fromCard = port_detail['infraPortBlk']['attributes']['fromCard']
+                                                fromPort = port_detail['infraPortBlk']['attributes']['fromPort']
+                                                toCard = port_detail['infraPortBlk']['attributes']['toCard']
+                                                toPort = port_detail['infraPortBlk']['attributes']['toPort']
+
+                                                if start_card == fromCard and start_port == fromPort and end_card == toCard and end_port == toPort:
+                                                    error = True
+                                                    output_log.append({'Errors': 'Line: ' + str(
+                                                        ipg[
+                                                            'line']) + ' ports already provisioned as non VPC port on LFS' + nonvpc_node_1})
+
+                    if ipg['vpc'] == 'NO':
+                        # Format the port
+                        port = ipg['ports'].split('/')[-1]
+
+                        if '-' in port:
+                            # format for multiple Interfaces
+                            start_card = ipg['ports'].split('/')[0]
+                            end_card = ipg['ports'].split('/')[0]
+                            start_port = port.split('-')[0]
+                            end_port = port.split('-')[1]
+
+                        else:
+                            start_card = ipg['ports'].split('/')[0]
+                            end_card = ipg['ports'].split('/')[0]
+                            start_port = port
+                            end_port = port
+
+                            # Get port details from node_1 LSP
+                            vpc = False
+                            nonvpc_node_1 = ipg['node_1']
+                            nonvpc_node_2 = ''
+                            get_lsp_detail_response = get_lsp_detail(base_url, apic_cookie, headers, output_log,
+                                                                           vpc,
+                                                                           nonvpc_node_1, nonvpc_node_2)
+
+                        if get_lsp_detail_response[0]:
+                            output_log = get_lsp_detail_response[1]
+                            error = True
+
+                        else:
+                            for lsp_detail in get_lsp_detail_response[1]['imdata']:
+                                if 'infraHPortS' in lsp_detail:
+                                    # Get Port details
+                                    dn = lsp_detail['infraHPortS']['attributes']['dn']
+
+                                    get_port_detail_response = get_port_detail(base_url, apic_cookie, headers,
+                                                                               output_log, dn)
+
+                                    if get_port_detail_response[0]:
+                                        output_log = get_port_detail_response[1]
+                                        error = True
+
+                                    else:
+                                        for port_detail in get_port_detail_response[1]['imdata']:
+                                            if 'infraPortBlk' in port_detail:
+                                                fromCard = port_detail['infraPortBlk']['attributes']['fromCard']
+                                                fromPort = port_detail['infraPortBlk']['attributes']['fromPort']
+                                                toCard = port_detail['infraPortBlk']['attributes']['toCard']
+                                                toPort = port_detail['infraPortBlk']['attributes']['toPort']
+
+                                                if start_card == fromCard and start_port == fromPort and end_card == toCard and end_port == toPort:
+                                                    ipg['presant'] = True
+                                                    output_log.append({'NotificationsWarning': 'Line: ' + str(
+                                                        ipg[
+                                                            'line']) + ' ports already provisioned, no IPG will be configured but any additional EPGs will be pusshed'})
+
+            # Check if EPGs are created.
+            if not error:
+                output_log.append({'Headers': "Checking if EPG's exist."})
+                get_all_epg_response = get_all_epgs(base_url, apic_cookie, headers, output_log)
+                if get_all_epg_response[0]:
+                    output_log = get_all_epg_response[1]
+                    error = True
+
+                else:
+                    epg_list = get_all_epg_response[1]['imdata']
+                    for ipg in ipg_list:
+                        for epg in ipg['epg_list']:
+                            if epg is None:
+                                continue
+                            else:
+                                if not [s for s in epg_list if epg.upper() == s['fvAEPg']['attributes']['name'].upper()]:
+                                    error = True
+                                    output_log.append({'Errors': 'Line: ' + str(ipg['line']) + ' ' + epg + ' does not exist on the fabric.'})
+
+            if not error:
+                output_log.append({'NotificationsSuccess': "EPG's validated successfully"})
+
+
+    return output_log, ipg_list
 
 
 def CONTRACT_DEPLOYMENT_EXCEL_OPEN_WORKBOOK(WORKBOOK, LOCATION):
@@ -628,6 +1114,7 @@ def EXTERNAL_EPG_DEPLOYMENT(RULE_LIST, location, url_dict, username, password):
 
     return OUTPUT_LOG
 
+
 @shared_task
 def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, username, password):
     CONTRACT_LIST = []
@@ -992,6 +1479,7 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, username, pass
         OUTPUT_LOG.append({'ValidationSuccess': 'APIC Configuration validated successfully'})
 
     return OUTPUT_LOG
+
 
 @shared_task
 def CONTRACT_DEPLOYMENT(RULE_LIST, location, url_dict, username, password):
