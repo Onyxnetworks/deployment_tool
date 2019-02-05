@@ -21,7 +21,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -134,5 +134,5 @@ STATIC_ROOT = '/home/django/deployment_tool/static/'
 STATIC_URL = '/static/'
 
 # Login Config
-LOGIN_URLS = '/login/'
+LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/index/'

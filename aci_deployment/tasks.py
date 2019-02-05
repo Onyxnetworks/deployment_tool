@@ -330,7 +330,7 @@ def ipg_deployment_validation(ipg_list, location, url_dict, username, password):
                         if ipg['vpc'] == 'NO':
 
                             # Set IPG to access (default used for all non VPC ports).
-                            ipg_name = '{0}{1}-ACCESS_IPG'.format(environment, ipg_prefix)
+                            ipg_name = '{0}{1}-SVR-ACCESS-{2}_IPG'.format(environment, ipg_prefix, ipg['speed'] )
 
                             port_settings['ipg'] = ipg_name
                             port_settings['lsp'] = 'LFS{0}_LSP'.format(node_1)
