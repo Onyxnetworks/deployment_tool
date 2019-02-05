@@ -10,4 +10,5 @@ urlpatterns = [
     url(r'^contract_deployment/$', views.contract_deployment, name='contract_deployment'),
     url(r'^contract_deployment_push/$', views.contract_deployment_push, name='contract_deployment_push'),
     url(r'^ipg_deployment/$', views.ipg_deployment, name='ipg_deployment'),
+    url(r'^ipg_deployment_push/$', views.ipg_deployment_push, name='ipg_deployment_push'),
 ]

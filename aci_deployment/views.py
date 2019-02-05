@@ -299,3 +299,41 @@ def ipg_deployment(request):
 
     content = {'environment': environment, 'locations': location_list, 'url_list': url_list, 'role': role, 'user': user}
     return render(request, 'aci_deployment/aci_ipg_deployment.html', content)
+
+
+def ipg_deployment_push(request):
+    user = request.session.get('user')
+    role = request.session.get('role')
+    # Deploy IPG configuration
+    if request.method == 'POST':
+        response_json = request.body
+        data = json.loads(response_json)
+        location = data['location']
+        ipg_list = data['ipg_list']
+
+        environment = request.session.get('environment')
+        if environment == 'Production':
+            username = request.session.get('prod_username')
+            password = request.session.get('prod_password')
+
+        elif environment == 'Pre-Production':
+            # Need to put in an error as PPE search wont work!
+            username = request.session.get('ppe_username')
+            password = request.session.get('ppe_password')
+
+        elif environment == 'Lab':
+            username = request.session.get('lab_username')
+            password = request.session.get('lab_password')
+
+        # Get base url to use
+        base_urls = get_base_url(environment)
+        url_dict = base_urls['ACI']
+
+        # Deploy APIC configuration
+        task = ipg_deployment_post.delay(ipg_list, location, url_dict, username, password)
+
+        # Return task id back to client for ajax use.
+        return HttpResponse(json.dumps({'task_id': task.id}), content_type='application/json')
+
+    return redirect('/ipg_deployment/')
+

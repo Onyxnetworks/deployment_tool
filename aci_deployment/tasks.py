@@ -1,7 +1,6 @@
-# Base Functions
+#  Base Functions
 import openpyxl
 from operator import itemgetter
-
 
 # Custom Functions
 from aci_deployment.scripts.ipg_search import *
@@ -13,6 +12,7 @@ from aci_deployment.scripts.baseline import APIC_LOGIN
 from index.scripts.baseline import get_base_url
 # Celery Functions
 from celery import shared_task
+
 
 @shared_task
 def ENDPOINT_SEARCH(base_urls, filter_default, username, password, search_string):
@@ -35,7 +35,7 @@ def ENDPOINT_SEARCH(base_urls, filter_default, username, password, search_string
         if request_type == 'subnet':
             if IPNetwork(search_string) in IPNetwork(i['Subnet']) or IPNetwork(i['Subnet']) in IPNetwork(search_string):
                 RESULTS.append({'Subnet': i['Subnet'], 'Locality': i['Locality'], 'Location': i['Location'],
-                                'EPG': i['EPG'],'Scope': i['Scope'], 'AppProfile':
+                                'EPG': i['EPG'], 'Scope': i['Scope'], 'AppProfile':
                                     i['AppProfile'], 'Tenant': i['Tenant']})
         if request_type == 'epg_name':
             if search_string.upper() in i['EPG'].upper():
@@ -74,13 +74,13 @@ def aci_ipg_search(base_urls, username, password, search_string):
             for epg in ipg_location['response']['imdata']:
                 results.append({'location': location, 'ipg':
                     epg['fvRsPathAtt']['attributes']['tDn'].split('/')[-1][8:].strip(']'), 'tenant':
-                    epg['fvRsPathAtt']['attributes']['dn'].split('/')[1][3:], 'app_prof':
-                    epg['fvRsPathAtt']['attributes']['dn'].split('/')[2][3:], 'epg':
-                    epg['fvRsPathAtt']['attributes']['dn'].split('/')[3][4:],'encap':
-                    epg['fvRsPathAtt']['attributes']['encap']})
+                                    epg['fvRsPathAtt']['attributes']['dn'].split('/')[1][3:], 'app_prof':
+                                    epg['fvRsPathAtt']['attributes']['dn'].split('/')[2][3:], 'epg':
+                                    epg['fvRsPathAtt']['attributes']['dn'].split('/')[3][4:], 'encap':
+                                    epg['fvRsPathAtt']['attributes']['encap']})
                 i += 1
 
-    return  results
+    return results
 
 
 def ipg_deployment_excel_open_workbook(file, location):
@@ -144,7 +144,6 @@ def ipg_deployment_validation(ipg_list, location, url_dict, username, password):
     error = False
     vpc_presant = False
 
-
     output_log.append({'Headers': "Validating Formatting in Workbook."})
     for ipg in ipg_list:
 
@@ -202,7 +201,6 @@ def ipg_deployment_validation(ipg_list, location, url_dict, username, password):
     if not error:
         output_log.append({'NotificationsSuccess': 'Workbook validated successfully'})
 
-
         # Go and check if switches exist on fabric.
         switch_list = []
         for switches in ipg_list:
@@ -238,51 +236,125 @@ def ipg_deployment_validation(ipg_list, location, url_dict, username, password):
             # Check if IPG's already exist.
             if not error:
                 output_log.append({'Headers': "Checking if IPG's presant in fabric."})
-                get_fabric_ipgs_response = get_fabric_ipgs(base_url, apic_cookie, headers, output_log)
-                if get_fabric_ipgs_response[0]:
-                    output_log = get_fabric_ipgs_response[1]
+                get_fabric_vpc_ipgs_response = get_fabric_vpc_ipgs(base_url, apic_cookie, headers, output_log)
+                if get_fabric_vpc_ipgs_response[0]:
+                    output_log = get_fabric_vpc_ipgs_response[1]
                     error = True
 
-                else:
-                    for ipg in ipg_list:
-                        if ipg['vpc'] == 'YES':
-                            # Build IPG Name
-                            if location == 'UKDC1':
-                                ipg_prefix = '1'
-                            elif location == 'UKDC2':
-                                ipg_prefix = '2'
-                            elif location == 'LAB':
-                                ipg_prefix = '2'
-                            environment = ipg['environment']
-                            node_1 = ipg['node_1']
-                            node_2 = ipg['node_2']
-                            port = ipg['ports'].split('/')[-1]
-                            # Format the port
-                            if len(port) == 1:
-                                 port = '0' + port
-                            if '-' in port:
-                                # format for multiple Interfaces
-                                port_start = port.split('-')[0]
-                                port_end = port.split('-')[1]
-                                if len(port_start) == 1:
-                                    port_start = '0' + port_start
-                                if len(port_end) == 1:
-                                    port_end = '0' + port_end
-                                port = port_start + '-' + port_end
+                if not error:
+                    get_fabric_ipgs_response = get_fabric_ipgs(base_url, apic_cookie, headers, output_log)
+                    if get_fabric_ipgs_response[0]:
+                        output_log = get_fabric_ipgs_response[1]
+                        error = True
 
-                            ipg_name = '{0}{1}-VPC-{2}-{3}-P{4}_IPG'.format(environment, ipg_prefix, node_1,
-                                                                            node_2, port)
+                if not error:
+                    accessIpg = True
+                    for ipg in ipg_list:
+                        # Set created flag to false
+                        ipg['lsp_mapped'] = False
+                        ipg['presant'] = False
+
+                        # Build IPG Name
+                        if location == 'UKDC1':
+                            ipg_prefix = '1'
+                        elif location == 'UKDC2':
+                            ipg_prefix = '2'
+                        elif location == 'LAB':
+                            ipg_prefix = '2'
+                        environment = ipg['environment']
+                        node_1 = ipg['node_1']
+
+                        port = ipg['ports'].split('/')[-1]
+                        fromPort = port
+                        toPort = port
+                        # Format the port
+                        if len(port) == 1:
+                            port = '0' + port
+
+                        if '-' in port:
+                            # format for multiple Interfaces
+                            port_start = port.split('-')[0]
+                            port_end = port.split('-')[1]
+                            if len(port_start) > 1:
+                                fromPort = port_start
+                            if len(port_end) > 1:
+                                toPort = port_end
+                            if len(port_start) == 1:
+                                fromPort = port_start
+                                port_start = '0' + port_start
+                            if len(port_end) == 1:
+                                toPort = port_end
+                                port_end = '0' + port_end
+
+                            port = port_start + '-' + port_end
+
+                        port_settings = {}
+                        port_settings['toPort'] = toPort
+                        port_settings['fromPort'] = fromPort
+                        port_settings['blockDescription'] = ipg['description']
+                        port_settings['lspDescription'] = 'P' + port + '-' + ipg['description']
+                        port_settings['block'] = ipg['ports']
+
+                        if ipg['vpc'] == 'YES':
+
+                            # Build IPG Name
+                            node_2 = ipg['node_2']
+
+                            ipg_name = '{0}{1}-VPC-{2}-{3}-P{4}_IPG'.format(environment, ipg_prefix, node_1, node_2,
+                                                                            port)
+
+                            port_settings['ipg'] = ipg_name
+                            port_settings['lsp'] = 'VPC-{0}-{1}_LSP'.format(node_1, node_2)
+
+                            ipg_settings = {}
+                            ipg_settings['name'] = ipg_name
+                            ipg_settings['speed'] = ipg['speed']
+                            ipg_settings['portChannelPolicy'] = ipg['port_channel_policy']
+
+                            # Add port & ipg settings to item.
+                            ipg['portSettings'] = port_settings
+                            ipg['ipgSettings'] = ipg_settings
+
                             fabric_ipg_list = []
-                            for fabric_ipg_name in get_fabric_ipgs_response[1]['imdata']:
+                            for fabric_ipg_name in get_fabric_vpc_ipgs_response[1]['imdata']:
                                 fabric_ipg_list.append(fabric_ipg_name['infraAccBndlGrp']['attributes']['name'])
 
                             if ipg_name in fabric_ipg_list:
+                                ipg['presant'] = True
                                 output_log.append({'NotificationsWarning': 'Line: ' + str(ipg['line']) + ' ' + ipg_name
                                                                            + " already exists on the fabric and won't "
                                                                              "be created"})
                             else:
                                 output_log.append({'Notifications': 'Line: ' + str(ipg['line']) + ' ' + ipg_name +
                                                                     " will be created"})
+                        if ipg['vpc'] == 'NO':
+
+                            # Set IPG to access (default used for all non VPC ports).
+                            ipg_name = '{0}{1}-ACCESS_IPG'.format(environment, ipg_prefix)
+
+                            port_settings['ipg'] = ipg_name
+                            port_settings['lsp'] = 'LFS{0}_LSP'.format(node_1)
+
+                            ipg_settings = {}
+                            ipg_settings['name'] = ipg_name
+
+                            # Add port & ipg settings to item.
+                            ipg['portSettings'] = port_settings
+                            ipg['ipgSettings'] = ipg_settings
+
+                            fabric_ipg_list = []
+                            for fabric_ipg_name in get_fabric_ipgs_response[1]['imdata']:
+                                fabric_ipg_list.append(fabric_ipg_name['infraAccPortGrp']['attributes']['name'])
+
+                            if ipg_name in fabric_ipg_list:
+                                ipg['presant'] = True
+                            else:
+                                error = True
+                                accessIpg = False
+                    if not accessIpg:
+                        output_log.append({'Errors': 'Unable to locate Access IPG on fabric. IPG Name: ' +
+                                                     ipg_name})
+
 
             # Checking if VPC domain are correct.
             if not error:
@@ -313,12 +385,13 @@ def ipg_deployment_validation(ipg_list, location, url_dict, username, password):
                                     node_id = int(node_detail['fabricNodePEp']['attributes']['id'])
                                     vpc_nodes.append(node_id)
 
+                            # Sort list so lowest node ID is 1st.
+                            vpc_nodes = sorted(vpc_nodes)
                             vpc_list.append(vpc_nodes)
-
                     for ipg in ipg_list:
                         if ipg['vpc'] == 'YES':
                             form_vpc = [int(ipg['node_1']), int(ipg['node_2'])]
-                            if form_vpc not in vpc_list:
+                            if sorted(form_vpc) not in vpc_list:
                                 error = True
                                 output_log.append({'Errors': 'Line: ' + str(ipg['line']) + ' Node: ' + ipg['node_1']
                                                              + ' & ' + ipg['node_2'] + ' not configured for VPC.'})
@@ -350,7 +423,8 @@ def ipg_deployment_validation(ipg_list, location, url_dict, username, password):
 
                         # Get port details from VPC LSP
                         vpc = True
-                        get_lsp_detail_response = get_lsp_detail(base_url, apic_cookie, headers, output_log, vpc, node_1,
+                        get_lsp_detail_response = get_lsp_detail(base_url, apic_cookie, headers, output_log, vpc,
+                                                                 node_1,
                                                                  node_2)
 
                         if get_lsp_detail_response[0]:
@@ -373,8 +447,6 @@ def ipg_deployment_validation(ipg_list, location, url_dict, username, password):
                                     else:
                                         for port_detail in get_port_detail_response[1]['imdata']:
 
-
-
                                             if 'infraPortBlk' in port_detail:
                                                 fromCard = port_detail['infraPortBlk']['attributes']['fromCard']
                                                 fromPort = port_detail['infraPortBlk']['attributes']['fromPort']
@@ -395,23 +467,26 @@ def ipg_deployment_validation(ipg_list, location, url_dict, username, password):
                                                     if len(port_end) == 1:
                                                         port_end = '0' + port_end
                                                     excel_port = port_start + '-' + port_end
-                                                ipg_name = '{0}{1}-VPC-{2}-{3}-P{4}_IPG'.format(environment, ipg_prefix,
-                                                                                                node_1,
-                                                                                                node_2, excel_port)
-                                                fabric_ipg_name = port_detail['infraRsAccBaseGrp']['attributes']['tDn'].split('accbundle-')[-1]
+
+                                                ipg_name = ipg['ipgSettings']['name']
+
+                                                fabric_ipg_name = \
+                                                port_detail['infraRsAccBaseGrp']['attributes']['tDn'].split(
+                                                    'accbundle-')[-1]
                                                 if ipg_name != fabric_ipg_name:
                                                     if start_card == fromCard and start_port == fromPort and end_card == toCard and end_port == toPort:
                                                         error = True
                                                         output_log.append({'Errors': 'Line: ' + str(
-                                                            ipg['line']) + ' IPG Name missmatch between the Workbook and Fabric. ' + ipg_name + ' & ' + fabric_ipg_name})
+                                                            ipg[
+                                                                'line']) + ' IPG Name missmatch between the Workbook and Fabric. ' + ipg_name + ' & ' + fabric_ipg_name})
 
                                                 if ipg_name == fabric_ipg_name:
                                                     if start_card == fromCard and start_port == fromPort and end_card == toCard and end_port == toPort:
                                                         ipg['presant'] = True
+                                                        ipg['lsp_mapped'] = True
                                                         output_log.append({'NotificationsWarning': 'Line: ' + str(
                                                             ipg[
                                                                 'line']) + ' ports already provisioned, no IPG will be configured but any additional EPGs will be pusshed'})
-
 
                         # Get port details from node_1 LSP
                         vpc = False
@@ -419,7 +494,6 @@ def ipg_deployment_validation(ipg_list, location, url_dict, username, password):
                         nonvpc_node_2 = ''
                         get_lsp_detail_response_node1 = get_lsp_detail(base_url, apic_cookie, headers, output_log, vpc,
                                                                        nonvpc_node_1, nonvpc_node_2)
-
 
                         if get_lsp_detail_response_node1[0]:
                             output_log = get_lsp_detail_response_node1[1]
@@ -448,8 +522,8 @@ def ipg_deployment_validation(ipg_list, location, url_dict, username, password):
 
                                                 if start_card == fromCard and start_port == fromPort and end_card == toCard and end_port == toPort:
                                                     error = True
-                                                    output_log.append({'Errors': 'Line: ' + str(ipg['line']) + ' ports already provisioned as non VPC port on LFS' + nonvpc_node_1})
-
+                                                    output_log.append({'Errors': 'Line: ' + str(ipg[
+                                                                                                    'line']) + ' ports already provisioned as non VPC port on LFS' + nonvpc_node_1})
 
                         nonvpc_node_1 = ipg['node_2']
                         get_lsp_detail_response_node2 = get_lsp_detail(base_url, apic_cookie, headers, output_log, vpc,
@@ -507,9 +581,10 @@ def ipg_deployment_validation(ipg_list, location, url_dict, username, password):
                             vpc = False
                             nonvpc_node_1 = ipg['node_1']
                             nonvpc_node_2 = ''
+
                             get_lsp_detail_response = get_lsp_detail(base_url, apic_cookie, headers, output_log,
-                                                                           vpc,
-                                                                           nonvpc_node_1, nonvpc_node_2)
+                                                                     vpc,
+                                                                     nonvpc_node_1, nonvpc_node_2)
 
                         if get_lsp_detail_response[0]:
                             output_log = get_lsp_detail_response[1]
@@ -557,15 +632,83 @@ def ipg_deployment_validation(ipg_list, location, url_dict, username, password):
                             if epg is None:
                                 continue
                             else:
-                                if not [s for s in epg_list if epg.upper() == s['fvAEPg']['attributes']['name'].upper()]:
+                                if not [s for s in epg_list if
+                                        epg.upper() == s['fvAEPg']['attributes']['name'].upper()]:
                                     error = True
-                                    output_log.append({'Errors': 'Line: ' + str(ipg['line']) + ' ' + epg + ' does not exist on the fabric.'})
+                                    output_log.append({'Errors': 'Line: ' + str(
+                                        ipg['line']) + ' ' + epg + ' does not exist on the fabric.'})
 
             if not error:
                 output_log.append({'NotificationsSuccess': "EPG's validated successfully"})
 
+        else:
+            output_log.append({'Errors': 'Failed to connect to apic.'})
 
     return output_log, ipg_list
+
+
+@shared_task
+def ipg_deployment_post(ipg_list, location, url_dict, username, password):
+    error = False
+    base_url = url_dict[location]
+    output_log = []
+    headers = {'content-type': 'application/json'}
+
+    # --------------------------------------------------------------------------#
+    # Begin Configuration
+    # --------------------------------------------------------------------------#
+    output_log.append({'Headers': 'Starting IPG provisioning.'})
+    output_log.append({'Headers': 'Connecting to APIC'})
+    apic_cookie = APIC_LOGIN(base_url, username, password)
+    if apic_cookie:
+        output_log.append({'Notifications': 'Successfully generated authentication cookie'})
+        output_log.append({'Headers': "Creating IPG's"})
+        for ipg in ipg_list:
+
+            # Create new VPC IPGs
+            if ipg['vpc'] == 'YES' and not ipg['presant']:
+
+                # Post call to create IPG's
+                post_create_ipg_response = post_create_ipg(base_url, apic_cookie, headers, output_log, ipg['ipgSettings'])
+                error = post_create_ipg_response[0]
+                output_log = post_create_ipg_response[1]
+
+        if not error:
+            # Map IPG to LSP
+            output_log.append({'Headers': "Mapping IPG's to Interface profiles"})
+            for ipg in ipg_list:
+                if not ipg['lsp_mapped']:
+
+                    if ipg['vpc'] == 'YES':
+                        # Post call to create switch profile ports.
+                        print('vpc')
+                        post_create_lsp_port_response = post_create_lsp_port(base_url, apic_cookie, headers, output_log,
+                                                                             ipg['portSettings'])
+
+                        error = post_create_lsp_port_response[0]
+                        output_log = post_create_lsp_port_response[1]
+
+                    if ipg['vpc'] == 'NO':
+                        print('non vpc')
+                        # Post call to create switch profile ports.
+                        post_create_lsp_port_response = post_create_lsp_port(base_url, apic_cookie, headers, output_log,
+                                                                             ipg['portSettings'])
+
+                        error = post_create_lsp_port_response[0]
+                        output_log = post_create_lsp_port_response[1]
+
+        if not error:
+            output_log.append({'Headers': "Pushing EPG static bindings"})
+            for ipg in ipg_list:
+                if ipg['vpc'] == 'YES':
+                    print('')
+
+
+
+    else:
+        output_log.append({'Errors': 'Failed to connect to apic.'})
+
+    return output_log
 
 
 def CONTRACT_DEPLOYMENT_EXCEL_OPEN_WORKBOOK(WORKBOOK, LOCATION):
@@ -683,7 +826,7 @@ def EXTERNAL_EPG_EXCEL_OPEN_WORKBOOK(WORKBOOK, LOCATION):
 
 
 @shared_task
-def EXTERNAL_EPG_VALIDATION(RULE_LIST, location, url_dict,  username, password):
+def EXTERNAL_EPG_VALIDATION(RULE_LIST, location, url_dict, username, password):
     OUTPUT_LOG = []
     DISPLAY_LIST = []
     TENANT_LIST = ['RED', 'GREEN', 'BLUE']
@@ -691,7 +834,6 @@ def EXTERNAL_EPG_VALIDATION(RULE_LIST, location, url_dict,  username, password):
     TENANT = 'common'
 
     BASE_URL = url_dict[location]
-
 
     OUTPUT_LOG.append({'Headers': 'Validating EPG names in Workbook.'})
 
@@ -769,7 +911,6 @@ def EXTERNAL_EPG_VALIDATION(RULE_LIST, location, url_dict,  username, password):
     if not ERROR:
         OUTPUT_LOG.append({'NotificationsSuccess': 'EPG formatting validated successfully'})
 
-
     OUTPUT_LOG.append({'Headers': 'Validating IP addresses'})
     for addresses in RULE_LIST:
         if len(addresses['CONSUMER_IP']) >= 1:
@@ -787,8 +928,6 @@ def EXTERNAL_EPG_VALIDATION(RULE_LIST, location, url_dict,  username, password):
                 except ValueError:
                     ERROR = True
                     OUTPUT_LOG.append({'Errors': subnets + ' Is not a valid IPv4 address.'})
-
-
 
     if ERROR:
         OUTPUT_LOG.append({'Errors': 'Errors found in IP validation'})
@@ -812,7 +951,8 @@ def EXTERNAL_EPG_VALIDATION(RULE_LIST, location, url_dict,  username, password):
                     L3OUT_NAME = rules['CONSUMER_L3OUT']
                     L3OUT_SEARCH_RESPONSE = L3OUT_SEARCH(BASE_URL, APIC_COOKIE, TENANT, L3OUT_NAME, HEADERS)
                     if int(L3OUT_SEARCH_RESPONSE[0]['totalCount']) == 1:
-                        if rules['CONSUMER_L3OUT'] == L3OUT_SEARCH_RESPONSE[0]['imdata'][0]['l3extOut']['attributes']['name']:
+                        if rules['CONSUMER_L3OUT'] == L3OUT_SEARCH_RESPONSE[0]['imdata'][0]['l3extOut']['attributes'][
+                            'name']:
                             pass
                         else:
                             ERROR = True
@@ -821,7 +961,6 @@ def EXTERNAL_EPG_VALIDATION(RULE_LIST, location, url_dict,  username, password):
                         L3OUT_LIST.append(L3OUT_NAME)
                         ERROR = True
 
-
             for rules in RULE_LIST:
                 if rules['PROVIDER_L3OUT'] == 'INTERNAL':
                     pass
@@ -829,7 +968,8 @@ def EXTERNAL_EPG_VALIDATION(RULE_LIST, location, url_dict,  username, password):
                     L3OUT_NAME = rules['PROVIDER_L3OUT']
                     L3OUT_SEARCH_RESPONSE = L3OUT_SEARCH(BASE_URL, APIC_COOKIE, TENANT, L3OUT_NAME, HEADERS)
                     if int(L3OUT_SEARCH_RESPONSE[0]['totalCount']) == 1:
-                        if rules['PROVIDER_L3OUT'] == L3OUT_SEARCH_RESPONSE[0]['imdata'][0]['l3extOut']['attributes']['name']:
+                        if rules['PROVIDER_L3OUT'] == L3OUT_SEARCH_RESPONSE[0]['imdata'][0]['l3extOut']['attributes'][
+                            'name']:
                             pass
                         else:
                             ERROR = True
@@ -863,21 +1003,22 @@ def EXTERNAL_EPG_VALIDATION(RULE_LIST, location, url_dict,  username, password):
                         for key in L3OUT_DATA:
                             # For Python 3+
                             if 'l3extRsEctx' in key:
-                            # For Python 2.7
-                            #if key.keys() == ['l3extRsEctx']:
+                                # For Python 2.7
+                                # if key.keys() == ['l3extRsEctx']:
                                 VRF_DN = key['l3extRsEctx']['attributes']['tDn']
                                 VRF_SEARCH_RESPONSE = VRF_SEARCH(BASE_URL, APIC_COOKIE, VRF_DN, HEADERS)
                                 for vrf_l3o in VRF_SEARCH_RESPONSE['imdata']:
                                     # For Python 3+
                                     if 'fvRtEctx' in vrf_l3o:
-                                    # For Python 2.7
-                                    #if vrf_l3o.keys() == ['fvRtEctx']:
+                                        # For Python 2.7
+                                        # if vrf_l3o.keys() == ['fvRtEctx']:
                                         L3OUT_DN = vrf_l3o['fvRtEctx']['attributes']['tDn']
                                         SUBNET_SEARCH_RESPONSE = SUBNET_SEARCH(BASE_URL, APIC_COOKIE, L3OUT_DN, HEADERS)
                                         for subnets in SUBNET_SEARCH_RESPONSE['imdata']:
                                             L3OUT_SUBNETS.append(subnets['l3extSubnet']['attributes']['ip'])
                                             EXISTING_SUBNET = subnets['l3extSubnet']['attributes']['ip']
-                                            EXISTING_L3OUT = subnets['l3extSubnet']['attributes']['dn'].split('/')[2][4:]
+                                            EXISTING_L3OUT = subnets['l3extSubnet']['attributes']['dn'].split('/')[2][
+                                                             4:]
                                             EXISTING_EPG = subnets['l3extSubnet']['attributes']['dn'].split('/')[3][6:]
                                             SCOPE = subnets['l3extSubnet']['attributes']['scope'].split(',')
                                             if EXISTING_SUBNET in rules['CONSUMER_IP']:
@@ -885,25 +1026,29 @@ def EXTERNAL_EPG_VALIDATION(RULE_LIST, location, url_dict,  username, password):
                                                     if EXISTING_EPG == rules['CONSUMER_EPG']:
                                                         rules['CONSUMER_IP'].remove(EXISTING_SUBNET)
                                                     else:
-                                                        OUTPUT_LOG.append({'Errors': EXISTING_SUBNET + ' already exists within ' + EXISTING_L3OUT + ' under EPG ' + EXISTING_EPG + ' no subnet configuration for this epg will be pushed.'})
+                                                        OUTPUT_LOG.append({
+                                                                              'Errors': EXISTING_SUBNET + ' already exists within ' + EXISTING_L3OUT + ' under EPG ' + EXISTING_EPG + ' no subnet configuration for this epg will be pushed.'})
                                                         ERROR = True
                                                         rules['CONSUMER_IP'].remove(EXISTING_SUBNET)
 
                                             else:
                                                 for rule_subnet in rules['CONSUMER_IP']:
                                                     if IPNetwork(rule_subnet) in IPNetwork(EXISTING_SUBNET):
-                                                        if int(EXISTING_SUBNET.split('/')[1]) >= 20 and 'import-security' in SCOPE:
-                                                            OUTPUT_LOG.append({'Errors': rule_subnet + ' already exists within ' + EXISTING_L3OUT + ' under EPG ' + EXISTING_EPG + ' inside ' + EXISTING_SUBNET})
+                                                        if int(EXISTING_SUBNET.split('/')[
+                                                                   1]) >= 20 and 'import-security' in SCOPE:
+                                                            OUTPUT_LOG.append({
+                                                                                  'Errors': rule_subnet + ' already exists within ' + EXISTING_L3OUT + ' under EPG ' + EXISTING_EPG + ' inside ' + EXISTING_SUBNET})
                                                             ERROR = True
                                                             rules['CONSUMER_IP'].remove(rule_subnet)
 
-
                         if len(rules['CONSUMER_IP']) >= 1:
-                            OUTPUT_LOG.append({'Notifications': 'The Following subnets will be added to the EPG: ' + rules['CONSUMER_EPG']})
+                            OUTPUT_LOG.append({'Notifications': 'The Following subnets will be added to the EPG: ' +
+                                                                rules['CONSUMER_EPG']})
                             OUTPUT_LOG.append({'Notifications': str(rules['CONSUMER_IP'])})
 
                         else:
-                            OUTPUT_LOG.append({'Notifications': 'No subnets will be added to EPG: ' + rules['CONSUMER_EPG']})
+                            OUTPUT_LOG.append(
+                                {'Notifications': 'No subnets will be added to EPG: ' + rules['CONSUMER_EPG']})
 
                     if rules['PROVIDER_L3OUT'] != 'INTERNAL' and rules['PROVIDER_EPG'] != 'BLANK':
                         L3OUT_NAME = rules['PROVIDER_L3OUT']
@@ -914,21 +1059,22 @@ def EXTERNAL_EPG_VALIDATION(RULE_LIST, location, url_dict,  username, password):
                         for key in L3OUT_DATA:
                             # For Python 3+
                             if 'l3extRsEctx' in key:
-                            # For Python 2.7
-                            #if key.keys() == ['l3extRsEctx']:
+                                # For Python 2.7
+                                # if key.keys() == ['l3extRsEctx']:
                                 VRF_DN = key['l3extRsEctx']['attributes']['tDn']
                                 VRF_SEARCH_RESPONSE = VRF_SEARCH(BASE_URL, APIC_COOKIE, VRF_DN, HEADERS)
                                 for vrf_l3o in VRF_SEARCH_RESPONSE['imdata']:
                                     # For Python 3+
                                     if 'fvRtEctx' in vrf_l3o:
-                                    # For Python 2.7
-                                    #if vrf_l3o.keys() == ['fvRtEctx']:
+                                        # For Python 2.7
+                                        # if vrf_l3o.keys() == ['fvRtEctx']:
                                         L3OUT_DN = vrf_l3o['fvRtEctx']['attributes']['tDn']
                                         SUBNET_SEARCH_RESPONSE = SUBNET_SEARCH(BASE_URL, APIC_COOKIE, L3OUT_DN, HEADERS)
                                         for subnets in SUBNET_SEARCH_RESPONSE['imdata']:
                                             L3OUT_SUBNETS.append(subnets['l3extSubnet']['attributes']['ip'])
                                             EXISTING_SUBNET = subnets['l3extSubnet']['attributes']['ip']
-                                            EXISTING_L3OUT = subnets['l3extSubnet']['attributes']['dn'].split('/')[2][4:]
+                                            EXISTING_L3OUT = subnets['l3extSubnet']['attributes']['dn'].split('/')[2][
+                                                             4:]
                                             EXISTING_EPG = subnets['l3extSubnet']['attributes']['dn'].split('/')[3][6:]
                                             SCOPE = subnets['l3extSubnet']['attributes']['scope'].split(',')
                                             if EXISTING_SUBNET in rules['PROVIDER_IP']:
@@ -937,43 +1083,51 @@ def EXTERNAL_EPG_VALIDATION(RULE_LIST, location, url_dict,  username, password):
                                                         rules['PROVIDER_IP'].remove(EXISTING_SUBNET)
 
                                                     else:
-                                                        OUTPUT_LOG.append({'Errors': EXISTING_SUBNET + ' already exists within ' + EXISTING_L3OUT + ' under EPG ' + EXISTING_EPG + ' no subnet configuration for this epg will be pushed.'})
+                                                        OUTPUT_LOG.append({
+                                                                              'Errors': EXISTING_SUBNET + ' already exists within ' + EXISTING_L3OUT + ' under EPG ' + EXISTING_EPG + ' no subnet configuration for this epg will be pushed.'})
                                                         ERROR = True
                                                         rules['PROVIDER_IP'].remove(EXISTING_SUBNET)
 
                                             else:
                                                 for rule_subnet in rules['PROVIDER_IP']:
                                                     if IPNetwork(rule_subnet) in IPNetwork(EXISTING_SUBNET):
-                                                        if int(EXISTING_SUBNET.split('/')[1]) >= 20 and 'import-security' in SCOPE:
-                                                            OUTPUT_LOG.append({'Errors': rule_subnet + ' already exists within ' + EXISTING_L3OUT + ' under EPG ' + EXISTING_EPG + ' inside ' + EXISTING_SUBNET})
+                                                        if int(EXISTING_SUBNET.split('/')[
+                                                                   1]) >= 20 and 'import-security' in SCOPE:
+                                                            OUTPUT_LOG.append({
+                                                                                  'Errors': rule_subnet + ' already exists within ' + EXISTING_L3OUT + ' under EPG ' + EXISTING_EPG + ' inside ' + EXISTING_SUBNET})
                                                             ERROR = True
                                                             rules['PROVIDER_IP'].remove(rule_subnet)
 
-
                         if len(rules['PROVIDER_IP']) >= 1:
-                            OUTPUT_LOG.append({'Notifications': 'The Following subnets will be added to the EPG: ' + rules['PROVIDER_EPG']})
+                            OUTPUT_LOG.append({'Notifications': 'The Following subnets will be added to the EPG: ' +
+                                                                rules['PROVIDER_EPG']})
                             OUTPUT_LOG.append({'Notifications': str(rules['PROVIDER_IP'])})
 
                         else:
-                            OUTPUT_LOG.append({'Notifications': 'No subnets will be added to EPG: ' + rules['PROVIDER_EPG']})
+                            OUTPUT_LOG.append(
+                                {'Notifications': 'No subnets will be added to EPG: ' + rules['PROVIDER_EPG']})
 
                 # Search for VIPs
                 OUTPUT_LOG.append({'Headers': 'Checking if any EPGs are for VIPS'})
 
                 for rules in RULE_LIST:
-                    if rules['PROVIDER_EPG'].split('_')[0].endswith('VS') and rules['PROVIDER_L3OUT'].endswith('DCI_L3O'):
+                    if rules['PROVIDER_EPG'].split('_')[0].endswith('VS') and rules['PROVIDER_L3OUT'].endswith(
+                            'DCI_L3O'):
                         for subnets in rules['PROVIDER_IP']:
                             if len(subnets.split('/')) != 0:
                                 subnet = subnets.split('/')[0]
                             else:
                                 subnet = subnets
                             if not ipaddress.ip_address(subnet).is_private:
-                                OUTPUT_LOG.append({'Notifications': rules['PROVIDER_EPG'] + ' contains a public address.'})
-                                OUTPUT_LOG.append({'Notifications': subnets + ' will be imported under the DCI and exported under the INET L3Outs'})
+                                OUTPUT_LOG.append(
+                                    {'Notifications': rules['PROVIDER_EPG'] + ' contains a public address.'})
+                                OUTPUT_LOG.append({
+                                                      'Notifications': subnets + ' will be imported under the DCI and exported under the INET L3Outs'})
 
 
                             elif ipaddress.ip_address(subnet).is_private:
-                                OUTPUT_LOG.append({'Notifications': rules['PROVIDER_EPG'] + ' contains a private address.'})
+                                OUTPUT_LOG.append(
+                                    {'Notifications': rules['PROVIDER_EPG'] + ' contains a private address.'})
                                 OUTPUT_LOG.append({'Notifications': subnets + ' will be imported under the DCI L3Out'})
 
         else:
@@ -983,11 +1137,10 @@ def EXTERNAL_EPG_VALIDATION(RULE_LIST, location, url_dict,  username, password):
         OUTPUT_LOG.append({'ValidationSuccess': 'APIC Configuration validated successfully'})
 
     return OUTPUT_LOG
-   
-        
+
+
 @shared_task
 def EXTERNAL_EPG_DEPLOYMENT(RULE_LIST, location, url_dict, username, password):
-
     BASE_URL = url_dict[location]
 
     if location == 'UKDC1':
@@ -1018,12 +1171,15 @@ def EXTERNAL_EPG_DEPLOYMENT(RULE_LIST, location, url_dict, username, password):
             if rules['CONSUMER_L3OUT'] != 'INTERNAL' and rules['CONSUMER_EPG'] != 'BLANK':
                 EPG_NAME = rules['CONSUMER_EPG']
                 L3OUT_NAME = rules['CONSUMER_L3OUT']
-                EXTERNAL_EPG_SEARCH_RESPONSE = EXTERNAL_EPG_SEARCH(BASE_URL, APIC_COOKIE, TENANT, L3OUT_NAME, EPG_NAME, HEADERS)
+                EXTERNAL_EPG_SEARCH_RESPONSE = EXTERNAL_EPG_SEARCH(BASE_URL, APIC_COOKIE, TENANT, L3OUT_NAME, EPG_NAME,
+                                                                   HEADERS)
                 if int(EXTERNAL_EPG_SEARCH_RESPONSE['totalCount']) == 1:
-                    OUTPUT_LOG.append({'NotificationsWarning': 'EPG: ' + EPG_NAME + ' already exists under ' + L3OUT_NAME + ' and wont be created'})
+                    OUTPUT_LOG.append({
+                                          'NotificationsWarning': 'EPG: ' + EPG_NAME + ' already exists under ' + L3OUT_NAME + ' and wont be created'})
                     L3OUT_CONSUME_EPG_CREATED = True
                 if not L3OUT_CONSUME_EPG_CREATED:
-                    OUTPUT_LOG.append({'Notifications': 'Adding External EPG: ' + EPG_NAME + ' TO L3Out: ' + L3OUT_NAME})
+                    OUTPUT_LOG.append(
+                        {'Notifications': 'Adding External EPG: ' + EPG_NAME + ' TO L3Out: ' + L3OUT_NAME})
                     EXTERNAL_EPG_ADD(BASE_URL, APIC_COOKIE, TENANT, L3OUT_NAME, EPG_NAME, HEADERS, OUTPUT_LOG)
                 # Add subnets to external EPG
                 if len(rules['CONSUMER_IP']) != 0:
@@ -1037,22 +1193,26 @@ def EXTERNAL_EPG_DEPLOYMENT(RULE_LIST, location, url_dict, username, password):
                                 EXISTING_SUBNET = subnets['l3extSubnet']['attributes']['ip']
                                 SCOPE = subnets['l3extSubnet']['attributes']['scope'].split(',')
                                 if EXISTING_SUBNET == IP:
-                                    #IP Already Configured under EPG
+                                    # IP Already Configured under EPG
                                     pass
 
                         else:
                             SCOPE = 'import-security'
-                            EXTERNAL_EPG_SUBNET_ADD(BASE_URL, APIC_COOKIE, TENANT, L3OUT_NAME, EPG_NAME, HEADERS, IP, SCOPE, OUTPUT_LOG)
+                            EXTERNAL_EPG_SUBNET_ADD(BASE_URL, APIC_COOKIE, TENANT, L3OUT_NAME, EPG_NAME, HEADERS, IP,
+                                                    SCOPE, OUTPUT_LOG)
 
             if rules['PROVIDER_L3OUT'] != 'INTERNAL' and rules['PROVIDER_EPG'] != 'BLANK':
                 EPG_NAME = rules['PROVIDER_EPG']
                 L3OUT_NAME = rules['PROVIDER_L3OUT']
-                EXTERNAL_EPG_SEARCH_RESPONSE = EXTERNAL_EPG_SEARCH(BASE_URL, APIC_COOKIE, TENANT, L3OUT_NAME, EPG_NAME, HEADERS)
+                EXTERNAL_EPG_SEARCH_RESPONSE = EXTERNAL_EPG_SEARCH(BASE_URL, APIC_COOKIE, TENANT, L3OUT_NAME, EPG_NAME,
+                                                                   HEADERS)
                 if int(EXTERNAL_EPG_SEARCH_RESPONSE['totalCount']) == 1:
-                    OUTPUT_LOG.append({'NotificationsWarning': 'EPG: ' + EPG_NAME + ' already exists under ' + L3OUT_NAME + ' and wont be created'})
+                    OUTPUT_LOG.append({
+                                          'NotificationsWarning': 'EPG: ' + EPG_NAME + ' already exists under ' + L3OUT_NAME + ' and wont be created'})
                     L3OUT_PROVIDE_EPG_CREATED = True
                 if not L3OUT_PROVIDE_EPG_CREATED:
-                    OUTPUT_LOG.append({'Notifications': 'Adding External EPG: ' + EPG_NAME + ' TO L3Out: ' + L3OUT_NAME})
+                    OUTPUT_LOG.append(
+                        {'Notifications': 'Adding External EPG: ' + EPG_NAME + ' TO L3Out: ' + L3OUT_NAME})
                     EXTERNAL_EPG_ADD(BASE_URL, APIC_COOKIE, TENANT, L3OUT_NAME, EPG_NAME, HEADERS, OUTPUT_LOG)
                 # Add subnets to external EPG
                 if len(rules['PROVIDER_IP']) != 0:
@@ -1066,7 +1226,7 @@ def EXTERNAL_EPG_DEPLOYMENT(RULE_LIST, location, url_dict, username, password):
                                 EXISTING_SUBNET = subnets['l3extSubnet']['attributes']['ip']
                                 SCOPE = subnets['l3extSubnet']['attributes']['scope'].split(',')
                                 if EXISTING_SUBNET == IP:
-                                    #IP Already Configured under EPG
+                                    # IP Already Configured under EPG
                                     pass
 
                         else:
@@ -1075,14 +1235,16 @@ def EXTERNAL_EPG_DEPLOYMENT(RULE_LIST, location, url_dict, username, password):
                             else:
                                 subnet = IP
                             # Check for VS EPGs
-                            if rules['PROVIDER_EPG'].split('_')[0].endswith('VS') and rules['PROVIDER_L3OUT'].endswith('DCI_L3O'):
+                            if rules['PROVIDER_EPG'].split('_')[0].endswith('VS') and rules['PROVIDER_L3OUT'].endswith(
+                                    'DCI_L3O'):
 
                                 if not ipaddress.ip_address(subnet).is_private:
                                     # Import Under DCI
                                     SCOPE = 'import-rtctrl,import-security'
                                     L3OUT_NAME = rules['PROVIDER_L3OUT']
                                     EPG_NAME = rules['PROVIDER_EPG']
-                                    EXTERNAL_EPG_SUBNET_ADD(BASE_URL, APIC_COOKIE, TENANT, L3OUT_NAME, EPG_NAME, HEADERS, IP, SCOPE, OUTPUT_LOG)
+                                    EXTERNAL_EPG_SUBNET_ADD(BASE_URL, APIC_COOKIE, TENANT, L3OUT_NAME, EPG_NAME,
+                                                            HEADERS, IP, SCOPE, OUTPUT_LOG)
 
                                     # Export Under Inet
                                     SCOPE = 'export-rtctrl'
@@ -1093,21 +1255,24 @@ def EXTERNAL_EPG_DEPLOYMENT(RULE_LIST, location, url_dict, username, password):
                                     else:
                                         L3OUT_NAME = rules['PROVIDER_L3OUT'].split('-')[0] + '-INET_L3O'
 
-                                    EPG_NAME = rules['PROVIDER_L3OUT'].split('_')[0] + '-ROUTING_EPG'
-                                    EXTERNAL_EPG_SUBNET_ADD(BASE_URL, APIC_COOKIE, TENANT, L3OUT_NAME, EPG_NAME, HEADERS, IP, SCOPE, OUTPUT_LOG)
+                                    EPG_NAME = L3OUT_NAME.split('_')[0] + '-ROUTING_EPG'
+                                    EXTERNAL_EPG_SUBNET_ADD(BASE_URL, APIC_COOKIE, TENANT, L3OUT_NAME, EPG_NAME,
+                                                            HEADERS, IP, SCOPE, OUTPUT_LOG)
 
                                 if ipaddress.ip_address(subnet).is_private:
                                     # Import Under DCI
                                     L3OUT_NAME = rules['PROVIDER_L3OUT']
                                     EPG_NAME = rules['PROVIDER_EPG']
                                     SCOPE = 'import-rtctrl,import-security'
-                                    EXTERNAL_EPG_SUBNET_ADD(BASE_URL, APIC_COOKIE, TENANT, L3OUT_NAME, EPG_NAME, HEADERS, IP, SCOPE, OUTPUT_LOG)
+                                    EXTERNAL_EPG_SUBNET_ADD(BASE_URL, APIC_COOKIE, TENANT, L3OUT_NAME, EPG_NAME,
+                                                            HEADERS, IP, SCOPE, OUTPUT_LOG)
 
                             else:
                                 L3OUT_NAME = rules['PROVIDER_L3OUT']
                                 EPG_NAME = rules['PROVIDER_EPG']
                                 SCOPE = 'import-security'
-                                EXTERNAL_EPG_SUBNET_ADD(BASE_URL, APIC_COOKIE, TENANT, L3OUT_NAME, EPG_NAME, HEADERS, IP, SCOPE, OUTPUT_LOG)
+                                EXTERNAL_EPG_SUBNET_ADD(BASE_URL, APIC_COOKIE, TENANT, L3OUT_NAME, EPG_NAME, HEADERS,
+                                                        IP, SCOPE, OUTPUT_LOG)
 
     else:
         OUTPUT_LOG.append({'Errors': 'Unable to connect to APIC.'})
@@ -1313,8 +1478,10 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, username, pass
                 if int(CONTRACT_SEARCH_RESPONSE['totalCount']) == 1:
                     TENANT = CONTRACT_SEARCH_RESPONSE['imdata'][0]['vzBrCP']['attributes']['dn'].split('/')[1][3:]
                     CONTRACT_SUBJECT = \
-                    CONTRACT_SEARCH_RESPONSE['imdata'][0]['vzBrCP']['attributes']['dn'].split('/')[2][4:].split('_')[0] + '_SBJ'
-                    SUBJECT_SEARCH_RESPONSE = SUBJECT_SEARCH(BASE_URL, APIC_COOKIE, CONTRACT_NAME, TENANT, CONTRACT_SUBJECT,
+                        CONTRACT_SEARCH_RESPONSE['imdata'][0]['vzBrCP']['attributes']['dn'].split('/')[2][4:].split(
+                            '_')[0] + '_SBJ'
+                    SUBJECT_SEARCH_RESPONSE = SUBJECT_SEARCH(BASE_URL, APIC_COOKIE, CONTRACT_NAME, TENANT,
+                                                             CONTRACT_SUBJECT,
                                                              HEADERS)
 
                     # Add all filters for a subject to a list to be used for comparison.
@@ -1329,7 +1496,8 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, username, pass
                         pass
 
                     elif len(FILTER_COMPARE[0]) > 0:
-                        OUTPUT_LOG.append({'Notifications': 'The below filters will be added to contract ' + CONTRACT_NAME})
+                        OUTPUT_LOG.append(
+                            {'Notifications': 'The below filters will be added to contract ' + CONTRACT_NAME})
                         OUTPUT_LOG.append({'Notifications': FILTER_COMPARE[0]})
 
                     else:
@@ -1346,7 +1514,8 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, username, pass
                     L3OUT_NAME = rules['CONSUMER_L3OUT']
                     L3OUT_SEARCH_RESPONSE = CONTRACT_L3OUT_SEARCH(BASE_URL, APIC_COOKIE, L3OUT_NAME, HEADERS)
                     if int(L3OUT_SEARCH_RESPONSE['totalCount']) == 1:
-                        if rules['CONSUMER_L3OUT'] == L3OUT_SEARCH_RESPONSE['imdata'][0]['l3extOut']['attributes']['name']:
+                        if rules['CONSUMER_L3OUT'] == L3OUT_SEARCH_RESPONSE['imdata'][0]['l3extOut']['attributes'][
+                            'name']:
                             pass
                         else:
                             ERROR = True
@@ -1362,7 +1531,8 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, username, pass
                     L3OUT_NAME = rules['PROVIDER_L3OUT']
                     L3OUT_SEARCH_RESPONSE = CONTRACT_L3OUT_SEARCH(BASE_URL, APIC_COOKIE, L3OUT_NAME, HEADERS)
                     if int(L3OUT_SEARCH_RESPONSE['totalCount']) == 1:
-                        if rules['PROVIDER_L3OUT'] == L3OUT_SEARCH_RESPONSE['imdata'][0]['l3extOut']['attributes']['name']:
+                        if rules['PROVIDER_L3OUT'] == L3OUT_SEARCH_RESPONSE['imdata'][0]['l3extOut']['attributes'][
+                            'name']:
                             pass
                         else:
                             ERROR = True
@@ -1386,18 +1556,23 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, username, pass
                         if rules['CONSUMER_EPG'] != 'BLANK':
                             CONSUMER_L3OUT = rules['CONSUMER_L3OUT']
                             CONSUMER_EPG = rules['CONSUMER_EPG']
-                            EXTERNAL_EPG_SEARCH_RESPONSE = CONTRACT_EXTERNAL_EPG_SEARCH(BASE_URL, APIC_COOKIE, CONSUMER_L3OUT, CONSUMER_EPG,
-                                                                               HEADERS)
+                            EXTERNAL_EPG_SEARCH_RESPONSE = CONTRACT_EXTERNAL_EPG_SEARCH(BASE_URL, APIC_COOKIE,
+                                                                                        CONSUMER_L3OUT, CONSUMER_EPG,
+                                                                                        HEADERS)
                             if int(EXTERNAL_EPG_SEARCH_RESPONSE['totalCount']) == 1:
-                                EPG_NAME = EXTERNAL_EPG_SEARCH_RESPONSE['imdata'][0]['l3extInstP']['attributes']['dn'].split('/')[
-                                               3][6:]
-                                L3OUT_NAME = EXTERNAL_EPG_SEARCH_RESPONSE['imdata'][0]['l3extInstP']['attributes']['dn'].split('/')[
-                                                 2][4:]
-                                EXTERNAL_EPG_SEARCH_RESPONSE['imdata'][0]['l3extInstP']['attributes']['dn'].split('/')[1][3:]
+                                EPG_NAME = \
+                                EXTERNAL_EPG_SEARCH_RESPONSE['imdata'][0]['l3extInstP']['attributes']['dn'].split('/')[
+                                    3][6:]
+                                L3OUT_NAME = \
+                                EXTERNAL_EPG_SEARCH_RESPONSE['imdata'][0]['l3extInstP']['attributes']['dn'].split('/')[
+                                    2][4:]
+                                EXTERNAL_EPG_SEARCH_RESPONSE['imdata'][0]['l3extInstP']['attributes']['dn'].split('/')[
+                                    1][3:]
                                 if L3OUT_NAME == rules['CONSUMER_L3OUT']:
                                     pass
                                 else:
-                                    OUTPUT_LOG.append({'Errors': 'EPG and L3OUT missmatch with ' + L3OUT_NAME + ' and ' + EPG_NAME + ' dont match value: ' +
+                                    OUTPUT_LOG.append({
+                                                          'Errors': 'EPG and L3OUT missmatch with ' + L3OUT_NAME + ' and ' + EPG_NAME + ' dont match value: ' +
                                                                     rules['CONSUMER_L3OUT']})
 
                             else:
@@ -1412,18 +1587,23 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, username, pass
                         if rules['PROVIDER_EPG'] != 'BLANK':
                             PROVIDER_EPG = rules['PROVIDER_EPG']
                             PROVIDER_L3OUT = rules['PROVIDER_L3OUT']
-                            EXTERNAL_EPG_SEARCH_RESPONSE = CONTRACT_EXTERNAL_EPG_SEARCH(BASE_URL, APIC_COOKIE, PROVIDER_L3OUT, PROVIDER_EPG,
-                                                                               HEADERS)
+                            EXTERNAL_EPG_SEARCH_RESPONSE = CONTRACT_EXTERNAL_EPG_SEARCH(BASE_URL, APIC_COOKIE,
+                                                                                        PROVIDER_L3OUT, PROVIDER_EPG,
+                                                                                        HEADERS)
                             if int(EXTERNAL_EPG_SEARCH_RESPONSE['totalCount']) == 1:
-                                EPG_NAME = EXTERNAL_EPG_SEARCH_RESPONSE['imdata'][0]['l3extInstP']['attributes']['dn'].split('/')[
-                                               3][6:]
-                                L3OUT_NAME = EXTERNAL_EPG_SEARCH_RESPONSE['imdata'][0]['l3extInstP']['attributes']['dn'].split('/')[
-                                                 2][4:]
-                                EXTERNAL_EPG_SEARCH_RESPONSE['imdata'][0]['l3extInstP']['attributes']['dn'].split('/')[1][3:]
+                                EPG_NAME = \
+                                EXTERNAL_EPG_SEARCH_RESPONSE['imdata'][0]['l3extInstP']['attributes']['dn'].split('/')[
+                                    3][6:]
+                                L3OUT_NAME = \
+                                EXTERNAL_EPG_SEARCH_RESPONSE['imdata'][0]['l3extInstP']['attributes']['dn'].split('/')[
+                                    2][4:]
+                                EXTERNAL_EPG_SEARCH_RESPONSE['imdata'][0]['l3extInstP']['attributes']['dn'].split('/')[
+                                    1][3:]
                                 if L3OUT_NAME == rules['PROVIDER_L3OUT']:
                                     pass
                                 else:
-                                    OUTPUT_LOG.append({'Errors': 'EPG and L3OUT missmatch with ' + L3OUT_NAME + ' and ' + EPG_NAME + ' dont match value: ' +
+                                    OUTPUT_LOG.append({
+                                                          'Errors': 'EPG and L3OUT missmatch with ' + L3OUT_NAME + ' and ' + EPG_NAME + ' dont match value: ' +
                                                                     rules['PROVIDER_L3OUT']})
 
                             else:
@@ -1483,7 +1663,6 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, username, pass
 
 @shared_task
 def CONTRACT_DEPLOYMENT(RULE_LIST, location, url_dict, username, password):
-
     BASE_URL = url_dict[location]
 
     CONTRACT_LIST = []
@@ -1542,7 +1721,8 @@ def CONTRACT_DEPLOYMENT(RULE_LIST, location, url_dict, username, password):
             if int(CONTRACT_SEARCH_RESPONSE['totalCount']) == 1:
                 TENANT = CONTRACT_SEARCH_RESPONSE['imdata'][0]['vzBrCP']['attributes']['dn'].split('/')[1][3:]
                 CONTRACT_SUBJECT = \
-                CONTRACT_SEARCH_RESPONSE['imdata'][0]['vzBrCP']['attributes']['dn'].split('/')[2][4:].split('_')[0] + '_SBJ'
+                    CONTRACT_SEARCH_RESPONSE['imdata'][0]['vzBrCP']['attributes']['dn'].split('/')[2][4:].split('_')[
+                        0] + '_SBJ'
                 SUBJECT_SEARCH_RESPONSE = SUBJECT_SEARCH(BASE_URL, APIC_COOKIE, CONTRACT_NAME, TENANT, CONTRACT_SUBJECT,
                                                          HEADERS)
 
@@ -1559,7 +1739,8 @@ def CONTRACT_DEPLOYMENT(RULE_LIST, location, url_dict, username, password):
 
                 elif len(FILTER_COMPARE[0]) > 0:
                     for FILTERS in FILTER_COMPARE[0]:
-                        OUTPUT_LOG = FILTER_ATTACH(BASE_URL, APIC_COOKIE, CONTRACT_NAME, CONTRACT_SUBJECT, FILTERS, HEADERS,
+                        OUTPUT_LOG = FILTER_ATTACH(BASE_URL, APIC_COOKIE, CONTRACT_NAME, CONTRACT_SUBJECT, FILTERS,
+                                                   HEADERS,
                                                    OUTPUT_LOG)
 
                 else:

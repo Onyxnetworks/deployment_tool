@@ -1,6 +1,7 @@
 import json, requests, time, os
 from .baseline import APIC_LOGIN
 
+
 def get_fabric_nodes(base_url, apic_cookie, headers, output_log):
     error = False
     try:
@@ -16,6 +17,20 @@ def get_fabric_nodes(base_url, apic_cookie, headers, output_log):
 
 
 def get_fabric_ipgs(base_url, apic_cookie, headers, output_log):
+    error = False
+    try:
+        get_url = base_url + 'node/class/infraAccPortGrp.json?'
+        get_response = requests.get(get_url, cookies=apic_cookie, headers=headers, verify=False)
+        get_fabic_ipg_response = json.loads(get_response.text)
+        return error, get_fabic_ipg_response
+
+    except:
+        error = True
+        output_log.append({'Errors': 'Failed to get IPG list from Fabric.'})
+        return error, output_log
+
+
+def get_fabric_vpc_ipgs(base_url, apic_cookie, headers, output_log):
     error = False
     try:
         get_url = base_url + 'node/class/infraAccBndlGrp.json?'
@@ -63,8 +78,8 @@ def get_lsp_detail(base_url, apic_cookie, headers, output_log, vpc, node_1, node
     try:
         if vpc:
             get_url = base_url + 'node/mo/uni/infra/accportprof-VPC-{1}-{2}_LSP.json?query-target=children'.format(vpc,
-                                                                                                              node_1,
-                                                                                                              node_2)
+                                                                                                                   node_1,
+                                                                                                                   node_2)
 
         if not vpc:
             get_url = base_url + 'node/mo/uni/infra/accportprof-LFS{0}_LSP.json?query-target=children'.format(node_1)
@@ -106,4 +121,178 @@ def get_all_epgs(base_url, apic_cookie, headers, output_log):
     except:
         error = True
         output_log.append({'Errors': 'Failed to get EPG details from Fabric.'})
+        return error, output_log
+
+
+def post_create_ipg(base_url, apic_cookie, headers, output_log, ipg_settings):
+    error = False
+
+    # Build JSON for IPG creation.
+    infraAccBndlGrp = {}
+    infraAccBndlGrp['attributes'] = {
+        'lagT': 'node',
+        'name': ipg_settings['name'],
+        'status': 'created'
+    }
+
+    infraRsAttEntP = {}
+    infraRsAttEntP['attributes'] = {
+        'tDn': 'uni/infra/attentp-Heroes_phys',
+        'status': 'created,modified'
+    }
+    infraRsAttEntP['children'] = []
+
+    infraRsHIfPol = {}
+    infraRsHIfPol['attributes'] = {
+        'tnFabricHIfPolName': ipg_settings['speed'],
+        'status': 'created,modified'
+    }
+    infraRsHIfPol['children'] = []
+
+    infraRsLacpPol = {}
+    infraRsLacpPol['attributes'] = {
+        'tnLacpLagPolName': ipg_settings['portChannelPolicy'],
+        'status': 'created,modified'
+    }
+    infraRsLacpPol['children'] = []
+
+    infraRsMonIfInfraPol = {}
+    infraRsMonIfInfraPol['attributes'] = {
+        'tnMonInfraPolName': 'default',
+        'status': 'created,modified'
+    }
+    infraRsMonIfInfraPol['children'] = []
+
+    infraRsCdpIfPol = {}
+    infraRsCdpIfPol['attributes'] = {
+        'tnCdpIfPolName': 'cdp-enabled',
+        'status': 'created,modified'
+    }
+    infraRsCdpIfPol['children'] = []
+
+    infraRsMcpIfPol = {}
+    infraRsMcpIfPol['attributes'] = {
+        'tnMcpIfPolName': 'default',
+        'status': 'created,modified'
+    }
+    infraRsMcpIfPol['children'] = []
+
+    infraRsLldpIfPol = {}
+    infraRsLldpIfPol['attributes'] = {
+        'tnLldpIfPolName': 'default',
+        'status': 'created,modified'
+    }
+    infraRsLldpIfPol['children'] = []
+
+    infraRsL2IfPol = {}
+    infraRsL2IfPol['attributes'] = {
+        'tnL2IfPolName': 'default',
+        'status': 'created,modified'
+    }
+    infraRsLldpIfPol['children'] = []
+
+    infraAccBndlGrp['children'] = [{'infraRsAttEntP': infraRsAttEntP},
+                                   {'infraRsHIfPol': infraRsHIfPol},
+                                   {'infraRsLacpPol': infraRsLacpPol},
+                                   {'infraRsMonIfInfraPol': infraRsMonIfInfraPol},
+                                   {'infraRsCdpIfPol': infraRsCdpIfPol},
+                                   {'infraRsMcpIfPol': infraRsMcpIfPol},
+                                   {'infraRsLldpIfPol': infraRsLldpIfPol},
+                                   {'infraRsL2IfPol': infraRsL2IfPol}
+                                   ]
+
+    try:
+        post_url = base_url + 'node/mo/uni/infra/funcprof/accbundle-{0}.json'.format(ipg_settings['name'])
+        ipg_json = json.dumps({'infraAccBndlGrp': infraAccBndlGrp})
+
+        post_response = requests.post(post_url, data=ipg_json, cookies=apic_cookie, headers=headers, verify=False)
+        post_ipg_create_response = json.loads(post_response.text)
+
+        if post_response.status_code == 200:
+            output_log.append({'NotificationsInfo': 'IPG: {0} successfully created.'.format(ipg_settings['name'])})
+            return error, output_log
+
+        else:
+            error = True
+            output_log.append({'Errors': 'Error: {0} - Failed to create IPG {1} to LSP.'.format(post_response.status_code, ipg_settings['name'])})
+
+    except:
+        error = True
+        output_log.append({'Errors': 'Failed to create IPG {0}'.format(ipg_settings['name'])})
+        return error, output_log
+
+
+def post_create_lsp_port(base_url, apic_cookie, headers, output_log, port_settings):
+    error = False
+    # Build JSON for LSP Port creation.
+    infraHPortS = {}
+    infraHPortS['attributes'] = {
+        'name': port_settings['lspDescription'],
+        'status': 'created,modified'
+    }
+
+    infraPortBlk = {}
+    infraPortBlk['attributes'] = {
+        'fromPort': port_settings['fromPort'],
+        'toPort': port_settings['toPort'],
+        'name': 'block2',
+        'status': 'created,modified'
+    }
+    infraPortBlk['children'] = []
+
+    infraRsAccBaseGrp = {}
+    infraRsAccBaseGrp['attributes'] = {
+        'tDn': 'uni/infra/funcprof/accbundle-{0}'.format(port_settings['ipg']),
+        'status': 'created,modified'
+    }
+    infraRsAccBaseGrp['children'] = []
+
+    infraHPortS['children'] = [
+        {'infraPortBlk': infraPortBlk},
+        {'infraRsAccBaseGrp': infraRsAccBaseGrp}
+    ]
+
+    try:
+
+        post_url = base_url + 'node/mo/uni/infra/accportprof-{0}/hports-{1}-typ-range.json'.format(port_settings['lsp'],
+                                                                                                   port_settings[
+                                                                                                       'lspDescription'])
+        lsp_json = json.dumps({'infraHPortS': infraHPortS})
+
+        post_response = requests.post(post_url, data=lsp_json, cookies=apic_cookie, headers=headers, verify=False)
+        post_lsp_map_response = json.loads(post_response.text)
+
+        if post_response.status_code == 200:
+            output_log.append({'NotificationsInfo': 'IPG: ' + port_settings['ipg'] + ' successfully mapped to LSP: ' +
+                               port_settings['lsp'] + ' on port: ' + port_settings['block']})
+
+            try:
+
+                infraPortBlk = {}
+                infraPortBlk['attributes'] = {
+                    'descr': port_settings['blockDescription']
+                }
+                infraPortBlk['children'] = []
+
+                lsp_desc_json = json.dumps({'infraPortBlk': infraPortBlk})
+
+                desc_post_url = base_url + 'node/mo/uni/infra/accportprof-{0}/hports-{1}-typ-range/portblk-block2.json'.format(
+                    port_settings['lsp'], port_settings['lspDescription'])
+
+                post_response = requests.post(desc_post_url, data=lsp_desc_json, cookies=apic_cookie, headers=headers,
+                                              verify=False)
+                post_lsp_desc_response = json.loads(post_response.text)
+
+            except:
+                error = True
+                output_log.append({'Errors': 'Failed to add description for IPG {0} to LSP.'.format(port_settings['ipg'])})
+
+            return error, output_log
+        else:
+            error = True
+            output_log.append({'Errors': 'Error: {0} - Failed to MAP IPG ' +  + ' to LSP.'.format(post_response.status_code, port_settings['ipg'])})
+
+    except:
+        error = True
+        output_log.append({'Errors': 'Failed to MAP IPG {0} to LSP.'.format(port_settings['ipg'])})
         return error, output_log
