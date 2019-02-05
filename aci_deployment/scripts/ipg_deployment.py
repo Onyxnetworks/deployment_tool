@@ -124,6 +124,30 @@ def get_all_epgs(base_url, apic_cookie, headers, output_log):
         return error, output_log
 
 
+def get_epg_detail(base_url, apic_cookie, headers, epg_name, output_log):
+    error = False
+    try:
+        get_url = base_url + 'node/class/fvAEPg.json?query-target-filter=and(eq(fvAEPg.name,"{0{"))'.format(epg_name)
+
+        get_response = requests.get(get_url, cookies=apic_cookie, headers=headers, verify=False)
+        get_fabic_epg_response = json.loads(get_response.text)
+
+        if int(get_fabic_epg_response['totalCount']) != 1:
+            raise ValueError
+
+        else:
+            return error, get_fabic_epg_response
+
+    except ValueError:
+        error = True
+        output_log.append({'Errors': 'More than one search result returned when looking for {0} in the Fabric.'.format(epg_name)})
+        return error, output_log
+
+    except:
+        error = True
+        output_log.append({'Errors': 'Failed to get EPG for {0} from Fabric.'.format(epg_name)})
+        return error, output_log
+
 def post_create_ipg(base_url, apic_cookie, headers, output_log, ipg_settings):
     error = False
 

@@ -1,5 +1,5 @@
 #  Base Functions
-import openpyxl
+import openpyxl, json
 from operator import itemgetter
 
 # Custom Functions
@@ -121,7 +121,11 @@ def ipg_deployment_excel_open_workbook(file, location):
         port_channel_policy = row[6].value
 
         if not row[8].value is None:
-            epg_list = row[8].value.split(',')
+            try:
+                epg_list = json.loads(row[8].value)
+            except:
+                epg_list = {"Incorrect Format - Line-{0} make sure to use {1} ".format(index, '""'): ''}
+
         else:
             epg_list = []
 
@@ -627,16 +631,18 @@ def ipg_deployment_validation(ipg_list, location, url_dict, username, password):
 
                 else:
                     epg_list = get_all_epg_response[1]['imdata']
+
+                    # build epg list
                     for ipg in ipg_list:
-                        for epg in ipg['epg_list']:
-                            if epg is None:
+                        for key in ipg['epg_list']:
+                            if key is None:
                                 continue
                             else:
-                                if not [s for s in epg_list if
-                                        epg.upper() == s['fvAEPg']['attributes']['name'].upper()]:
+                                if key.upper() in (s['fvAEPg']['attributes']['name'].upper() for s in epg_list):
                                     error = True
-                                    output_log.append({'Errors': 'Line: ' + str(
-                                        ipg['line']) + ' ' + epg + ' does not exist on the fabric.'})
+                                    output_log.append({'Errors': '{0} EPG not presant in fabric.'.format(key)})
+
+
 
             if not error:
                 output_log.append({'NotificationsSuccess': "EPG's validated successfully"})
@@ -681,7 +687,6 @@ def ipg_deployment_post(ipg_list, location, url_dict, username, password):
 
                     if ipg['vpc'] == 'YES':
                         # Post call to create switch profile ports.
-                        print('vpc')
                         post_create_lsp_port_response = post_create_lsp_port(base_url, apic_cookie, headers, output_log,
                                                                              ipg['portSettings'])
 
@@ -689,7 +694,6 @@ def ipg_deployment_post(ipg_list, location, url_dict, username, password):
                         output_log = post_create_lsp_port_response[1]
 
                     if ipg['vpc'] == 'NO':
-                        print('non vpc')
                         # Post call to create switch profile ports.
                         post_create_lsp_port_response = post_create_lsp_port(base_url, apic_cookie, headers, output_log,
                                                                              ipg['portSettings'])
@@ -699,9 +703,17 @@ def ipg_deployment_post(ipg_list, location, url_dict, username, password):
 
         if not error:
             output_log.append({'Headers': "Pushing EPG static bindings"})
+            print('start')
             for ipg in ipg_list:
                 if ipg['vpc'] == 'YES':
-                    print('')
+                    # GET EPG DN
+                    for key in ipg['epg_list']:
+                        if key is None:
+                            continue
+                        else:
+                            #epg_dn = get_epg_detail(base_url, apic_cookie, headers, key, output_log)
+                            #epg_dn = epg_dn['imdata'][0]['fvAEPg']['attributes']['dn']
+                            print(key)
 
 
 
