@@ -127,7 +127,7 @@ def ipg_deployment_excel_open_workbook(file, location):
                 epg_list = {"Incorrect Format - Line-{0} make sure to use {1} ".format(index, '""'): ''}
 
         else:
-            epg_list = []
+            epg_list = {}
 
         description = row[7].value
 
@@ -359,7 +359,6 @@ def ipg_deployment_validation(ipg_list, location, url_dict, username, password):
                         output_log.append({'Errors': 'Unable to locate Access IPG on fabric. IPG Name: ' +
                                                      ipg_name})
 
-
             # Checking if VPC domain are correct.
             if not error:
                 output_log.append({'Headers': 'Checking VPC Pairs.'})
@@ -427,9 +426,7 @@ def ipg_deployment_validation(ipg_list, location, url_dict, username, password):
 
                         # Get port details from VPC LSP
                         vpc = True
-                        get_lsp_detail_response = get_lsp_detail(base_url, apic_cookie, headers, output_log, vpc,
-                                                                 node_1,
-                                                                 node_2)
+                        get_lsp_detail_response = get_lsp_detail(base_url, apic_cookie, headers, output_log, vpc, node1, node2)
 
                         if get_lsp_detail_response[0]:
                             output_log = get_lsp_detail_response[1]
@@ -581,14 +578,12 @@ def ipg_deployment_validation(ipg_list, location, url_dict, username, password):
                             start_port = port
                             end_port = port
 
-                            # Get port details from node_1 LSP
-                            vpc = False
-                            nonvpc_node_1 = ipg['node_1']
-                            nonvpc_node_2 = ''
-
-                            get_lsp_detail_response = get_lsp_detail(base_url, apic_cookie, headers, output_log,
-                                                                     vpc,
-                                                                     nonvpc_node_1, nonvpc_node_2)
+                        # Get port details from node_1 LSP
+                        vpc = False
+                        nonvpc_node_1 = node1
+                        nonvpc_node_2 = ''
+                        get_lsp_detail_response = get_lsp_detail(base_url, apic_cookie, headers, output_log, vpc,
+                                                                 nonvpc_node_1, nonvpc_node_2)
 
                         if get_lsp_detail_response[0]:
                             output_log = get_lsp_detail_response[1]
@@ -617,6 +612,7 @@ def ipg_deployment_validation(ipg_list, location, url_dict, username, password):
 
                                                 if start_card == fromCard and start_port == fromPort and end_card == toCard and end_port == toPort:
                                                     ipg['presant'] = True
+                                                    ipg['lsp_mapped'] = True
                                                     output_log.append({'NotificationsWarning': 'Line: ' + str(
                                                         ipg[
                                                             'line']) + ' ports already provisioned, no IPG will be configured but any additional EPGs will be pusshed'})
@@ -631,14 +627,13 @@ def ipg_deployment_validation(ipg_list, location, url_dict, username, password):
 
                 else:
                     epg_list = get_all_epg_response[1]['imdata']
-
                     # build epg list
                     for ipg in ipg_list:
                         for key in ipg['epg_list']:
                             if key is None:
                                 continue
                             else:
-                                if key.upper() in (s['fvAEPg']['attributes']['name'].upper() for s in epg_list):
+                                if key.upper() not in (s['fvAEPg']['attributes']['name'].upper() for s in epg_list):
                                     error = True
                                     output_log.append({'Errors': '{0} EPG not presant in fabric.'.format(key)})
 
@@ -673,7 +668,6 @@ def ipg_deployment_post(ipg_list, location, url_dict, username, password):
 
             # Create new VPC IPGs
             if ipg['vpc'] == 'YES' and not ipg['presant']:
-
                 # Post call to create IPG's
                 post_create_ipg_response = post_create_ipg(base_url, apic_cookie, headers, output_log, ipg['ipgSettings'])
                 error = post_create_ipg_response[0]
@@ -703,17 +697,70 @@ def ipg_deployment_post(ipg_list, location, url_dict, username, password):
 
         if not error:
             output_log.append({'Headers': "Pushing EPG static bindings"})
-            print('start')
             for ipg in ipg_list:
                 if ipg['vpc'] == 'YES':
                     # GET EPG DN
-                    for key in ipg['epg_list']:
+                    for key, value in ipg['epg_list'].items():
                         if key is None:
                             continue
                         else:
-                            #epg_dn = get_epg_detail(base_url, apic_cookie, headers, key, output_log)
-                            #epg_dn = epg_dn['imdata'][0]['fvAEPg']['attributes']['dn']
-                            print(key)
+                            epg_dn = get_epg_detail(base_url, apic_cookie, headers, key, output_log)
+                            if epg_dn[0]:
+                                output_log = epg_dn[1]
+                                error = True
+                            else:
+                                epg_dn = epg_dn[1]['imdata'][0]['fvAEPg']['attributes']['dn']
+
+                                binding_settings = {}
+                                if ipg['mode'] == 'TRUNK':
+                                    binding_settings['mode'] = 'regular'
+                                if ipg['mode'] == 'ACCESS':
+                                    binding_settings['mode'] = 'native'
+                                binding_settings['vpc'] = True
+                                binding_settings['encap'] = str(value)
+                                binding_settings['tDn'] = epg_dn
+                                binding_settings['epg_name'] = key
+                                binding_settings['ipg_name'] = ipg['ipgSettings']['name']
+                                binding_settings['lsptDn'] = 'topology/pod-1/protpaths-{0}-{1}/pathep-[{2}]'.format\
+                                    (ipg['node_1'], ipg['node_2'], ipg['ipgSettings']['name'])
+
+                                create_binding_response = post_create_static_binding(base_url, apic_cookie,
+                                                                                         headers, output_log,
+                                                                                         binding_settings)
+                                error = create_binding_response[0]
+                                output_log = create_binding_response[1]
+
+                if ipg['vpc'] == 'NO':
+                    # GET EPG DN
+                    for key, value in ipg['epg_list'].items():
+                        if key is None:
+                            continue
+                        else:
+                            epg_dn = get_epg_detail(base_url, apic_cookie, headers, key, output_log)
+                            if epg_dn[0]:
+                                output_log = epg_dn[1]
+                                error = True
+                            else:
+                                epg_dn = epg_dn[1]['imdata'][0]['fvAEPg']['attributes']['dn']
+
+                                binding_settings = {}
+                                if ipg['mode'] == 'TRUNK':
+                                    binding_settings['mode'] = 'regular'
+                                if ipg['mode'] == 'ACCESS':
+                                    binding_settings['mode'] = 'native'
+                                binding_settings['vpc'] = True
+                                binding_settings['encap'] = str(value)
+                                binding_settings['tDn'] = epg_dn
+                                binding_settings['epg_name'] = key
+                                binding_settings['ipg_name'] = ipg['ipgSettings']['name']
+                                binding_settings['lsptDn'] = 'topology/pod-1/paths-{0}/pathep-[eth{1}]'.format\
+                                    (ipg['node_1'], ipg['ports'])
+
+                                create_binding_response = post_create_static_binding(base_url, apic_cookie,
+                                                                                         headers, output_log,
+                                                                                         binding_settings)
+                                error = create_binding_response[0]
+                                output_log = create_binding_response[1]
 
 
 

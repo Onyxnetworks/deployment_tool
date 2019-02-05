@@ -77,8 +77,7 @@ def get_lsp_detail(base_url, apic_cookie, headers, output_log, vpc, node_1, node
     error = False
     try:
         if vpc:
-            get_url = base_url + 'node/mo/uni/infra/accportprof-VPC-{1}-{2}_LSP.json?query-target=children'.format(vpc,
-                                                                                                                   node_1,
+            get_url = base_url + 'node/mo/uni/infra/accportprof-VPC-{0}-{1}_LSP.json?query-target=children'.format(node_1,
                                                                                                                    node_2)
 
         if not vpc:
@@ -127,7 +126,7 @@ def get_all_epgs(base_url, apic_cookie, headers, output_log):
 def get_epg_detail(base_url, apic_cookie, headers, epg_name, output_log):
     error = False
     try:
-        get_url = base_url + 'node/class/fvAEPg.json?query-target-filter=and(eq(fvAEPg.name,"{0{"))'.format(epg_name)
+        get_url = base_url + 'node/class/fvAEPg.json?query-target-filter=and(eq(fvAEPg.name,"{0}"))'.format(epg_name)
 
         get_response = requests.get(get_url, cookies=apic_cookie, headers=headers, verify=False)
         get_fabic_epg_response = json.loads(get_response.text)
@@ -140,13 +139,15 @@ def get_epg_detail(base_url, apic_cookie, headers, epg_name, output_log):
 
     except ValueError:
         error = True
-        output_log.append({'Errors': 'More than one search result returned when looking for {0} in the Fabric.'.format(epg_name)})
+        output_log.append({'Errors': 'More than one search result returned when looking for EPG: {0} in the Fabric, '
+                                     'static binding skipped.'.format(epg_name, get_fabic_epg_response['totalCount'])})
         return error, output_log
 
     except:
         error = True
         output_log.append({'Errors': 'Failed to get EPG for {0} from Fabric.'.format(epg_name)})
         return error, output_log
+
 
 def post_create_ipg(base_url, apic_cookie, headers, output_log, ipg_settings):
     error = False
@@ -312,11 +313,49 @@ def post_create_lsp_port(base_url, apic_cookie, headers, output_log, port_settin
                 output_log.append({'Errors': 'Failed to add description for IPG {0} to LSP.'.format(port_settings['ipg'])})
 
             return error, output_log
+
         else:
             error = True
-            output_log.append({'Errors': 'Error: {0} - Failed to MAP IPG ' +  + ' to LSP.'.format(post_response.status_code, port_settings['ipg'])})
+            output_log.append({'Errors': 'Error: {0} - Failed to MAP IPG {1} to LSP.'.format(post_response.status_code, port_settings['ipg'])})
 
     except:
         error = True
         output_log.append({'Errors': 'Failed to MAP IPG {0} to LSP.'.format(port_settings['ipg'])})
         return error, output_log
+
+
+def post_create_static_binding(base_url, apic_cookie, headers, output_log, binding_settings):
+    error = False
+
+    fvRsPathAtt = {}
+    fvRsPathAtt['attributes'] = {
+        'encap': 'vlan-{0}'.format(binding_settings['encap']),
+        'tDn': binding_settings['lsptDn'],
+        'mode': binding_settings['mode'],
+        'instrImedcy': 'immediate',
+        'status': 'created'
+    }
+    fvRsPathAtt['children'] = []
+
+    static_binding_json = json.dumps({'fvRsPathAtt': fvRsPathAtt})
+
+    try:
+        post_url = base_url + 'node/mo/{0}.json'.format(binding_settings['tDn'])
+
+        post_response = requests.post(post_url, data=static_binding_json, cookies=apic_cookie, headers=headers, verify=False)
+        post_static_binding_response = json.loads(post_response.text)
+
+        if post_response.status_code == 200:
+            output_log.append({'NotificationsInfo': 'IPG: {0} successfully mapped to EPG {1}'.format(binding_settings['ipg_name'], binding_settings['epg_name'])})
+
+            return error, output_log
+
+        else:
+            raise Exception
+
+    except:
+        error = True
+        output_log.append({'Errors': 'Failed to map static binding {0} for {1}.'.format(binding_settings['ipg_name'], binding_settings['epg_name'])})
+        return error, output_log
+
+
