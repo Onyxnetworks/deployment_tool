@@ -158,13 +158,17 @@ def ipg_deployment_validation(ipg_list, location, url_dict, username, password):
     output_log.append({'Headers': "Validating Formatting in Workbook."})
     for ipg in ipg_list:
 
+        if ipg['vmm'] and ipg['epg_list']:
+            error = True
+            output_log.append({'Errors': 'Line: {0} - cannot have VMM integrated IPG with static EPG mappings.'.format(str(ipg['line']))})
+
         if ipg['environment'] is None:
             error = True
-            output_log.append({'Errors': 'Line: ' + str(ipg['line']) + ' - No environment defined.'})
+            output_log.append({'Errors': 'Line: {0} - No environment defined.'.format(str(ipg['line']))})
 
         if ipg['vpc'] is None:
             error = True
-            output_log.append({'Errors': 'Line: ' + str(ipg['line']) + ' - VPC Field not defined'})
+            output_log.append({'Errors': 'Line: {0} - VPC Field not defined'.format(str(ipg['line']))})
             continue
 
         if ipg['vpc'] == 'YES':
@@ -173,41 +177,36 @@ def ipg_deployment_validation(ipg_list, location, url_dict, username, password):
             # If VPC = Yes check to make sure both nodes are defined.
             if ipg['node_2'] is None:
                 error = True
-                output_log.append({'Errors': 'Line: ' + str(ipg['line']) +
-                                             ' - Type VPC selected but Node 2 not defined.'})
+                output_log.append({'Errors': 'Line: {0} - Type VPC selected but Node 2 not defined.'.format(str(ipg['line']))})
                 continue
 
             # If VPC = Yes check to make sure switches are a VPC pair
             if int(ipg['node_2']) - int(ipg['node_1']) != 1:
                 error = True
-                output_log.append({'Errors': 'Line: ' + str(ipg['line']) +
-                                             ' - Type VPC selected but switches are not a VPC Pair.'})
+                output_log.append({'Errors': 'Line: {0} - Type VPC selected but switches are not a VPC Pair.'.format(str(ipg['line']))})
 
             # If VPC = Yes check that a port-channel policy is defined.
             if ipg['port_channel_policy'] is None:
                 error = True
-                output_log.append({'Errors': 'Line: ' + str(ipg['line']) +
-                                             ' - Type VPC selected but no port-channel policy defined.'})
+                output_log.append({'Errors': 'Line: {0} - Type VPC selected but no port-channel policy defined.'.format(str(ipg['line']))})
         if ipg['vpc'] == 'NO':
             # If VPC = No check to make sure node_2 has no value
             if not ipg['node_2'] is None:
                 error = True
-                output_log.append({'Errors': 'Line: ' + str(ipg['line']) +
-                                             ' - Non VPC selected but two switches defined.'})
+                output_log.append({'Errors': 'Line: {0} - Non VPC selected but two switches defined.'.format(str(ipg['line']))})
             # If VPC = No check to make sure port-channel policy has no value
             if not ipg['port_channel_policy'] is None:
                 error = True
-                output_log.append({'Errors': 'Line: ' + str(ipg['line']) +
-                                             ' - Non VPC selected but port-channel policy defined.'})
+                output_log.append({'Errors': 'Line: {0} - Non VPC selected but port-channel policy defined.'.format(str(ipg['line']))})
         # Check to make sure speed is defined.
         if ipg['speed'] is None:
             error = True
-            output_log.append({'Errors': 'Line: ' + str(ipg['line']) + ' - Interface speed not defined.'})
+            output_log.append({'Errors': 'Line: {0} - Interface speed not defined.'.format(str(ipg['line']))})
 
         # Check to make sure description is defined.
         if ipg['description'] is None:
             error = True
-            output_log.append({'Errors': 'Line: ' + str(ipg['line']) + ' - Description not defined.'})
+            output_log.append({'Errors': 'Line: {0} - Description not defined.'.format(str(ipg['line']))})
 
     if not error:
         output_log.append({'NotificationsSuccess': 'Workbook validated successfully'})
@@ -239,7 +238,7 @@ def ipg_deployment_validation(ipg_list, location, url_dict, username, password):
                 for switch in excel_switch_list:
                     if switch not in fabric_switch_list:
                         error = True
-                        output_log.append({'Errors': 'Node ' + switch + ' not found in fabric.'})
+                        output_log.append({'Errors': 'Node {0} not found in fabric.'.format(switch)})
 
             if not error:
                 output_log.append({'NotificationsSuccess': 'Fabric switches validated successfully'})
@@ -303,7 +302,7 @@ def ipg_deployment_validation(ipg_list, location, url_dict, username, password):
                         port_settings['toPort'] = toPort
                         port_settings['fromPort'] = fromPort
                         port_settings['blockDescription'] = ipg['description']
-                        port_settings['lspDescription'] = 'P' + port + '-' + ipg['description']
+                        port_settings['lspDescription'] = 'P{0}-{1}'.format(port, ipg['description'])
                         port_settings['block'] = ipg['ports']
 
                         if ipg['vpc'] == 'YES':
@@ -339,12 +338,9 @@ def ipg_deployment_validation(ipg_list, location, url_dict, username, password):
 
                             if ipg_name in fabric_ipg_list:
                                 ipg['presant'] = True
-                                output_log.append({'NotificationsWarning': 'Line: ' + str(ipg['line']) + ' ' + ipg_name
-                                                                           + " already exists on the fabric and won't "
-                                                                             "be created"})
+                                output_log.append({'NotificationsWarning': "Line: {0} {1} already exists on the fabric and won't be created".format(str(ipg['line']), ipg_name)})
                             else:
-                                output_log.append({'Notifications': 'Line: ' + str(ipg['line']) + ' ' + ipg_name +
-                                                                    " will be created"})
+                                output_log.append({'Notifications': "Line: {0} {1} will be created".format(str(ipg['line']), ipg_name)})
                         if ipg['vpc'] == 'NO':
 
                             # Set IPG to access (default used for all non VPC ports).
@@ -370,8 +366,7 @@ def ipg_deployment_validation(ipg_list, location, url_dict, username, password):
                                 error = True
                                 accessIpg = False
                     if not accessIpg:
-                        output_log.append({'Errors': 'Unable to locate Access IPG on fabric. IPG Name: ' +
-                                                     ipg_name})
+                        output_log.append({'Errors': 'Unable to locate Access IPG on fabric. IPG Name: {0}'.format(ipg_name)})
 
             # Checking if VPC domain are correct.
             if not error:
@@ -410,8 +405,7 @@ def ipg_deployment_validation(ipg_list, location, url_dict, username, password):
                             form_vpc = [int(ipg['node_1']), int(ipg['node_2'])]
                             if sorted(form_vpc) not in vpc_list:
                                 error = True
-                                output_log.append({'Errors': 'Line: ' + str(ipg['line']) + ' Node: ' + ipg['node_1']
-                                                             + ' & ' + ipg['node_2'] + ' not configured for VPC.'})
+                                output_log.append({'Errors': 'Line: {0} Node: {1} & {2} not configured for VPC.'.format(str(ipg['line']), ipg['node_1'], ipg['node_2'])})
             # Check if ports are already in use.
             if not error:
                 output_log.append({'NotificationsSuccess': "VPC's validated successfully"})
@@ -627,9 +621,7 @@ def ipg_deployment_validation(ipg_list, location, url_dict, username, password):
                                                 if start_card == fromCard and start_port == fromPort and end_card == toCard and end_port == toPort:
                                                     ipg['presant'] = True
                                                     ipg['lsp_mapped'] = True
-                                                    output_log.append({'NotificationsWarning': 'Line: ' + str(
-                                                        ipg[
-                                                            'line']) + ' ports already provisioned, no IPG will be configured but any additional EPGs will be pusshed'})
+                                                    output_log.append({'NotificationsWarning': 'Line: {0} ports already provisioned, no IPG will be configured but any additional EPGs will be pusshed'.format(str(ipg['line']))})
 
             # Check if EPGs are created.
             if not error:

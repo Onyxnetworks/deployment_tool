@@ -1,5 +1,35 @@
 var frm = $('#ipgs');
 var rslt = $('#ipg_result');
+
+
+// Alert to warn users about script limitations.
+$( document ).ready(function() {
+    if (document.cookie.indexOf("AlertCookie=") >= 0) {
+    console.log('Alert Cookie Exists')
+  // They've been here before.
+}
+else {
+  // set a new cookie
+  console.log('Show alert and set cookie')
+  JSconfirm();
+  document.cookie = "AlertCookie=True; path=/;";
+}
+});
+
+function JSconfirm()
+{
+	swal({
+            title: "Attention",
+            text: 'Please note that this script does not account for VLAN Pools or Physical Domains, to that end please ensure that these are provisioned under the EPG before starting.',
+            type: "warning",
+            showCancelButton: false,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Ok",
+            closeOnConfirm: true,
+            closeOnClickOutside: true,
+        })
+}
+
 frm.submit(function(e) {e.preventDefault();
 var formData = new FormData(this);
 document.getElementById("resultdiv").style.visibility = "hidden";
