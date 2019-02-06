@@ -190,28 +190,28 @@ def post_create_ipg(base_url, apic_cookie, headers, output_log, ipg_settings):
 
     infraRsCdpIfPol = {}
     infraRsCdpIfPol['attributes'] = {
-        'tnCdpIfPolName': 'cdp-enabled',
+        'tnCdpIfPolName': 'CDP-ENABLE-POL',
         'status': 'created,modified'
     }
     infraRsCdpIfPol['children'] = []
 
     infraRsMcpIfPol = {}
     infraRsMcpIfPol['attributes'] = {
-        'tnMcpIfPolName': 'default',
+        'tnMcpIfPolName': 'MCP-ENABLED_POL',
         'status': 'created,modified'
     }
     infraRsMcpIfPol['children'] = []
 
     infraRsLldpIfPol = {}
     infraRsLldpIfPol['attributes'] = {
-        'tnLldpIfPolName': 'default',
+        'tnLldpIfPolName': 'LLDP-ENABLE-POL',
         'status': 'created,modified'
     }
     infraRsLldpIfPol['children'] = []
 
     infraRsL2IfPol = {}
     infraRsL2IfPol['attributes'] = {
-        'tnL2IfPolName': 'default',
+        'tnL2IfPolName': 'L2-DEFAULT_POL',
         'status': 'created,modified'
     }
     infraRsLldpIfPol['children'] = []
@@ -350,7 +350,14 @@ def post_create_static_binding(base_url, apic_cookie, headers, output_log, bindi
 
             return error, output_log
 
+        elif post_response.status_code == 400 and int(post_static_binding_response['imdata'][0]['error']['attributes']['code']) == 103:
+            output_log.append({'NotificationsWarning': 'IPG: {0} already mapped to EPG {1}'.format(
+                binding_settings['ipg_name'], binding_settings['epg_name'])})
+
+            return error, output_log
+
         else:
+
             raise Exception
 
     except:

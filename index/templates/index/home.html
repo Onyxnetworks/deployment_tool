@@ -1,15 +1,28 @@
 {% extends "index/header.html" %}
 {% load static %}
-{% block head %} 
+{% block head %}
 {% endblock %}
 
 {% block content %}
-        <div id="page-wrapper">
-            <div class="row">
-                <div class="col-lg-12">Landing Page
-				</div>
-			</div>	
-		</div>
+    <div id="page-wrapper">
+        <div class="row">
+            <div class="col-lg-12">
+                <h2>ACI Workbooks</h2>
+                <hr>
+                <h4>IPG Deployment</h4>
+                <p>The latest supported version of the IPG Workbook can be found <a href="{% static 'index/workbooks/ipg_deployment_template.xlsx' %}">here</a></p>
+                <h4>External EPG Deployment</h4>
+                <p>The latest supported version of the External EPG Workbook can be found <a href="">here</a></p>
+                <h4>Contract Deployment</h4>
+                <p>The latest supported version of the Contract Workbook can be found <a href="">here</a></p>
+                <br>
+                <h2>F5 Workbooks</h2>
+                <hr>
+                <h4>Virtual Server Deployment</h4>
+                <p>The latest supported version of the Virtual Server Workbook can be found <a href="">here</a></p>
+            </div>
+        </div>
+    </div>
 {% endblock %}
 {% block scripts %}
 {% endblock %}

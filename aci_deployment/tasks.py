@@ -325,7 +325,7 @@ def ipg_deployment_validation(ipg_list, location, url_dict, username, password):
                                     ipg['environment'], ipg_prefix)
 
                             ipg_settings['name'] = ipg_name
-                            ipg_settings['speed'] = ipg['speed']
+                            ipg_settings['speed'] = '{0}-AUTO_POL'.format(ipg['speed'])
                             ipg_settings['portChannelPolicy'] = ipg['port_channel_policy']
 
                             # Add port & ipg settings to item.
