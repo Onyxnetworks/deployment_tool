@@ -1,5 +1,5 @@
 #  Base Functions
-import openpyxl, json
+import openpyxl, json, yaml
 from operator import itemgetter
 
 # Custom Functions
@@ -81,6 +81,62 @@ def aci_ipg_search(base_urls, username, password, search_string):
                 i += 1
 
     return results
+
+
+def ipg_deployment_open_yaml(file, location):
+    data = yaml.safe_load(file)
+    ipg_list = []
+    index = 1
+    for lines in data:
+
+        # Required Fields
+        line = index
+        environment = lines['environment'].upper()
+        node_1 = str(lines['node_1'])
+        ports = lines['ports']
+        speed = lines['speed']
+        description = lines['description']
+        mode = lines['mode'].upper()
+
+
+        # Optional Fields
+        if 'node_2' in lines:
+            node_2 = str(lines['node_2'])
+        else:
+            node_2 = None
+
+        if 'vpc' in lines:
+            vpc = 'YES'
+        else:
+            vpc = 'NO'
+
+        if 'port_channel_policy' in lines:
+            port_channel_policy = lines['port_channel_policy'].upper()
+        else:
+            port_channel_policy = None
+
+
+        if 'epg_list' in lines:
+            epg_list = lines['epg_list']
+        else:
+            epg_list = {}
+
+
+        if 'vmm' in lines:
+            if lines['vmm'].upper() == 'YES':
+                vmm = True
+            else:
+                vmm = False
+        else:
+            vmm = False
+
+        ipg_list.append({'line': line, 'environment': environment, 'node_1': node_1, 'node_2': node_2,
+                         'ports': ports, 'speed': speed, 'vpc': vpc, 'port_channel_policy': port_channel_policy,
+                         'description': description, 'epg_list': epg_list, 'mode': mode, 'vmm': vmm})
+
+        index += 1
+
+    return ipg_list
 
 
 def ipg_deployment_excel_open_workbook(file, location):
