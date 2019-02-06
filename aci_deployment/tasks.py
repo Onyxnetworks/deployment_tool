@@ -96,7 +96,7 @@ def ipg_deployment_excel_open_workbook(file, location):
     ipg_list = []
 
     # Loops through the rows in the worksheet to build IPG information
-    for row in py_ws.iter_rows(min_row=4, max_col=9):
+    for row in py_ws.iter_rows(min_row=4, max_col=11):
         epg_list = []
 
         # Skip empty cells
@@ -129,11 +129,18 @@ def ipg_deployment_excel_open_workbook(file, location):
         else:
             epg_list = {}
 
+        mode = row[9].value.upper()
+
+        if row[10].value.upper() == 'YES':
+            vmm = True
+        else:
+            vmm = False
+
         description = row[7].value
 
         ipg_list.append({'line': index, 'environment': environment, 'node_1': node_1, 'node_2': node_2,
                          'ports': ports, 'speed': speed, 'vpc': vpc, 'port_channel_policy': port_channel_policy,
-                         'description': description, 'epg_list': epg_list})
+                         'description': description, 'epg_list': epg_list, 'mode': mode, 'vmm': vmm})
 
         index += 1
 
@@ -311,6 +318,13 @@ def ipg_deployment_validation(ipg_list, location, url_dict, username, password):
                             port_settings['lsp'] = 'VPC-{0}-{1}_LSP'.format(node_1, node_2)
 
                             ipg_settings = {}
+
+                            if ipg['vmm']:
+                                ipg_settings['aep'] = 'uni/infra/attentp-{0}{1}-HYPERVISOR_AEP'.format(ipg['environment'], ipg_prefix)
+                            else:
+                                ipg_settings['aep'] = 'uni/infra/attentp-{0}{1}-ACCESS_AEP'.format(
+                                    ipg['environment'], ipg_prefix)
+
                             ipg_settings['name'] = ipg_name
                             ipg_settings['speed'] = ipg['speed']
                             ipg_settings['portChannelPolicy'] = ipg['port_channel_policy']
@@ -668,6 +682,7 @@ def ipg_deployment_post(ipg_list, location, url_dict, username, password):
 
             # Create new VPC IPGs
             if ipg['vpc'] == 'YES' and not ipg['presant']:
+                output_log.append({'Headers2': "Creating IPG's for line: {0}".format(ipg['line'])})
                 # Post call to create IPG's
                 post_create_ipg_response = post_create_ipg(base_url, apic_cookie, headers, output_log, ipg['ipgSettings'])
                 error = post_create_ipg_response[0]
@@ -678,6 +693,7 @@ def ipg_deployment_post(ipg_list, location, url_dict, username, password):
             output_log.append({'Headers': "Mapping IPG's to Interface profiles"})
             for ipg in ipg_list:
                 if not ipg['lsp_mapped']:
+                    output_log.append({'Headers2': "Mapping LSP's for line: {0}".format(ipg['line'])})
 
                     if ipg['vpc'] == 'YES':
                         # Post call to create switch profile ports.
@@ -698,6 +714,9 @@ def ipg_deployment_post(ipg_list, location, url_dict, username, password):
         if not error:
             output_log.append({'Headers': "Pushing EPG static bindings"})
             for ipg in ipg_list:
+                if ipg['epg_list']:
+                    output_log.append({'Headers2': 'Pushing Bindings for line: {0}'.format(ipg['line'])})
+
                 if ipg['vpc'] == 'YES':
                     # GET EPG DN
                     for key, value in ipg['epg_list'].items():

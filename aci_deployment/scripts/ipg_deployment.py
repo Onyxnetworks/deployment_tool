@@ -162,7 +162,7 @@ def post_create_ipg(base_url, apic_cookie, headers, output_log, ipg_settings):
 
     infraRsAttEntP = {}
     infraRsAttEntP['attributes'] = {
-        'tDn': 'uni/infra/attentp-Heroes_phys',
+        'tDn': ipg_settings['aep'],
         'status': 'created,modified'
     }
     infraRsAttEntP['children'] = []
