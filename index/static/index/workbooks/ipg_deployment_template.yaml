@@ -1,0 +1,49 @@
+---
+## Example for NON VPC Port
+#- environment: PRD
+#  node_1: 104
+#  ports: 1/4
+#  speed: 10G
+#  description: ukdc1-pc-ifb101-lan1
+#  epg_list:
+#    EPG1_NAME: 300
+#    EPG2_NAME: 400
+#  mode: Trunk
+#
+## Example for VPC Port
+#- environment: PRD
+#  node_1: '101'
+#  node_2: '102'
+#  ports: 1/24
+#  speed: 10G
+#  vpc: 'YES'
+#  port_channel_policy: LACP-ACTIVE
+#  description: ukdc1-pc-ifb103-lan1-2
+#  epg_list:
+#    EPG1_NAME: 300
+#    EPG2_NAME: 400
+#  mode: Trunk
+#
+#  # Example with VMM Intergration
+#- environment: PRD
+#  node_1: '101'
+#  node_2: '102'
+#  ports: 1/24
+#  speed: 10G
+#  vpc: 'YES'
+#  port_channel_policy: LACP-ACTIVE
+#  description: ukdc1-pc-ifb103-lan1-2
+#  mode: Trunk
+#  vmm: 'True'
+#
+# Options for Environment:
+# environment: PRD | PPE
+#
+# Options for Speed:
+# speed: 10G | 1G | 100M
+#
+# Options for Mode:
+# mode: Trunk  | Access
+#
+# Options for Port-Channel Policy
+# port_channel_policy: LACP-ACTIVE | MAC-PINNING | STATIC-ON

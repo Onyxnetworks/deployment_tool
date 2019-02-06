@@ -282,7 +282,12 @@ def ipg_deployment(request):
         url_dict = base_urls['ACI']
 
         # Open workbook and build jason data structure.
-        ipg_list = ipg_deployment_excel_open_workbook(file, location)
+        if file.name.endswith('yaml'):
+            ipg_list = ipg_deployment_open_yaml(file, location)
+
+        else:
+            ipg_list = ipg_deployment_excel_open_workbook(file, location)
+
         # Validate Request names and format
         task = ipg_deployment_validation.delay(ipg_list, location, url_dict, username, password)
 
