@@ -898,7 +898,7 @@ def external_epg_open_yaml(file, location):
     index = 1
     for lines in data:
         # Objects for combined EPG/Contract Form
-        if lines['contract']:
+        if 'contract' in lines:
             if 'provider_l3out' in lines:
                 provider_l3out = lines['provider_l3out'].upper()
             else:
@@ -941,33 +941,40 @@ def external_epg_open_yaml(file, location):
             else:
                 provider_ip = []
 
+            epg_list.append({'LINE': index, 'PROVIDER_L3OUT': provider_l3out, 'CONSUMER_L3OUT': consumer_l3out,
+                             'CONSUMER_EPG': consumer_epg, 'CONSUMER_IP': consumer_ip,
+                             'PROVIDER_EPG': provider_epg, 'PROVIDER_IP': provider_ip})
+
+            index += 1
+
         # Objects for combined EPG Only Form
-        if not lines['contract']:
+        if 'l3out' in lines:
             # Only use Provicer settings to catch ant VIP requirements.
             consumer_ip = []
             consumer_l3out = 'INTERNAL'
             consumer_epg = 'BLANK'
-            provider_l3out = lines['l3out'].upper()
 
-            provider_epg = lines['epg'].upper()
-            if 'subnet' in lines:
-                provider_ip = lines['subnet']
-                i = 0
-                for ip in provider_ip:
-                    if len(ip.split('/')) <= 1:
-                        subnet = '{0}/32'.format(ip)
-                        consumer_ip[i] = subnet
-                    i += 1
-            else:
-                provider_ip = []
+            for items in lines['l3out']:
+                for epgs in items['epg']:
+                    provider_l3out = items['name'].upper()
+                    provider_epg = epgs['name'].upper()
 
-        index += 1
+                    if 'subnets' in epgs:
+                        provider_ip = epgs['subnets']
+                        i = 0
+                        for ip in provider_ip:
+                            if len(str(ip).split('/')) <= 1:
+                                subnet = '{0}/32'.format(str(ip))
+                                provider_ip[i] = subnet
+                            i += 1
+                    else:
+                        provider_ip = []
 
-        epg_list.append({'LINE': index, 'PROVIDER_L3OUT': provider_l3out, 'CONSUMER_L3OUT': consumer_l3out,
-                         'CONSUMER_EPG': consumer_epg, 'CONSUMER_IP': consumer_ip,
-                         'PROVIDER_EPG': provider_epg, 'PROVIDER_IP': provider_ip})
+                    epg_list.append({'LINE': index, 'PROVIDER_L3OUT': provider_l3out, 'CONSUMER_L3OUT': consumer_l3out,
+                                     'CONSUMER_EPG': consumer_epg, 'CONSUMER_IP': consumer_ip,
+                                     'PROVIDER_EPG': provider_epg, 'PROVIDER_IP': provider_ip})
 
-    print(epg_list)
+                    index += 1
     return epg_list
 
 def EXTERNAL_EPG_EXCEL_OPEN_WORKBOOK(WORKBOOK, LOCATION):

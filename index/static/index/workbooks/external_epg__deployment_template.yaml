@@ -1,27 +1,20 @@
 ---
-# Example for External normal EPG with subnets.
-#- contract: False
-#  l3out: GREEN-DCI_L3O
-#  epg: GREEN-DCI-TEST1_EPG
-#  subnet:
-#  - 1.1.1.1/32
-#  - 2.2.2.2/32
-
-# Example for External normal EPG without subnets.
-#- contract: False
-#  l3out: GREEN-DCI_L3O
-#  epg: GREEN-DCI-TEST2_EPG
-
-
-# Example for External normal EPG with subnets.
-- contract: false
-  l3out: GREEN-DCI_L3O
-  epg: GREEN-DCI-TEST1_EPG
-  subnet:
-  - 1.1.1.1/32
-  - 2.2.2.2/32
-
-# Example for External normal EPG without subnets.
-- contract: false
-  l3out: GREEN-DCI_L3O
-  epg: GREEN-DCI-TEST2_EPG
+# Example layout below, to add subnets to the EPG include the subnets key, if you just want to create an empty EPG,
+# leave the subnets key out.
+#
+# This works the same as the Excel Workbook, so if -VS_EPG is at the end of the EPG name and the L3out is DCI
+# it will be imported. If the address is a public address it will be exported under the INET L3Out
+#
+#- l3out:
+#  - name: GREEN-DCI_L3O
+#    epg:
+#    - name: GREEN-DCI-TEST1_L3OUT
+#      subnets:
+#      - 1.1.1.1/32
+#      - 2.2.2.2/32
+#    - name: GREEN-DCI-TEST2_EPG_L3O
+#      subnets:
+#      - 3.3.3.3/32
+#  - name: GREEN-DC1-HERITAGE_L3O
+#    epg:
+#    - name: GREEN-DC1-HERITAGE-TEST3_EPG
