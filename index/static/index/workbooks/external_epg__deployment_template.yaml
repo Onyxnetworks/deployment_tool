@@ -1,0 +1,27 @@
+---
+# Example for External normal EPG with subnets.
+#- contract: False
+#  l3out: GREEN-DCI_L3O
+#  epg: GREEN-DCI-TEST1_EPG
+#  subnet:
+#  - 1.1.1.1/32
+#  - 2.2.2.2/32
+
+# Example for External normal EPG without subnets.
+#- contract: False
+#  l3out: GREEN-DCI_L3O
+#  epg: GREEN-DCI-TEST2_EPG
+
+
+# Example for External normal EPG with subnets.
+- contract: false
+  l3out: GREEN-DCI_L3O
+  epg: GREEN-DCI-TEST1_EPG
+  subnet:
+  - 1.1.1.1/32
+  - 2.2.2.2/32
+
+# Example for External normal EPG without subnets.
+- contract: false
+  l3out: GREEN-DCI_L3O
+  epg: GREEN-DCI-TEST2_EPG

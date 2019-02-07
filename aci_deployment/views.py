@@ -114,7 +114,11 @@ def external_epg_deployment(request):
         url_dict = base_urls['ACI']
 
         # Open workbook and build jason data structure.
-        rule_list = EXTERNAL_EPG_EXCEL_OPEN_WORKBOOK(file, location)
+        if file.name.endswith('yaml'):
+            rule_list = external_epg_open_yaml(file, location)
+
+        else:
+            rule_list = EXTERNAL_EPG_EXCEL_OPEN_WORKBOOK(file, location)
 
         # Validate Request names and format
         task = EXTERNAL_EPG_VALIDATION.delay(rule_list, location, url_dict, username, password)
