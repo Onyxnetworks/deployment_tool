@@ -977,6 +977,7 @@ def external_epg_open_yaml(file, location):
                     index += 1
     return epg_list
 
+
 def EXTERNAL_EPG_EXCEL_OPEN_WORKBOOK(WORKBOOK, LOCATION):
     WB = openpyxl.load_workbook(WORKBOOK, data_only=True)
     if LOCATION == 'UKDC1':
