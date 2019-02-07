@@ -892,6 +892,92 @@ def CONTRACT_DEPLOYMENT_EXCEL_OPEN_WORKBOOK(WORKBOOK, LOCATION):
     return RULE_LIST
 
 
+def external_epg_open_yaml(file, location):
+    data = yaml.safe_load(file)
+    epg_list = []
+    index = 1
+    for lines in data:
+        # Objects for combined EPG/Contract Form
+        if 'contract' in lines:
+            if 'provider_l3out' in lines:
+                provider_l3out = lines['provider_l3out'].upper()
+            else:
+                provider_l3out = 'INTERNAL'
+
+            if 'consumer_l3out' in lines:
+                consumer_l3out = lines['consumer_l3out'].upper()
+            else:
+                consumer_l3out = 'INTERNAL'
+
+            if 'consumer_epg' in lines:
+                consumer_epg = lines['consumer_epg'].upper()
+            else:
+                consumer_epg = 'BLANK'
+
+            if 'consumer_ip' in lines:
+                consumer_ip = lines['consumer_ip']
+                i = 0
+                for ip in consumer_ip:
+                    if len(ip.split('/')) <= 1:
+                        subnet = '{0}/32'.format(ip)
+                        consumer_ip[i] = subnet
+                    i += 1
+            else:
+                consumer_ip = []
+
+            if 'provider_epg' in lines:
+                provider_epg = lines['provider_epg'].upper()
+            else:
+                provider_epg = 'BLANK'
+
+            if 'provider_ip' in lines:
+                provider_ip = lines['provider_ip']
+                i = 0
+                for ip in provider_ip:
+                    if len(ip.split('/')) <= 1:
+                        subnet = '{0}/32'.format(ip)
+                        consumer_ip[i] = subnet
+                    i += 1
+            else:
+                provider_ip = []
+
+            epg_list.append({'LINE': index, 'PROVIDER_L3OUT': provider_l3out, 'CONSUMER_L3OUT': consumer_l3out,
+                             'CONSUMER_EPG': consumer_epg, 'CONSUMER_IP': consumer_ip,
+                             'PROVIDER_EPG': provider_epg, 'PROVIDER_IP': provider_ip})
+
+            index += 1
+
+        # Objects for combined EPG Only Form
+        if 'l3out' in lines:
+            # Only use Provicer settings to catch ant VIP requirements.
+            consumer_ip = []
+            consumer_l3out = 'INTERNAL'
+            consumer_epg = 'BLANK'
+
+            for items in lines['l3out']:
+                for epgs in items['epg']:
+                    provider_l3out = items['name'].upper()
+                    provider_epg = epgs['name'].upper()
+
+                    if 'subnets' in epgs:
+                        provider_ip = epgs['subnets']
+                        i = 0
+                        for ip in provider_ip:
+                            if len(str(ip).split('/')) <= 1:
+                                subnet = '{0}/32'.format(str(ip))
+                                provider_ip[i] = subnet
+                            i += 1
+                    else:
+                        provider_ip = []
+
+                    epg_list.append({'LINE': index, 'PROVIDER_L3OUT': provider_l3out, 'CONSUMER_L3OUT': consumer_l3out,
+                                     'CONSUMER_EPG': consumer_epg, 'CONSUMER_IP': consumer_ip,
+                                     'PROVIDER_EPG': provider_epg, 'PROVIDER_IP': provider_ip})
+
+                    index += 1
+    return epg_list
+
+
 def EXTERNAL_EPG_EXCEL_OPEN_WORKBOOK(WORKBOOK, LOCATION):
     WB = openpyxl.load_workbook(WORKBOOK, data_only=True)
     if LOCATION == 'UKDC1':
