@@ -918,8 +918,8 @@ def external_epg_open_yaml(file, location):
                 consumer_ip = lines['consumer_ip']
                 i = 0
                 for ip in consumer_ip:
-                    if len(ip.split('/')) <= 1:
-                        subnet = '{0}/32'.format(ip)
+                    if len(str(ip).split('/')) <= 1:
+                        subnet = '{0}/32'.format(str(ip))
                         consumer_ip[i] = subnet
                     i += 1
             else:
@@ -934,8 +934,8 @@ def external_epg_open_yaml(file, location):
                 provider_ip = lines['provider_ip']
                 i = 0
                 for ip in provider_ip:
-                    if len(ip.split('/')) <= 1:
-                        subnet = '{0}/32'.format(ip)
+                    if len(str(ip).split('/')) <= 1:
+                        subnet = '{0}/32'.format(str(ip))
                         consumer_ip[i] = subnet
                     i += 1
             else:
