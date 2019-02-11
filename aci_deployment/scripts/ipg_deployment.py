@@ -267,7 +267,7 @@ def post_create_lsp_port(base_url, apic_cookie, headers, output_log, port_settin
 
     infraRsAccBaseGrp = {}
     infraRsAccBaseGrp['attributes'] = {
-        'tDn': 'uni/infra/funcprof/accbundle-{0}'.format(port_settings['ipg']),
+        'tDn': 'uni/infra/funcprof/{0}-{1}'.format(port_settings['ipgPrefix'], port_settings['ipg']),
         'status': 'created,modified'
     }
     infraRsAccBaseGrp['children'] = []

@@ -370,6 +370,7 @@ def ipg_deployment_validation(ipg_list, location, url_dict, username, password):
                                                                             port)
 
                             port_settings['ipg'] = ipg_name
+                            port_settings['ipgPrefix'] = 'accbundle'
                             port_settings['lsp'] = 'VPC-{0}-{1}_LSP'.format(node_1, node_2)
 
                             ipg_settings = {}
@@ -401,7 +402,7 @@ def ipg_deployment_validation(ipg_list, location, url_dict, username, password):
 
                             # Set IPG to access (default used for all non VPC ports).
                             ipg_name = '{0}{1}-SVR-ACCESS-{2}_IPG'.format(environment, ipg_prefix, ipg['speed'] )
-
+                            port_settings['ipgPrefix'] = 'accportgrp'
                             port_settings['ipg'] = ipg_name
                             port_settings['lsp'] = 'LFS{0}_LSP'.format(node_1)
 
