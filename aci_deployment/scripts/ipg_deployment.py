@@ -190,7 +190,7 @@ def post_create_ipg(base_url, apic_cookie, headers, output_log, ipg_settings):
 
     infraRsCdpIfPol = {}
     infraRsCdpIfPol['attributes'] = {
-        'tnCdpIfPolName': 'CDP-ENABLE-POL',
+        'tnCdpIfPolName': 'CDP-ENABLE_POL',
         'status': 'created,modified'
     }
     infraRsCdpIfPol['children'] = []
@@ -204,7 +204,7 @@ def post_create_ipg(base_url, apic_cookie, headers, output_log, ipg_settings):
 
     infraRsLldpIfPol = {}
     infraRsLldpIfPol['attributes'] = {
-        'tnLldpIfPolName': 'LLDP-ENABLE-POL',
+        'tnLldpIfPolName': 'LLDP-ENABLE_POL',
         'status': 'created,modified'
     }
     infraRsLldpIfPol['children'] = []
