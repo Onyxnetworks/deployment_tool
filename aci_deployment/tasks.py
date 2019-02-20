@@ -1593,14 +1593,16 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, username, pass
                 OUTPUT_LOG.append(
                     {'Errors': 'EPG "' + rules['PROVIDER_EPG'] + '" does not conform to the naming standard'})
 
-        DISPLAY_SET = set(DISPLAY_LIST)
-        for contracts in DISPLAY_SET:
-            OUTPUT_LOG.append({'Errors': 'EPG "' + contracts + '" does not conform to the naming standard'})
-        DISPLAY_LIST = []
-        ANSIBLE_SET = set(ANSIBLE_LIST)
-        for ansible_epg in ANSIBLE_SET:
-            OUTPUT_LOG.append({'AnsibleErrors': 'EPG {0} is managed by ansible, configuration should be deployed from ansible Tower.'.format(ansible_epg)})
+    DISPLAY_SET = set(DISPLAY_LIST)
+    for contracts in DISPLAY_SET:
+        OUTPUT_LOG.append({'Errors': 'EPG "' + contracts + '" does not conform to the naming standard'})
 
+    ANSIBLE_SET = set(ANSIBLE_LIST)
+    for ansible_epg in ANSIBLE_SET:
+        OUTPUT_LOG.append({'AnsibleErrors': 'EPG {0} is managed by ansible, configuration should be deployed from ansible Tower.'.format(ansible_epg)})
+
+    DISPLAY_LIST = []
+    ANSIBLE_LIST = []
     if not ERROR:
         OUTPUT_LOG.append({'NotificationsSuccess': 'EPG formatting validated successfully'})
 
