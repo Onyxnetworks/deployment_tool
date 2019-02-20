@@ -1506,169 +1506,178 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, username, pass
 
     BASE_URL = url_dict[location]
 
-    # Validate Contract Name formatting
-    OUTPUT_LOG.append({'Headers': 'Validating Contract names in Workbook.'})
+    OUTPUT_LOG.append({'Headers': 'Connecting to APIC'})
+    APIC_COOKIE = APIC_LOGIN(BASE_URL, username, password)
 
-    try:
+    if APIC_COOKIE:
+        OUTPUT_LOG.append({'Notifications': 'Successfully generated authentication cookie'})
+
+        # Validate Contract Name formatting
+        OUTPUT_LOG.append({'Headers': 'Validating Contract names in Workbook.'})
+
+        try:
+            for rules in RULE_LIST:
+                if (len(rules['NAME'].split('_'))) > 2:
+                    DISPLAY_LIST.append(rules['NAME'])
+                    ERROR = True
+                elif rules['NAME'].split('_')[1].upper() != 'GCTR':
+                    DISPLAY_LIST.append(rules['NAME'])
+                    ERROR = True
+                elif rules['NAME'].split('-')[0].upper() not in TENANT_LIST:
+                    DISPLAY_LIST.append(rules['NAME'])
+                    ERROR = True
+                else:
+                    pass
+
+            DISPLAY_SET = set(DISPLAY_LIST)
+            for contracts in DISPLAY_SET:
+                OUTPUT_LOG.append({'Errors': 'Contract "' + contracts + '" does not conform to the naming standard'})
+            DISPLAY_LIST = []
+
+        except:
+            OUTPUT_LOG.append({'Errors': 'Errors validating Contract names'})
+            ERROR = True
+
+        if not ERROR:
+            OUTPUT_LOG.append({'NotificationsSuccess': 'Contract formatting validated successfully'})
+
+        OUTPUT_LOG.append({'Headers': 'Validating EPG names in Workbook.'})
+
         for rules in RULE_LIST:
-            if (len(rules['NAME'].split('_'))) > 2:
-                DISPLAY_LIST.append(rules['NAME'])
-                ERROR = True
-            elif rules['NAME'].split('_')[1].upper() != 'GCTR':
-                DISPLAY_LIST.append(rules['NAME'])
-                ERROR = True
-            elif rules['NAME'].split('-')[0].upper() not in TENANT_LIST:
-                DISPLAY_LIST.append(rules['NAME'])
-                ERROR = True
+            if rules['CONSUMER_EPG'] != 'BLANK':
+                try:
+                    if len(rules['CONSUMER_EPG'].split('_')) > 2:
+                        DISPLAY_LIST.append(rules['CONSUMER_EPG'])
+                        ERROR = True
+                    elif rules['CONSUMER_EPG'].split('_')[1].upper() != 'EPG':
+                        DISPLAY_LIST.append(rules['CONSUMER_EPG'])
+                        ERROR = True
+                    elif rules['CONSUMER_EPG'].split('-')[0].upper() not in TENANT_LIST:
+                        if rules['CONSUMER_L3OUT'] == 'INTERNAL' \
+                                and len(rules['CONSUMER_EPG'].split('-')[0]) == 1 \
+                                and len(rules['CONSUMER_EPG'].split('-')[1]) == 1:
+                            ANSIBLE_EPG_SEARCH_RESPONSE = INTERNAL_EPG_SEARCH(BASE_URL, APIC_COOKIE, rules['CONSUMER_EPG'],
+                                                                               HEADERS)
+                            if int(ANSIBLE_EPG_SEARCH_RESPONSE['totalCount']) == 1:
+                                print(ANSIBLE_EPG_SEARCH_RESPONSE['fvAEPg']['attributes']['descr'])
+                                # Check for ansible deployed tenant.
+                                ANSIBLE_LIST.append(rules['CONSUMER_EPG'])
+
+                        else:
+                            DISPLAY_LIST.append(rules['CONSUMER_EPG'])
+                        ERROR = True
+
+                    else:
+                        pass
+
+                except:
+                    ERROR = True
+                    OUTPUT_LOG.append(
+                        {'Errors': 'EPG "' + rules['CONSUMER_EPG'] + '" does not conform to the naming standard'})
+
+            if rules['PROVIDER_EPG'] != 'BLANK':
+                try:
+                    if len(rules['PROVIDER_EPG'].split('_')) > 2:
+                        DISPLAY_LIST.append(rules['PROVIDER_EPG'])
+                        ERROR = True
+
+                    elif rules['PROVIDER_EPG'].split('_')[1].upper() != 'EPG':
+                        DISPLAY_LIST.append(rules['PROVIDER_EPG'])
+                        ERROR = True
+
+                    elif rules['PROVIDER_EPG'].split('-')[0].upper() not in TENANT_LIST:
+                        if rules['PROVIDER_L3OUT'] == 'INTERNAL' \
+                                and len(rules['PROVIDER_EPG'].split('-')[0]) == 1 \
+                                and len(rules['PROVIDER_EPG'].split('-')[1]) == 1:
+                            ANSIBLE_EPG_SEARCH_RESPONSE = INTERNAL_EPG_SEARCH(BASE_URL, APIC_COOKIE, rules['PROVIDER_EPG'],
+                                                                               HEADERS)
+                            if int(ANSIBLE_EPG_SEARCH_RESPONSE['totalCount']) == 1:
+                                print(ANSIBLE_EPG_SEARCH_RESPONSE['fvAEPg']['attributes']['descr'])
+                                # Check for ansible deployed tenant.
+                                ANSIBLE_LIST.append(rules['PROVIDER_EPG'])
+                        else:
+                            DISPLAY_LIST.append(rules['PROVIDER_EPG'])
+                        ERROR = True
+
+                    else:
+                        pass
+
+                except:
+                    ERROR = True
+                    OUTPUT_LOG.append(
+                        {'Errors': 'EPG "' + rules['PROVIDER_EPG'] + '" does not conform to the naming standard'})
+
+        DISPLAY_SET = set(DISPLAY_LIST)
+        for contracts in DISPLAY_SET:
+            OUTPUT_LOG.append({'Errors': 'EPG "' + contracts + '" does not conform to the naming standard'})
+
+        ANSIBLE_SET = set(ANSIBLE_LIST)
+        for ansible_epg in ANSIBLE_SET:
+            OUTPUT_LOG.append({'AnsibleErrors': 'EPG {0} is managed by ansible, internal EPG configuration should be '
+                                                'deployed from ansible Tower.'.format(ansible_epg)})
+
+        DISPLAY_LIST = []
+        ANSIBLE_LIST = []
+        if not ERROR:
+            OUTPUT_LOG.append({'NotificationsSuccess': 'EPG formatting validated successfully'})
+
+        OUTPUT_LOG.append({'Headers': 'Validating Contract and EPG locality.'})
+
+        for rules in RULE_LIST:
+
+            if rules['CONSUMER_EPG'] != 'BLANK':
+                if rules['CONSUMER_EPG'].split('-')[0].upper() != rules['NAME'].split('-')[0].upper():
+                    DISPLAY_LIST.append(rules['CONSUMER_EPG'])
+                    ERROR = True
+
+            if rules['PROVIDER_EPG'] != 'BLANK':
+                if rules['PROVIDER_EPG'].split('-')[0].upper() != rules['NAME'].split('-')[0].upper():
+                    DISPLAY_LIST.append(rules['PROVIDER_EPG'])
+                    ERROR = True
+
             else:
                 pass
 
         DISPLAY_SET = set(DISPLAY_LIST)
         for contracts in DISPLAY_SET:
-            OUTPUT_LOG.append({'Errors': 'Contract "' + contracts + '" does not conform to the naming standard'})
+            OUTPUT_LOG.append({'Errors': contracts + ' and Contract named for different Tenants.'})
         DISPLAY_LIST = []
 
-    except:
-        OUTPUT_LOG.append({'Errors': 'Errors validating Contract names'})
-        ERROR = True
+        if not ERROR:
+            OUTPUT_LOG.append({'NotificationsSuccess': 'Contract and EPG locality validated successfully'})
 
-    if not ERROR:
-        OUTPUT_LOG.append({'NotificationsSuccess': 'Contract formatting validated successfully'})
+        OUTPUT_LOG.append({'Headers': 'Validating Services in Workbook.'})
 
-    OUTPUT_LOG.append({'Headers': 'Validating EPG names in Workbook.'})
-
-    for rules in RULE_LIST:
-        if rules['CONSUMER_EPG'] != 'BLANK':
-            try:
-                if len(rules['CONSUMER_EPG'].split('_')) > 2:
-                    DISPLAY_LIST.append(rules['CONSUMER_EPG'])
-                    ERROR = True
-                elif rules['CONSUMER_EPG'].split('_')[1].upper() != 'EPG':
-                    DISPLAY_LIST.append(rules['CONSUMER_EPG'])
-                    ERROR = True
-                elif rules['CONSUMER_EPG'].split('-')[0].upper() not in TENANT_LIST:
-                    if rules['CONSUMER_L3OUT'] == 'INTERNAL' \
-                            and len(rules['CONSUMER_EPG'].split('-')[0]) == 1 \
-                            and len(rules['CONSUMER_EPG'].split('-')[1]) == 1:
-                        # Check for ansible deployed tenant.
-                        ANSIBLE_LIST.append(rules['CONSUMER_EPG'])
-
-                    else:
-                        DISPLAY_LIST.append(rules['CONSUMER_EPG'])
+        for rules in RULE_LIST:
+            for services in rules['SERVICE']:
+                PROTOCOLS = ['TCP', 'UDP']
+                try:
+                    value = int(services.split('-')[1])
+                except:
+                    OUTPUT_LOG.append(
+                        {'Errors': 'Service port not correct format for ' + services + ' on line ' + str(rules['LINE'])})
+                if services.split('-')[0] not in PROTOCOLS:
+                    OUTPUT_LOG.append({'Errors': 'TCP or UDP not specified for service ' + services})
                     ERROR = True
 
-                else:
-                    pass
-
-            except:
-                ERROR = True
-                OUTPUT_LOG.append(
-                    {'Errors': 'EPG "' + rules['CONSUMER_EPG'] + '" does not conform to the naming standard'})
-
-        if rules['PROVIDER_EPG'] != 'BLANK':
-            try:
-                if len(rules['PROVIDER_EPG'].split('_')) > 2:
-                    DISPLAY_LIST.append(rules['PROVIDER_EPG'])
-                    ERROR = True
-
-                elif rules['PROVIDER_EPG'].split('_')[1].upper() != 'EPG':
-                    DISPLAY_LIST.append(rules['PROVIDER_EPG'])
-                    ERROR = True
-
-                elif rules['PROVIDER_EPG'].split('-')[0].upper() not in TENANT_LIST:
-                    if rules['PROVIDER_L3OUT'] == 'INTERNAL' \
-                            and len(rules['PROVIDER_EPG'].split('-')[0]) == 1 \
-                            and len(rules['PROVIDER_EPG'].split('-')[1]) == 1:
-                        # Check for ansible deployed tenant.
-                        ANSIBLE_LIST.append(rules['PROVIDER_EPG'])
-                    else:
-                        DISPLAY_LIST.append(rules['PROVIDER_EPG'])
-                    ERROR = True
-
-                else:
-                    pass
-
-            except:
-                ERROR = True
-                OUTPUT_LOG.append(
-                    {'Errors': 'EPG "' + rules['PROVIDER_EPG'] + '" does not conform to the naming standard'})
-
-    DISPLAY_SET = set(DISPLAY_LIST)
-    for contracts in DISPLAY_SET:
-        OUTPUT_LOG.append({'Errors': 'EPG "' + contracts + '" does not conform to the naming standard'})
-
-    ANSIBLE_SET = set(ANSIBLE_LIST)
-    for ansible_epg in ANSIBLE_SET:
-        OUTPUT_LOG.append({'AnsibleErrors': 'EPG {0} is managed by ansible, configuration should be deployed from ansible Tower.'.format(ansible_epg)})
-
-    DISPLAY_LIST = []
-    ANSIBLE_LIST = []
-    if not ERROR:
-        OUTPUT_LOG.append({'NotificationsSuccess': 'EPG formatting validated successfully'})
-
-    OUTPUT_LOG.append({'Headers': 'Validating Contract and EPG locality.'})
-
-    for rules in RULE_LIST:
-
-        if rules['CONSUMER_EPG'] != 'BLANK':
-            if rules['CONSUMER_EPG'].split('-')[0].upper() != rules['NAME'].split('-')[0].upper():
-                DISPLAY_LIST.append(rules['CONSUMER_EPG'])
-                ERROR = True
-
-        if rules['PROVIDER_EPG'] != 'BLANK':
-            if rules['PROVIDER_EPG'].split('-')[0].upper() != rules['NAME'].split('-')[0].upper():
-                DISPLAY_LIST.append(rules['PROVIDER_EPG'])
-                ERROR = True
-
-        else:
-            pass
-
-    DISPLAY_SET = set(DISPLAY_LIST)
-    for contracts in DISPLAY_SET:
-        OUTPUT_LOG.append({'Errors': contracts + ' and Contract named for different Tenants.'})
-    DISPLAY_LIST = []
-
-    if not ERROR:
-        OUTPUT_LOG.append({'NotificationsSuccess': 'Contract and EPG locality validated successfully'})
-
-    OUTPUT_LOG.append({'Headers': 'Validating Services in Workbook.'})
-
-    for rules in RULE_LIST:
-        for services in rules['SERVICE']:
-            PROTOCOLS = ['TCP', 'UDP']
-            try:
-                value = int(services.split('-')[1])
-            except:
-                OUTPUT_LOG.append(
-                    {'Errors': 'Service port not correct format for ' + services + ' on line ' + str(rules['LINE'])})
-            if services.split('-')[0] not in PROTOCOLS:
-                OUTPUT_LOG.append({'Errors': 'TCP or UDP not specified for service ' + services})
-                ERROR = True
-
-            elif int(services.split('-')[1]) == 0:
-                OUTPUT_LOG.append({'Errors': 'Error Port out of range ' + services})
-                ERROR = True
-
-            elif int(services.split('-')[1]) not in range(1, 65536):
-                OUTPUT_LOG.append({'Errors': 'Error Port out of range ' + services})
-                ERROR = True
-
-            elif len(services.split('-')) == 3:
-                if int(services.split('-')[2]) not in range(1, 65536):
+                elif int(services.split('-')[1]) == 0:
                     OUTPUT_LOG.append({'Errors': 'Error Port out of range ' + services})
                     ERROR = True
 
-            else:
-                pass
+                elif int(services.split('-')[1]) not in range(1, 65536):
+                    OUTPUT_LOG.append({'Errors': 'Error Port out of range ' + services})
+                    ERROR = True
 
-    if not ERROR:
-        OUTPUT_LOG.append({'NotificationsSuccess': 'Services validated successfully'})
+                elif len(services.split('-')) == 3:
+                    if int(services.split('-')[2]) not in range(1, 65536):
+                        OUTPUT_LOG.append({'Errors': 'Error Port out of range ' + services})
+                        ERROR = True
 
-        OUTPUT_LOG.append({'Headers': 'Connecting to APIC'})
-        APIC_COOKIE = APIC_LOGIN(BASE_URL, username, password)
+                else:
+                    pass
 
-        if APIC_COOKIE:
-            OUTPUT_LOG.append({'Notifications': 'Successfully generated authentication cookie'})
+        if not ERROR:
+            OUTPUT_LOG.append({'NotificationsSuccess': 'Services validated successfully'})
 
             # Check if Contracts Exist
             OUTPUT_LOG.append({'Headers': 'Checking if Contracts exist'})
