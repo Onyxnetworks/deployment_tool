@@ -1498,6 +1498,7 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, username, pass
     CONTRACT_LIST = []
     FILTER_LIST = []
     DISPLAY_LIST = []
+    ANSIBLE_LIST = []
     OUTPUT_LOG = []
     ERROR = False
     HEADERS = {'content-type': 'application/json'}
@@ -1519,7 +1520,6 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, username, pass
             elif rules['NAME'].split('-')[0].upper() not in TENANT_LIST:
                 DISPLAY_LIST.append(rules['NAME'])
                 ERROR = True
-
             else:
                 pass
 
@@ -1547,7 +1547,13 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, username, pass
                     DISPLAY_LIST.append(rules['CONSUMER_EPG'])
                     ERROR = True
                 elif rules['CONSUMER_EPG'].split('-')[0].upper() not in TENANT_LIST:
-                    DISPLAY_LIST.append(rules['CONSUMER_EPG'])
+                    if rules['CONSUMER_L3OUT'] == 'INTERNAL' \
+                            and len(rules['CONSUMER_EPG'].split('-')[0]) == 1 \
+                            and len(rules['CONSUMER_EPG'].split('-')[1]) == 1:
+                        # Check for ansible deployed tenant.
+                        ANSIBLE_LIST.append(rules['CONSUMER_EPG'])
+                    else:
+                        DISPLAY_LIST.append(rules['CONSUMER_EPG'])
                     ERROR = True
 
                 else:
@@ -1569,7 +1575,13 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, username, pass
                     ERROR = True
 
                 elif rules['PROVIDER_EPG'].split('-')[0].upper() not in TENANT_LIST:
-                    DISPLAY_LIST.append(rules['PROVIDER_EPG'])
+                    if rules['PROVIDER_L3OUT'] == 'INTERNAL' \
+                            and len(rules['PROVIDER_EPG'].split('-')[0]) == 1 \
+                            and len(rules['PROVIDER_EPG'].split('-')[1]) == 1:
+                        # Check for ansible deployed tenant.
+                        ANSIBLE_LIST.append(rules['PROVIDER_EPG'])
+                    else:
+                        DISPLAY_LIST.append(rules['PROVIDER_EPG'])
                     ERROR = True
 
                 else:
@@ -1584,6 +1596,9 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, username, pass
         for contracts in DISPLAY_SET:
             OUTPUT_LOG.append({'Errors': 'EPG "' + contracts + '" does not conform to the naming standard'})
         DISPLAY_LIST = []
+        ANSIBLE_SET = set(ANSIBLE_LIST)
+        for ansible_epg in ANSIBLE_SET:
+            OUTPUT_LOG.append({'AnsibleErrors': 'EPG {0} is managed by ansible, configuration should be deployed from ansible Tower.'.format(ansible_epg)})
 
     if not ERROR:
         OUTPUT_LOG.append({'NotificationsSuccess': 'EPG formatting validated successfully'})
@@ -1829,6 +1844,7 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, username, pass
 
             # Check if Internal EPGs Exist
             OUTPUT_LOG.append({'Headers': 'Checking if Internal EPGs are created'})
+            DISPLAY_LIST = []
             EPG_LIST = []
             # Search to validate internal EPG's are created
             for rules in RULE_LIST:

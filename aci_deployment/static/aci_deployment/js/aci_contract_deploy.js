@@ -85,6 +85,13 @@ function get_validation_task_info(task_id, location, rule_list) {
                         result_location.appendChild(notifications_warning);
                         notifications_warning.innerHTML = results[i].NotificationsWarning;
                     }
+                    if (results[i].AnsibleErrors) {
+                        var errors = document.createElement("dd");
+                        errors.setAttribute("class", "text-danger");
+                        errors.setAttribute("style", "text-indent: 30px");
+                        result_location.appendChild(errors);
+                        errors.innerHTML = results[i].Errors;
+                    }
                     if (results[i].Errors) {
                         var errors = document.createElement("dd");
                         errors.setAttribute("class", "text-danger");
@@ -100,7 +107,7 @@ function get_validation_task_info(task_id, location, rule_list) {
                         result_location.appendChild(validation_success);
                         validation_success.innerHTML = results[i].ValidationSuccess;
                     }
-                    if ("Errors" in results[i]) {
+                    if ("Errors" || "AnsibleErrors" in results[i]) {
                         var validation_error = true
                     }
                 }
