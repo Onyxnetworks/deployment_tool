@@ -1552,6 +1552,7 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, username, pass
                             and len(rules['CONSUMER_EPG'].split('-')[1]) == 1:
                         # Check for ansible deployed tenant.
                         ANSIBLE_LIST.append(rules['CONSUMER_EPG'])
+
                     else:
                         DISPLAY_LIST.append(rules['CONSUMER_EPG'])
                     ERROR = True

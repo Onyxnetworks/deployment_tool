@@ -90,7 +90,7 @@ function get_validation_task_info(task_id, location, rule_list) {
                         errors.setAttribute("class", "text-danger");
                         errors.setAttribute("style", "text-indent: 30px");
                         result_location.appendChild(errors);
-                        errors.innerHTML = results[i].Errors;
+                        errors.innerHTML = results[i].AnsibleErrors;
                     }
                     if (results[i].Errors) {
                         var errors = document.createElement("dd");
