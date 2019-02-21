@@ -1501,6 +1501,8 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, username, pass
     ANSIBLE_LIST = []
     OUTPUT_LOG = []
     ERROR = False
+    ansibleError = False
+    nameError = False
     HEADERS = {'content-type': 'application/json'}
     TENANT_LIST = ['RED', 'GREEN', 'BLUE']
 
@@ -1542,35 +1544,51 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, username, pass
             OUTPUT_LOG.append({'NotificationsSuccess': 'Contract formatting validated successfully'})
 
         OUTPUT_LOG.append({'Headers': 'Validating EPG names in Workbook.'})
-
-        for rules in RULE_LIST:
+        for index, rules in enumerate(RULE_LIST):
+            #Set ansible flags to false
+            RULE_LIST[index]['provideAnsible'] = False
+            RULE_LIST[index]['consumeAnsible'] = False
             if rules['CONSUMER_EPG'] != 'BLANK':
                 try:
                     if len(rules['CONSUMER_EPG'].split('_')) > 2:
                         DISPLAY_LIST.append(rules['CONSUMER_EPG'])
+                        nameError = True
                         ERROR = True
                     elif rules['CONSUMER_EPG'].split('_')[1].upper() != 'EPG':
                         DISPLAY_LIST.append(rules['CONSUMER_EPG'])
+                        nameError = True
                         ERROR = True
                     elif rules['CONSUMER_EPG'].split('-')[0].upper() not in TENANT_LIST:
-                        if rules['CONSUMER_L3OUT'] == 'INTERNAL' \
-                                and len(rules['CONSUMER_EPG'].split('-')[0]) == 1 \
-                                and len(rules['CONSUMER_EPG'].split('-')[1]) == 1:
-                            ANSIBLE_EPG_SEARCH_RESPONSE = INTERNAL_EPG_SEARCH(BASE_URL, APIC_COOKIE, rules['CONSUMER_EPG'],
-                                                                               HEADERS)
+                        # Check for ansible deployed tenant.
+                        if rules['CONSUMER_L3OUT'] == 'INTERNAL':
+                            ANSIBLE_EPG_SEARCH_RESPONSE = INTERNAL_EPG_SEARCH(BASE_URL, APIC_COOKIE, rules['CONSUMER_EPG'], HEADERS)
                             if int(ANSIBLE_EPG_SEARCH_RESPONSE['totalCount']) == 1:
-                                print(ANSIBLE_EPG_SEARCH_RESPONSE['fvAEPg']['attributes']['descr'])
-                                # Check for ansible deployed tenant.
-                                ANSIBLE_LIST.append(rules['CONSUMER_EPG'])
-
+                                if ANSIBLE_EPG_SEARCH_RESPONSE['imdata'][0]['fvAEPg']['attributes']['descr'] == 'Created by Ansible':
+                                    ANSIBLE_LIST.append(rules['CONSUMER_EPG'])
+                                    ansibleError = True
+                                    RULE_LIST[index]['consumeAnsible'] = True
+                                
+                                else:
+                                    DISPLAY_LIST.append(rules['PROVIDER_EPG'])
+                                    nameError = True
+                                    ERROR = True
+                                    
+                                
+                            else:
+                                DISPLAY_LIST.append(rules['PROVIDER_EPG'])
+                                nameError = True
+                                ERROR = True
+                            
                         else:
-                            DISPLAY_LIST.append(rules['CONSUMER_EPG'])
-                        ERROR = True
+                            DISPLAY_LIST.append(rules['PROVIDER_EPG'])
+                            nameError = True
+                            ERROR = True
 
                     else:
                         pass
 
                 except:
+                    nameError = True
                     ERROR = True
                     OUTPUT_LOG.append(
                         {'Errors': 'EPG "' + rules['CONSUMER_EPG'] + '" does not conform to the naming standard'})
@@ -1579,30 +1597,45 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, username, pass
                 try:
                     if len(rules['PROVIDER_EPG'].split('_')) > 2:
                         DISPLAY_LIST.append(rules['PROVIDER_EPG'])
+                        nameError = True
                         ERROR = True
 
                     elif rules['PROVIDER_EPG'].split('_')[1].upper() != 'EPG':
                         DISPLAY_LIST.append(rules['PROVIDER_EPG'])
+                        nameError = True
                         ERROR = True
 
                     elif rules['PROVIDER_EPG'].split('-')[0].upper() not in TENANT_LIST:
-                        if rules['PROVIDER_L3OUT'] == 'INTERNAL' \
-                                and len(rules['PROVIDER_EPG'].split('-')[0]) == 1 \
-                                and len(rules['PROVIDER_EPG'].split('-')[1]) == 1:
-                            ANSIBLE_EPG_SEARCH_RESPONSE = INTERNAL_EPG_SEARCH(BASE_URL, APIC_COOKIE, rules['PROVIDER_EPG'],
-                                                                               HEADERS)
+                        # Check for ansible deployed tenant.
+                        if rules['PROVIDER_L3OUT'] == 'INTERNAL':
+                            ANSIBLE_EPG_SEARCH_RESPONSE = INTERNAL_EPG_SEARCH(BASE_URL, APIC_COOKIE, rules['PROVIDER_EPG'], HEADERS)
                             if int(ANSIBLE_EPG_SEARCH_RESPONSE['totalCount']) == 1:
-                                print(ANSIBLE_EPG_SEARCH_RESPONSE['fvAEPg']['attributes']['descr'])
-                                # Check for ansible deployed tenant.
-                                ANSIBLE_LIST.append(rules['PROVIDER_EPG'])
+                                if ANSIBLE_EPG_SEARCH_RESPONSE['imdata'][0]['fvAEPg']['attributes']['descr'] == 'Created by Ansible':
+                                    ANSIBLE_LIST.append(rules['PROVIDER_EPG'])
+                                    ansibleError = True
+                                    RULE_LIST[index]['provideAnsible'] = True
+                                
+                                else:
+                                    DISPLAY_LIST.append(rules['PROVIDER_EPG'])
+                                    nameError = True
+                                    ERROR = True
+                                    
+                                
+                            else:
+                                DISPLAY_LIST.append(rules['PROVIDER_EPG'])
+                                nameError = True
+                                ERROR = True
+                            
                         else:
                             DISPLAY_LIST.append(rules['PROVIDER_EPG'])
-                        ERROR = True
+                            nameError = True
+                            ERROR = True
 
                     else:
                         pass
 
                 except:
+                    nameError = True
                     ERROR = True
                     OUTPUT_LOG.append(
                         {'Errors': 'EPG "' + rules['PROVIDER_EPG'] + '" does not conform to the naming standard'})
@@ -1622,18 +1655,18 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, username, pass
             OUTPUT_LOG.append({'NotificationsSuccess': 'EPG formatting validated successfully'})
 
         OUTPUT_LOG.append({'Headers': 'Validating Contract and EPG locality.'})
-
         for rules in RULE_LIST:
-
-            if rules['CONSUMER_EPG'] != 'BLANK':
-                if rules['CONSUMER_EPG'].split('-')[0].upper() != rules['NAME'].split('-')[0].upper():
-                    DISPLAY_LIST.append(rules['CONSUMER_EPG'])
-                    ERROR = True
-
-            if rules['PROVIDER_EPG'] != 'BLANK':
-                if rules['PROVIDER_EPG'].split('-')[0].upper() != rules['NAME'].split('-')[0].upper():
-                    DISPLAY_LIST.append(rules['PROVIDER_EPG'])
-                    ERROR = True
+            if not rules['consumeAnsible']:
+                if rules['CONSUMER_EPG'] != 'BLANK':
+                    if rules['CONSUMER_EPG'].split('-')[0].upper() != rules['NAME'].split('-')[0].upper():
+                        DISPLAY_LIST.append(rules['CONSUMER_EPG'])
+                        ERROR = True
+                        
+            if not rules['provideAnsible']:            
+                if rules['PROVIDER_EPG'] != 'BLANK':
+                    if rules['PROVIDER_EPG'].split('-')[0].upper() != rules['NAME'].split('-')[0].upper():
+                        DISPLAY_LIST.append(rules['PROVIDER_EPG'])
+                        ERROR = True
 
             else:
                 pass
@@ -1679,181 +1712,181 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, username, pass
         if not ERROR:
             OUTPUT_LOG.append({'NotificationsSuccess': 'Services validated successfully'})
 
-            # Check if Contracts Exist
-            OUTPUT_LOG.append({'Headers': 'Checking if Contracts exist'})
-            for rules in RULE_LIST:
-                CONTRACT_NAME = rules['NAME']
-                CONTRACT_SEARCH_RESPONSE = CONTRACT_SEARCH(BASE_URL, APIC_COOKIE, CONTRACT_NAME, HEADERS)
-                if int(CONTRACT_SEARCH_RESPONSE['totalCount']) == 1:
+        # Check if Contracts Exist
+        OUTPUT_LOG.append({'Headers': 'Checking if Contracts exist'})
+        for rules in RULE_LIST:
+            CONTRACT_NAME = rules['NAME']
+            CONTRACT_SEARCH_RESPONSE = CONTRACT_SEARCH(BASE_URL, APIC_COOKIE, CONTRACT_NAME, HEADERS)
+            if int(CONTRACT_SEARCH_RESPONSE['totalCount']) == 1:
+                pass
+            else:
+                CONTRACT_LIST.append(CONTRACT_NAME)
+
+        CONTRACT_SET = set(CONTRACT_LIST)
+        for contracts in CONTRACT_SET:
+            OUTPUT_LOG.append({'Notifications': 'Contract ' + contracts + ' will be created'})
+
+        # Check if Filters Exist
+        OUTPUT_LOG.append({'Headers': 'Checking if Filters exist'})
+        for rules in RULE_LIST:
+            for services in rules['SERVICE']:
+                FILTER_NAME = services
+                FILTER_SEARCH_RESPONSE = FILTER_SEARCH(BASE_URL, APIC_COOKIE, FILTER_NAME, HEADERS)
+                if int(FILTER_SEARCH_RESPONSE['totalCount']) == 1:
                     pass
                 else:
-                    CONTRACT_LIST.append(CONTRACT_NAME)
+                    FILTER_LIST.append(FILTER_NAME)
 
-            CONTRACT_SET = set(CONTRACT_LIST)
-            for contracts in CONTRACT_SET:
-                OUTPUT_LOG.append({'Notifications': 'Contract ' + contracts + ' will be created'})
+        FILTER_SET = set(FILTER_LIST)
+        for filters in FILTER_SET:
+            OUTPUT_LOG.append({'Notifications': 'Filter ' + filters + ' will be created'})
 
-            # Check if Filters Exist
-            OUTPUT_LOG.append({'Headers': 'Checking if Filters exist'})
-            for rules in RULE_LIST:
-                for services in rules['SERVICE']:
-                    FILTER_NAME = services
-                    FILTER_SEARCH_RESPONSE = FILTER_SEARCH(BASE_URL, APIC_COOKIE, FILTER_NAME, HEADERS)
-                    if int(FILTER_SEARCH_RESPONSE['totalCount']) == 1:
+        # Check if Filters are applied to contracts
+        OUTPUT_LOG.append({'Headers': 'Checking if Filters are applied to contracts'})
+        for rules in RULE_LIST:
+            # Use the contract search to locate subject
+            CONTRACT_NAME = rules['NAME']
+            CONTRACT_SEARCH_RESPONSE = CONTRACT_SEARCH(BASE_URL, APIC_COOKIE, CONTRACT_NAME, HEADERS)
+            # Validate that a contract can be located
+            if int(CONTRACT_SEARCH_RESPONSE['totalCount']) == 1:
+                TENANT = CONTRACT_SEARCH_RESPONSE['imdata'][0]['vzBrCP']['attributes']['dn'].split('/')[1][3:]
+                CONTRACT_SUBJECT = \
+                    CONTRACT_SEARCH_RESPONSE['imdata'][0]['vzBrCP']['attributes']['dn'].split('/')[2][4:].split(
+                        '_')[0] + '_SBJ'
+                SUBJECT_SEARCH_RESPONSE = SUBJECT_SEARCH(BASE_URL, APIC_COOKIE, CONTRACT_NAME, TENANT,
+                                                         CONTRACT_SUBJECT,
+                                                         HEADERS)
+
+                # Add all filters for a subject to a list to be used for comparison.
+                SUBJECT_FILTERS = []
+                for filters in SUBJECT_SEARCH_RESPONSE['imdata']:
+                    SUBJECT_FILTERS.append(filters['vzRsSubjFiltAtt']['attributes']['tnVzFilterName'])
+
+                # compare list of filters to those already in subject
+
+                FILTER_COMPARE = LIST_COMPARE(rules['SERVICE'], SUBJECT_FILTERS)
+                if len(FILTER_COMPARE[0]) == 0:
+                    pass
+
+                elif len(FILTER_COMPARE[0]) > 0:
+                    OUTPUT_LOG.append(
+                        {'Notifications': 'The below filters will be added to contract ' + CONTRACT_NAME})
+                    OUTPUT_LOG.append({'Notifications': FILTER_COMPARE[0]})
+
+                else:
+                    ERROR = True
+            else:
+                pass
+
+        # Check if L3Outs Exist
+        OUTPUT_LOG.append({'Headers': 'Checking if L3Outs exist'})
+        for rules in RULE_LIST:
+            if rules['CONSUMER_L3OUT'] == 'INTERNAL':
+                pass
+            else:
+                L3OUT_NAME = rules['CONSUMER_L3OUT']
+                L3OUT_SEARCH_RESPONSE = CONTRACT_L3OUT_SEARCH(BASE_URL, APIC_COOKIE, L3OUT_NAME, HEADERS)
+                if int(L3OUT_SEARCH_RESPONSE['totalCount']) == 1:
+                    if rules['CONSUMER_L3OUT'] == L3OUT_SEARCH_RESPONSE['imdata'][0]['l3extOut']['attributes'][
+                        'name']:
                         pass
-                    else:
-                        FILTER_LIST.append(FILTER_NAME)
-
-            FILTER_SET = set(FILTER_LIST)
-            for filters in FILTER_SET:
-                OUTPUT_LOG.append({'Notifications': 'Filter ' + filters + ' will be created'})
-
-            # Check if Filters are applied to contracts
-            OUTPUT_LOG.append({'Headers': 'Checking if Filters are applied to contracts'})
-            for rules in RULE_LIST:
-                # Use the contract search to locate subject
-                CONTRACT_NAME = rules['NAME']
-                CONTRACT_SEARCH_RESPONSE = CONTRACT_SEARCH(BASE_URL, APIC_COOKIE, CONTRACT_NAME, HEADERS)
-                # Validate that a contract can be located
-                if int(CONTRACT_SEARCH_RESPONSE['totalCount']) == 1:
-                    TENANT = CONTRACT_SEARCH_RESPONSE['imdata'][0]['vzBrCP']['attributes']['dn'].split('/')[1][3:]
-                    CONTRACT_SUBJECT = \
-                        CONTRACT_SEARCH_RESPONSE['imdata'][0]['vzBrCP']['attributes']['dn'].split('/')[2][4:].split(
-                            '_')[0] + '_SBJ'
-                    SUBJECT_SEARCH_RESPONSE = SUBJECT_SEARCH(BASE_URL, APIC_COOKIE, CONTRACT_NAME, TENANT,
-                                                             CONTRACT_SUBJECT,
-                                                             HEADERS)
-
-                    # Add all filters for a subject to a list to be used for comparison.
-                    SUBJECT_FILTERS = []
-                    for filters in SUBJECT_SEARCH_RESPONSE['imdata']:
-                        SUBJECT_FILTERS.append(filters['vzRsSubjFiltAtt']['attributes']['tnVzFilterName'])
-
-                    # compare list of filters to those already in subject
-
-                    FILTER_COMPARE = LIST_COMPARE(rules['SERVICE'], SUBJECT_FILTERS)
-                    if len(FILTER_COMPARE[0]) == 0:
-                        pass
-
-                    elif len(FILTER_COMPARE[0]) > 0:
-                        OUTPUT_LOG.append(
-                            {'Notifications': 'The below filters will be added to contract ' + CONTRACT_NAME})
-                        OUTPUT_LOG.append({'Notifications': FILTER_COMPARE[0]})
-
                     else:
                         ERROR = True
-                else:
-                    pass
 
-            # Check if L3Outs Exist
-            OUTPUT_LOG.append({'Headers': 'Checking if L3Outs exist'})
+                else:
+                    DISPLAY_LIST.append(L3OUT_NAME)
+                    ERROR = True
+
+        for rules in RULE_LIST:
+            if rules['PROVIDER_L3OUT'] == 'INTERNAL':
+                pass
+            else:
+                L3OUT_NAME = rules['PROVIDER_L3OUT']
+                L3OUT_SEARCH_RESPONSE = CONTRACT_L3OUT_SEARCH(BASE_URL, APIC_COOKIE, L3OUT_NAME, HEADERS)
+                if int(L3OUT_SEARCH_RESPONSE['totalCount']) == 1:
+                    if rules['PROVIDER_L3OUT'] == L3OUT_SEARCH_RESPONSE['imdata'][0]['l3extOut']['attributes'][
+                        'name']:
+                        pass
+                    else:
+                        ERROR = True
+
+                else:
+                    DISPLAY_LIST.append(L3OUT_NAME)
+                    ERROR = True
+
+        DISPLAY_SET = set(DISPLAY_LIST)
+        for l3out in DISPLAY_SET:
+            OUTPUT_LOG.append({'Errors': 'L3Out: ' + l3out + ' Does not exist, please check naming.'})
+        DISPLAY_LIST = []
+        if not ERROR and not nameError:
+            # Check if External EPGs Exist
+            OUTPUT_LOG.append({'Headers': 'Checking if External EPGs are created'})
             for rules in RULE_LIST:
                 if rules['CONSUMER_L3OUT'] == 'INTERNAL':
                     pass
                 else:
-                    L3OUT_NAME = rules['CONSUMER_L3OUT']
-                    L3OUT_SEARCH_RESPONSE = CONTRACT_L3OUT_SEARCH(BASE_URL, APIC_COOKIE, L3OUT_NAME, HEADERS)
-                    if int(L3OUT_SEARCH_RESPONSE['totalCount']) == 1:
-                        if rules['CONSUMER_L3OUT'] == L3OUT_SEARCH_RESPONSE['imdata'][0]['l3extOut']['attributes'][
-                            'name']:
-                            pass
+                    if rules['CONSUMER_EPG'] != 'BLANK':
+                        CONSUMER_L3OUT = rules['CONSUMER_L3OUT']
+                        CONSUMER_EPG = rules['CONSUMER_EPG']
+                        EXTERNAL_EPG_SEARCH_RESPONSE = CONTRACT_EXTERNAL_EPG_SEARCH(BASE_URL, APIC_COOKIE,
+                                                                                    CONSUMER_L3OUT, CONSUMER_EPG,
+                                                                                    HEADERS)
+                        if int(EXTERNAL_EPG_SEARCH_RESPONSE['totalCount']) == 1:
+                            EPG_NAME = \
+                            EXTERNAL_EPG_SEARCH_RESPONSE['imdata'][0]['l3extInstP']['attributes']['dn'].split('/')[
+                                3][6:]
+                            L3OUT_NAME = \
+                            EXTERNAL_EPG_SEARCH_RESPONSE['imdata'][0]['l3extInstP']['attributes']['dn'].split('/')[
+                                2][4:]
+                            EXTERNAL_EPG_SEARCH_RESPONSE['imdata'][0]['l3extInstP']['attributes']['dn'].split('/')[
+                                1][3:]
+                            if L3OUT_NAME == rules['CONSUMER_L3OUT']:
+                                pass
+                            else:
+                                OUTPUT_LOG.append({
+                                                      'Errors': 'EPG and L3OUT missmatch with ' + L3OUT_NAME + ' and ' + EPG_NAME + ' dont match value: ' +
+                                                                rules['CONSUMER_L3OUT']})
+
                         else:
+                            DISPLAY_LIST.append(CONSUMER_EPG)
                             ERROR = True
 
-                    else:
-                        DISPLAY_LIST.append(L3OUT_NAME)
-                        ERROR = True
-
             for rules in RULE_LIST:
+                PROVIDER_EPG = rules['PROVIDER_EPG']
                 if rules['PROVIDER_L3OUT'] == 'INTERNAL':
                     pass
                 else:
-                    L3OUT_NAME = rules['PROVIDER_L3OUT']
-                    L3OUT_SEARCH_RESPONSE = CONTRACT_L3OUT_SEARCH(BASE_URL, APIC_COOKIE, L3OUT_NAME, HEADERS)
-                    if int(L3OUT_SEARCH_RESPONSE['totalCount']) == 1:
-                        if rules['PROVIDER_L3OUT'] == L3OUT_SEARCH_RESPONSE['imdata'][0]['l3extOut']['attributes'][
-                            'name']:
-                            pass
+                    if rules['PROVIDER_EPG'] != 'BLANK':
+                        PROVIDER_EPG = rules['PROVIDER_EPG']
+                        PROVIDER_L3OUT = rules['PROVIDER_L3OUT']
+                        EXTERNAL_EPG_SEARCH_RESPONSE = CONTRACT_EXTERNAL_EPG_SEARCH(BASE_URL, APIC_COOKIE,
+                                                                                    PROVIDER_L3OUT, PROVIDER_EPG,
+                                                                                    HEADERS)
+                        if int(EXTERNAL_EPG_SEARCH_RESPONSE['totalCount']) == 1:
+                            EPG_NAME = \
+                            EXTERNAL_EPG_SEARCH_RESPONSE['imdata'][0]['l3extInstP']['attributes']['dn'].split('/')[
+                                3][6:]
+                            L3OUT_NAME = \
+                            EXTERNAL_EPG_SEARCH_RESPONSE['imdata'][0]['l3extInstP']['attributes']['dn'].split('/')[
+                                2][4:]
+                            EXTERNAL_EPG_SEARCH_RESPONSE['imdata'][0]['l3extInstP']['attributes']['dn'].split('/')[
+                                1][3:]
+                            if L3OUT_NAME == rules['PROVIDER_L3OUT']:
+                                pass
+                            else:
+                                OUTPUT_LOG.append({
+                                                      'Errors': 'EPG and L3OUT missmatch with ' + L3OUT_NAME + ' and ' + EPG_NAME + ' dont match value: ' +
+                                                                rules['PROVIDER_L3OUT']})
+
                         else:
+                            DISPLAY_LIST.append(PROVIDER_EPG)
                             ERROR = True
 
-                    else:
-                        DISPLAY_LIST.append(L3OUT_NAME)
-                        ERROR = True
-
             DISPLAY_SET = set(DISPLAY_LIST)
-            for l3out in DISPLAY_SET:
-                OUTPUT_LOG.append({'Errors': 'L3Out: ' + l3out + ' Does not exist, please check naming.'})
-            DISPLAY_LIST = []
-
-            if not ERROR:
-                # Check if External EPGs Exist
-                OUTPUT_LOG.append({'Headers': 'Checking if External EPGs are created'})
-                for rules in RULE_LIST:
-                    if rules['CONSUMER_L3OUT'] == 'INTERNAL':
-                        pass
-                    else:
-                        if rules['CONSUMER_EPG'] != 'BLANK':
-                            CONSUMER_L3OUT = rules['CONSUMER_L3OUT']
-                            CONSUMER_EPG = rules['CONSUMER_EPG']
-                            EXTERNAL_EPG_SEARCH_RESPONSE = CONTRACT_EXTERNAL_EPG_SEARCH(BASE_URL, APIC_COOKIE,
-                                                                                        CONSUMER_L3OUT, CONSUMER_EPG,
-                                                                                        HEADERS)
-                            if int(EXTERNAL_EPG_SEARCH_RESPONSE['totalCount']) == 1:
-                                EPG_NAME = \
-                                EXTERNAL_EPG_SEARCH_RESPONSE['imdata'][0]['l3extInstP']['attributes']['dn'].split('/')[
-                                    3][6:]
-                                L3OUT_NAME = \
-                                EXTERNAL_EPG_SEARCH_RESPONSE['imdata'][0]['l3extInstP']['attributes']['dn'].split('/')[
-                                    2][4:]
-                                EXTERNAL_EPG_SEARCH_RESPONSE['imdata'][0]['l3extInstP']['attributes']['dn'].split('/')[
-                                    1][3:]
-                                if L3OUT_NAME == rules['CONSUMER_L3OUT']:
-                                    pass
-                                else:
-                                    OUTPUT_LOG.append({
-                                                          'Errors': 'EPG and L3OUT missmatch with ' + L3OUT_NAME + ' and ' + EPG_NAME + ' dont match value: ' +
-                                                                    rules['CONSUMER_L3OUT']})
-
-                            else:
-                                DISPLAY_LIST.append(CONSUMER_EPG)
-                                ERROR = True
-
-                for rules in RULE_LIST:
-                    PROVIDER_EPG = rules['PROVIDER_EPG']
-                    if rules['PROVIDER_L3OUT'] == 'INTERNAL':
-                        pass
-                    else:
-                        if rules['PROVIDER_EPG'] != 'BLANK':
-                            PROVIDER_EPG = rules['PROVIDER_EPG']
-                            PROVIDER_L3OUT = rules['PROVIDER_L3OUT']
-                            EXTERNAL_EPG_SEARCH_RESPONSE = CONTRACT_EXTERNAL_EPG_SEARCH(BASE_URL, APIC_COOKIE,
-                                                                                        PROVIDER_L3OUT, PROVIDER_EPG,
-                                                                                        HEADERS)
-                            if int(EXTERNAL_EPG_SEARCH_RESPONSE['totalCount']) == 1:
-                                EPG_NAME = \
-                                EXTERNAL_EPG_SEARCH_RESPONSE['imdata'][0]['l3extInstP']['attributes']['dn'].split('/')[
-                                    3][6:]
-                                L3OUT_NAME = \
-                                EXTERNAL_EPG_SEARCH_RESPONSE['imdata'][0]['l3extInstP']['attributes']['dn'].split('/')[
-                                    2][4:]
-                                EXTERNAL_EPG_SEARCH_RESPONSE['imdata'][0]['l3extInstP']['attributes']['dn'].split('/')[
-                                    1][3:]
-                                if L3OUT_NAME == rules['PROVIDER_L3OUT']:
-                                    pass
-                                else:
-                                    OUTPUT_LOG.append({
-                                                          'Errors': 'EPG and L3OUT missmatch with ' + L3OUT_NAME + ' and ' + EPG_NAME + ' dont match value: ' +
-                                                                    rules['PROVIDER_L3OUT']})
-
-                            else:
-                                DISPLAY_LIST.append(PROVIDER_EPG)
-                                ERROR = True
-
-                DISPLAY_SET = set(DISPLAY_LIST)
-                for epgs in DISPLAY_SET:
-                    OUTPUT_LOG.append({'Errors': 'EPG "' + epgs + '" needs creating.'})
-
+            for epgs in DISPLAY_SET:
+                OUTPUT_LOG.append({'Errors': 'EPG "' + epgs + '" needs creating.'})
+                
+        if not ERROR and not nameError:
             # Check if Internal EPGs Exist
             OUTPUT_LOG.append({'Headers': 'Checking if Internal EPGs are created'})
             DISPLAY_LIST = []
@@ -1872,7 +1905,7 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, username, pass
                             ERROR = True
                 else:
                     pass
-
+    
             for rules in RULE_LIST:
                 if rules['PROVIDER_L3OUT'] == 'INTERNAL':
                     if rules['PROVIDER_EPG'] != 'BLANK':
@@ -1886,17 +1919,17 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, username, pass
                             ERROR = True
                 else:
                     pass
-
+    
             DISPLAY_SET = set(DISPLAY_LIST)
             for epgs in DISPLAY_SET:
                 OUTPUT_LOG.append({'Errors': 'EPG "' + epgs + '" needs creating.'})
             DISPLAY_LIST = []
 
 
-        else:
-            OUTPUT_LOG.append({'Errors': 'Unable to connect to APIC.'})
+    else:
+        OUTPUT_LOG.append({'Errors': 'Unable to connect to APIC.'})
 
-    if not ERROR:
+    if not ERROR and not ansibleError:
         OUTPUT_LOG.append({'ValidationSuccess': 'APIC Configuration validated successfully'})
 
     return OUTPUT_LOG
