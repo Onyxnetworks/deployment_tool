@@ -1777,8 +1777,7 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, username, pass
                 L3OUT_NAME = rules['CONSUMER_L3OUT']
                 L3OUT_SEARCH_RESPONSE = CONTRACT_L3OUT_SEARCH(BASE_URL, APIC_COOKIE, L3OUT_NAME, HEADERS)
                 if int(L3OUT_SEARCH_RESPONSE['totalCount']) == 1:
-                    if rules['CONSUMER_L3OUT'] == L3OUT_SEARCH_RESPONSE['imdata'][0]['l3extOut']['attributes'][
-                        'name']:
+                    if rules['CONSUMER_L3OUT'] == L3OUT_SEARCH_RESPONSE['imdata'][0]['l3extOut']['attributes']['name']:
                         pass
                     else:
                         ERROR = True
@@ -1794,8 +1793,7 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, username, pass
                 L3OUT_NAME = rules['PROVIDER_L3OUT']
                 L3OUT_SEARCH_RESPONSE = CONTRACT_L3OUT_SEARCH(BASE_URL, APIC_COOKIE, L3OUT_NAME, HEADERS)
                 if int(L3OUT_SEARCH_RESPONSE['totalCount']) == 1:
-                    if rules['PROVIDER_L3OUT'] == L3OUT_SEARCH_RESPONSE['imdata'][0]['l3extOut']['attributes'][
-                        'name']:
+                    if rules['PROVIDER_L3OUT'] == L3OUT_SEARCH_RESPONSE['imdata'][0]['l3extOut']['attributes']['name']:
                         pass
                     else:
                         ERROR = True
