@@ -1533,7 +1533,7 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, username, pass
 
             DISPLAY_SET = set(DISPLAY_LIST)
             for contracts in DISPLAY_SET:
-                OUTPUT_LOG.append({'Errors': 'Contract "' + contracts + '" does not conform to the naming standard'})
+                OUTPUT_LOG.append({'Errors': 'Contract "{0}" does not conform to the naming standard'.format(contracts)})
             DISPLAY_LIST = []
 
         except:
@@ -1550,37 +1550,33 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, username, pass
             RULE_LIST[index]['consumeAnsible'] = False
             if rules['CONSUMER_EPG'] != 'BLANK':
                 try:
+                    # Check for ansible deployed tenant.
+                    if rules['CONSUMER_L3OUT'] == 'INTERNAL':
+                        ANSIBLE_EPG_SEARCH_RESPONSE = INTERNAL_EPG_SEARCH(BASE_URL, APIC_COOKIE, rules['CONSUMER_EPG'],
+                                                                          HEADERS)
+                        if int(ANSIBLE_EPG_SEARCH_RESPONSE['totalCount']) == 1:
+                            if ANSIBLE_EPG_SEARCH_RESPONSE['imdata'][0]['fvAEPg']['attributes']['descr'] == 'Created by Ansible':
+                                ANSIBLE_LIST.append(rules['CONSUMER_EPG'])
+                                ansibleError = True
+                                RULE_LIST[index]['consumeAnsible'] = True
+
                     if len(rules['CONSUMER_EPG'].split('_')) > 2:
                         DISPLAY_LIST.append(rules['CONSUMER_EPG'])
                         nameError = True
                         ERROR = True
+
                     elif rules['CONSUMER_EPG'].split('_')[1].upper() != 'EPG':
                         DISPLAY_LIST.append(rules['CONSUMER_EPG'])
                         nameError = True
                         ERROR = True
+
                     elif rules['CONSUMER_EPG'].split('-')[0].upper() not in TENANT_LIST:
                         # Check for ansible deployed tenant.
-                        if rules['CONSUMER_L3OUT'] == 'INTERNAL':
-                            ANSIBLE_EPG_SEARCH_RESPONSE = INTERNAL_EPG_SEARCH(BASE_URL, APIC_COOKIE, rules['CONSUMER_EPG'], HEADERS)
-                            if int(ANSIBLE_EPG_SEARCH_RESPONSE['totalCount']) == 1:
-                                if ANSIBLE_EPG_SEARCH_RESPONSE['imdata'][0]['fvAEPg']['attributes']['descr'] == 'Created by Ansible':
-                                    ANSIBLE_LIST.append(rules['CONSUMER_EPG'])
-                                    ansibleError = True
-                                    RULE_LIST[index]['consumeAnsible'] = True
-                                
-                                else:
-                                    DISPLAY_LIST.append(rules['PROVIDER_EPG'])
-                                    nameError = True
-                                    ERROR = True
-                                    
-                                
-                            else:
-                                DISPLAY_LIST.append(rules['PROVIDER_EPG'])
-                                nameError = True
-                                ERROR = True
-                            
+                        if rules['consumeAnsible']:
+                            pass
+
                         else:
-                            DISPLAY_LIST.append(rules['PROVIDER_EPG'])
+                            DISPLAY_LIST.append(rules['CONSUMER_EPG'])
                             nameError = True
                             ERROR = True
 
@@ -1591,10 +1587,20 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, username, pass
                     nameError = True
                     ERROR = True
                     OUTPUT_LOG.append(
-                        {'Errors': 'EPG "' + rules['CONSUMER_EPG'] + '" does not conform to the naming standard'})
+                        {'Errors': 'EPG "{0}" does not conform to the naming standard'.format(rules['CONSUMER_EPG'])})
 
             if rules['PROVIDER_EPG'] != 'BLANK':
                 try:
+                    # Check for ansible deployed tenant.
+                    if rules['PROVIDER_L3OUT'] == 'INTERNAL':
+                        ANSIBLE_EPG_SEARCH_RESPONSE = INTERNAL_EPG_SEARCH(BASE_URL, APIC_COOKIE, rules['PROVIDER_EPG'],
+                                                                          HEADERS)
+                        if int(ANSIBLE_EPG_SEARCH_RESPONSE['totalCount']) == 1:
+                            if ANSIBLE_EPG_SEARCH_RESPONSE['imdata'][0]['fvAEPg']['attributes']['descr'] == 'Created by Ansible':
+                                ANSIBLE_LIST.append(rules['PROVIDER_EPG'])
+                                ansibleError = True
+                                RULE_LIST[index]['provideAnsible'] = True
+
                     if len(rules['PROVIDER_EPG'].split('_')) > 2:
                         DISPLAY_LIST.append(rules['PROVIDER_EPG'])
                         nameError = True
@@ -1607,25 +1613,9 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, username, pass
 
                     elif rules['PROVIDER_EPG'].split('-')[0].upper() not in TENANT_LIST:
                         # Check for ansible deployed tenant.
-                        if rules['PROVIDER_L3OUT'] == 'INTERNAL':
-                            ANSIBLE_EPG_SEARCH_RESPONSE = INTERNAL_EPG_SEARCH(BASE_URL, APIC_COOKIE, rules['PROVIDER_EPG'], HEADERS)
-                            if int(ANSIBLE_EPG_SEARCH_RESPONSE['totalCount']) == 1:
-                                if ANSIBLE_EPG_SEARCH_RESPONSE['imdata'][0]['fvAEPg']['attributes']['descr'] == 'Created by Ansible':
-                                    ANSIBLE_LIST.append(rules['PROVIDER_EPG'])
-                                    ansibleError = True
-                                    RULE_LIST[index]['provideAnsible'] = True
-                                
-                                else:
-                                    DISPLAY_LIST.append(rules['PROVIDER_EPG'])
-                                    nameError = True
-                                    ERROR = True
-                                    
-                                
-                            else:
-                                DISPLAY_LIST.append(rules['PROVIDER_EPG'])
-                                nameError = True
-                                ERROR = True
-                            
+                        if rules['provideAnsible']:
+                            pass
+
                         else:
                             DISPLAY_LIST.append(rules['PROVIDER_EPG'])
                             nameError = True
@@ -1638,11 +1628,11 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, username, pass
                     nameError = True
                     ERROR = True
                     OUTPUT_LOG.append(
-                        {'Errors': 'EPG "' + rules['PROVIDER_EPG'] + '" does not conform to the naming standard'})
+                        {'Errors': 'EPG "{0}" does not conform to the naming standard'.format(rules['PROVIDER_EPG'])})
 
         DISPLAY_SET = set(DISPLAY_LIST)
-        for contracts in DISPLAY_SET:
-            OUTPUT_LOG.append({'Errors': 'EPG "' + contracts + '" does not conform to the naming standard'})
+        for epgs in DISPLAY_SET:
+            OUTPUT_LOG.append({'Errors': 'EPG "{0}" does not conform to the naming standard'.format(epgs)})
 
         ANSIBLE_SET = set(ANSIBLE_LIST)
         for ansible_epg in ANSIBLE_SET:
@@ -1688,22 +1678,22 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, username, pass
                     value = int(services.split('-')[1])
                 except:
                     OUTPUT_LOG.append(
-                        {'Errors': 'Service port not correct format for ' + services + ' on line ' + str(rules['LINE'])})
+                        {'Errors': 'Service port not correct format for {0} on line {1}'.format(services, + str(rules['LINE']))})
                 if services.split('-')[0] not in PROTOCOLS:
                     OUTPUT_LOG.append({'Errors': 'TCP or UDP not specified for service ' + services})
                     ERROR = True
 
                 elif int(services.split('-')[1]) == 0:
-                    OUTPUT_LOG.append({'Errors': 'Error Port out of range ' + services})
+                    OUTPUT_LOG.append({'Errors': 'Error Port out of range {0}'.format(services)})
                     ERROR = True
 
                 elif int(services.split('-')[1]) not in range(1, 65536):
-                    OUTPUT_LOG.append({'Errors': 'Error Port out of range ' + services})
+                    OUTPUT_LOG.append({'Errors': 'Error Port out of range {0}'.format(services)})
                     ERROR = True
 
                 elif len(services.split('-')) == 3:
                     if int(services.split('-')[2]) not in range(1, 65536):
-                        OUTPUT_LOG.append({'Errors': 'Error Port out of range ' + services})
+                        OUTPUT_LOG.append({'Errors': 'Error Port out of range {0}'.format(services)})
                         ERROR = True
 
                 else:
@@ -1724,7 +1714,7 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, username, pass
 
         CONTRACT_SET = set(CONTRACT_LIST)
         for contracts in CONTRACT_SET:
-            OUTPUT_LOG.append({'Notifications': 'Contract ' + contracts + ' will be created'})
+            OUTPUT_LOG.append({'Notifications': 'Contract {0} will be created'.format(contracts)})
 
         # Check if Filters Exist
         OUTPUT_LOG.append({'Headers': 'Checking if Filters exist'})
@@ -1739,7 +1729,7 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, username, pass
 
         FILTER_SET = set(FILTER_LIST)
         for filters in FILTER_SET:
-            OUTPUT_LOG.append({'Notifications': 'Filter ' + filters + ' will be created'})
+            OUTPUT_LOG.append({'Notifications': 'Filter {0} will be created'.format(filters)})
 
         # Check if Filters are applied to contracts
         OUTPUT_LOG.append({'Headers': 'Checking if Filters are applied to contracts'})
@@ -1770,7 +1760,7 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, username, pass
 
                 elif len(FILTER_COMPARE[0]) > 0:
                     OUTPUT_LOG.append(
-                        {'Notifications': 'The below filters will be added to contract ' + CONTRACT_NAME})
+                        {'Notifications': 'The below filters will be added to contract {0}'.format(CONTRACT_NAME)})
                     OUTPUT_LOG.append({'Notifications': FILTER_COMPARE[0]})
 
                 else:
@@ -1816,7 +1806,7 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, username, pass
 
         DISPLAY_SET = set(DISPLAY_LIST)
         for l3out in DISPLAY_SET:
-            OUTPUT_LOG.append({'Errors': 'L3Out: ' + l3out + ' Does not exist, please check naming.'})
+            OUTPUT_LOG.append({'Errors': 'L3Out: {0} Does not exist, please check naming.'.format(l3out)})
         DISPLAY_LIST = []
         if not ERROR and not nameError:
             # Check if External EPGs Exist
@@ -1843,9 +1833,7 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, username, pass
                             if L3OUT_NAME == rules['CONSUMER_L3OUT']:
                                 pass
                             else:
-                                OUTPUT_LOG.append({
-                                                      'Errors': 'EPG and L3OUT missmatch with ' + L3OUT_NAME + ' and ' + EPG_NAME + ' dont match value: ' +
-                                                                rules['CONSUMER_L3OUT']})
+                                OUTPUT_LOG.append({'Errors': 'EPG and L3OUT missmatch with {0} and {1} dont match value: {2}'.format(L3OUT_NAME, EPG_NAME,rules['CONSUMER_L3OUT'])})
 
                         else:
                             DISPLAY_LIST.append(CONSUMER_EPG)
@@ -1874,9 +1862,7 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, username, pass
                             if L3OUT_NAME == rules['PROVIDER_L3OUT']:
                                 pass
                             else:
-                                OUTPUT_LOG.append({
-                                                      'Errors': 'EPG and L3OUT missmatch with ' + L3OUT_NAME + ' and ' + EPG_NAME + ' dont match value: ' +
-                                                                rules['PROVIDER_L3OUT']})
+                                OUTPUT_LOG.append({'Errors': 'EPG and L3OUT missmatch with {0} and {1} dont match value: {2}'.format(L3OUT_NAME, EPG_NAME, rules['PROVIDER_L3OUT'])})
 
                         else:
                             DISPLAY_LIST.append(PROVIDER_EPG)
@@ -1884,7 +1870,7 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, username, pass
 
             DISPLAY_SET = set(DISPLAY_LIST)
             for epgs in DISPLAY_SET:
-                OUTPUT_LOG.append({'Errors': 'EPG "' + epgs + '" needs creating.'})
+                OUTPUT_LOG.append({'Errors': 'EPG "{0}" needs creating.'.format(epgs)})
                 
         if not ERROR and not nameError:
             # Check if Internal EPGs Exist
@@ -1922,7 +1908,7 @@ def CONTRACT_DEPLOYMENT_VALIDATION(RULE_LIST, location, url_dict, username, pass
     
             DISPLAY_SET = set(DISPLAY_LIST)
             for epgs in DISPLAY_SET:
-                OUTPUT_LOG.append({'Errors': 'EPG "' + epgs + '" needs creating.'})
+                OUTPUT_LOG.append({'Errors': 'EPG "{0}" needs creating.'.format(epgs)})
             DISPLAY_LIST = []
 
 
