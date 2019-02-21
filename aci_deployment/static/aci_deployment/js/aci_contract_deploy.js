@@ -107,9 +107,14 @@ function get_validation_task_info(task_id, location, rule_list) {
                         result_location.appendChild(validation_success);
                         validation_success.innerHTML = results[i].ValidationSuccess;
                     }
-                    if ("Errors" || "AnsibleErrors" in results[i]) {
+                    if ("Errors" in results[i]) {
+						console.log('Errors')
                         var validation_error = true
                     }
+                    if ("AnsibleErrors" in results[i]) {
+						console.log('Ansible Errors')
+                        var validation_error = true
+                    }					
                 }
                 if (validation_error){
                     var br = document.createElement("br");
