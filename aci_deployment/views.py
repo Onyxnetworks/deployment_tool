@@ -6,7 +6,7 @@ from .tasks import *
 from index.scripts.baseline import get_base_url
 from index.scripts.external_links import *
 
-logging.basicConfig(filename='{0}aci_deployment.log'.format(settings.LOG_URL), format='%(asctime)s - aci - %(levelname)s - %(message)s', level=settings.LOG_LEVEL)
+logging.basicConfig(filename='{0}aci_deployment.log'.format(settings.LOG_URL), format='%(asctime)s - aci - %(levelname)s - %(message)s', level=logging.DEBUG)
 
 def endpoint_search(request):
     user = request.session.get('user')
@@ -117,7 +117,7 @@ def external_epg_deployment(request):
         url_dict = base_urls['ACI']
 
         # Open workbook and build jason data structure.
-        if file.name.endswith('yaml'):
+        if file.name.endswith('yml'):
             logging.info('File Name: {0}  |  Yaml File detected, running external_epg_open_yaml.'.format(file.name))
             rule_list = external_epg_open_yaml(file, location)
 
@@ -302,7 +302,7 @@ def ipg_deployment(request):
         url_dict = base_urls['ACI']
 
         # Open workbook and build jason data structure.
-        if file.name.endswith('yaml'):
+        if file.name.endswith('yml'):
             logging.info('File Name: {0}  |  Yaml File detected, running ipg_deployment_open_yaml.'.format(file.name))
             ipg_list = ipg_deployment_open_yaml(file, location)
 

@@ -138,5 +138,5 @@ LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/index/'
 
 # Logging Config
-LOG_URL = '/var/log/deplyment_tool/'
+LOG_URL = '/var/log/deployment_tool/'
 LOG_LEVEL = 'logging.DEBUG'
