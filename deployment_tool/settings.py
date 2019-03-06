@@ -136,3 +136,7 @@ STATIC_URL = '/static/'
 # Login Config
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/index/'
+
+# Logging Config
+LOG_URL = '/var/logs/deplyment_tool/'
+LOG_LEVEL = 'logging.DEBUG'

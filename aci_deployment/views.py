@@ -1,10 +1,12 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-
+from django.conf import settings
+import logging
 from .tasks import *
 from index.scripts.baseline import get_base_url
 from index.scripts.external_links import *
 
+logging.basicConfig(filename='{0}aci_deployment.log'.format(settings.LOG_URL), format='%(asctime)s - aci - %(levelname)s - %(messages)s', level=settings.LOG_LEVEL)
 
 def endpoint_search(request):
     user = request.session.get('user')
@@ -94,8 +96,8 @@ def external_epg_deployment(request):
     if request.method == 'POST' and 'file' in request.FILES:
         file = request.FILES['file']
         location = request.POST['location']
-
         environment = request.session.get('environment')
+        logging.info('Action: EPG Deployment Validation | File Name: {0} | Location: {1}  | Environment: {2}  | Username: {3}'.format(file.name, location, environment, user))
         if environment == 'Production':
             username = request.session.get('prod_username')
             password = request.session.get('prod_password')
@@ -109,19 +111,24 @@ def external_epg_deployment(request):
             username = request.session.get('lab_username')
             password = request.session.get('lab_password')
 
+
         # Get base url to use
         base_urls = get_base_url(environment)
         url_dict = base_urls['ACI']
 
         # Open workbook and build jason data structure.
         if file.name.endswith('yaml'):
+            logging.info('File Name: {0}  |  Yaml File detected, running external_epg_open_yaml.'.format(file.name))
             rule_list = external_epg_open_yaml(file, location)
 
         else:
+            logging.info('File Name: {0}  |  Excel File detected, running external_epg_open_yaml.'.format(file.name))
             rule_list = EXTERNAL_EPG_EXCEL_OPEN_WORKBOOK(file, location)
 
         # Validate Request names and format
+        logging.info('File Name: {0}  |  Running External EPG Validation.'.format(file.name))
         task = EXTERNAL_EPG_VALIDATION.delay(rule_list, location, url_dict, username, password)
+        logging.info('File Name: {0}  |  External EPG Validation sent to celery for processing..'.format(file.name))
 
         # Return task id.
         return HttpResponse(json.dumps({'task_id': task.id, 'rule_list': rule_list, 'location': location,
@@ -147,8 +154,10 @@ def external_epg_deployment_push(request):
         data = json.loads(response_json)
         location = data['location']
         rule_list = data['rule_list']
-
         environment = request.session.get('environment')
+        logging.info('Action: EPG Deployment Push | Location: {0}  | Environment: {1}  | Username: {2}'.format(location, environment, user))
+        logging.debug('Config Data: {0}'.format(rule_list))
+
         if environment == 'Production':
             username = request.session.get('prod_username')
             password = request.session.get('prod_password')
@@ -167,7 +176,9 @@ def external_epg_deployment_push(request):
         url_dict = base_urls['ACI']
 
         # Deploy APIC configuration
+        logging.info('Username: {0}  |  Running External EPG Push.'.format(user))
         task = EXTERNAL_EPG_DEPLOYMENT.delay(rule_list, location, url_dict, username, password)
+        logging.info('Username: {0}  |   External EPG Push sent to celery for processing..'.format(user))
 
         # Return task id back to client for ajax use.
         return HttpResponse(json.dumps({'task_id': task.id}), content_type='application/json')
@@ -182,8 +193,8 @@ def contract_deployment(request):
     if request.method == 'POST' and 'file' in request.FILES:
         file = request.FILES['file']
         location = request.POST['location']
-
         environment = request.session.get('environment')
+        logging.info('Action: Contract Deployment Validation | File Name: {0} | Location: {1}  | Environment: {2}  | Username: {3}'.format(file.name, location, environment, user))
         if environment == 'Production':
             username = request.session.get('prod_username')
             password = request.session.get('prod_password')
@@ -202,10 +213,13 @@ def contract_deployment(request):
         url_dict = base_urls['ACI']
 
         # Open workbook and build jason data structure.
+        logging.info('File Name: {0}  |  Excel File detected, running contract_deployment_excel_open_workbook.'.format(file.name))
         rule_list = CONTRACT_DEPLOYMENT_EXCEL_OPEN_WORKBOOK(file, location)
 
         # Validate Request names and format
+        logging.info('Username: {0}  |  Running Contract Validation.'.format(user))
         task = CONTRACT_DEPLOYMENT_VALIDATION.delay(rule_list, location, url_dict, username, password)
+        logging.info('Username: {0}  |   Contract validation sent to celery for processing..'.format(user))
 
         # Return task id.
         return HttpResponse(json.dumps({'task_id': task.id, 'rule_list': rule_list, 'location': location,
@@ -231,8 +245,9 @@ def contract_deployment_push(request):
         data = json.loads(response_json)
         location = data['location']
         rule_list = data['rule_list']
-
         environment = request.session.get('environment')
+        logging.info('Action: Contract Deployment Push | Location: {0}  | Environment: {1}  | Username: {2}'.format(location, environment, user))
+        logging.debug('Config Data: {0}'.format(rule_list))
         if environment == 'Production':
             username = request.session.get('prod_username')
             password = request.session.get('prod_password')
@@ -251,8 +266,9 @@ def contract_deployment_push(request):
         url_dict = base_urls['ACI']
 
         # Deploy APIC configuration
+        logging.info('Username: {0}  |  Running Contract Push.'.format(user))
         task = CONTRACT_DEPLOYMENT.delay(rule_list, location, url_dict, username, password)
-
+        logging.info('Username: {0}  |   Contract Push sent to celery for processing..'.format(user))
         # Return task id back to client for ajax use.
         return HttpResponse(json.dumps({'task_id': task.id}), content_type='application/json')
 
@@ -266,8 +282,8 @@ def ipg_deployment(request):
     if request.method == 'POST' and 'file' in request.FILES:
         file = request.FILES['file']
         location = request.POST['location']
-
         environment = request.session.get('environment')
+        logging.info('Action: Contract Deployment Validation | File Name: {0} | Location: {1}  | Environment: {2}  | Username: {3}'.format(file.name, location, environment, user))
         if environment == 'Production':
             username = request.session.get('prod_username')
             password = request.session.get('prod_password')
@@ -287,13 +303,17 @@ def ipg_deployment(request):
 
         # Open workbook and build jason data structure.
         if file.name.endswith('yaml'):
+            logging.info('File Name: {0}  |  Yaml File detected, running ipg_deployment_open_yaml.'.format(file.name))
             ipg_list = ipg_deployment_open_yaml(file, location)
 
         else:
+            logging.info('File Name: {0}  |  Excel File detected, running ipg_deployment_excel_open_workbook.'.format(file.name))
             ipg_list = ipg_deployment_excel_open_workbook(file, location)
 
         # Validate Request names and format
+        logging.info('Username: {0}  |  Running IPG Deployment validation.'.format(user))
         task = ipg_deployment_validation.delay(ipg_list, location, url_dict, username, password)
+        logging.info('Username: {0}  |  IPG Deployment validation sent to celery for processing.'.format(user))
 
         # Return task id.
         return HttpResponse(json.dumps({'task_id': task.id, 'ipg_list': ipg_list, 'location': location,
@@ -319,8 +339,9 @@ def ipg_deployment_push(request):
         data = json.loads(response_json)
         location = data['location']
         ipg_list = data['ipg_list']
-
         environment = request.session.get('environment')
+        logging.info('Action: Contract Deployment Push | Location: {0}  | Environment: {1}  | Username: {2}'.format(location, environment, user))
+        logging.debug('Config Data: {0}'.format(ipg_list))
         if environment == 'Production':
             username = request.session.get('prod_username')
             password = request.session.get('prod_password')
@@ -339,8 +360,9 @@ def ipg_deployment_push(request):
         url_dict = base_urls['ACI']
 
         # Deploy APIC configuration
+        logging.info('Username: {0}  |  Running IPG Deployment Push.'.format(user))
         task = ipg_deployment_post.delay(ipg_list, location, url_dict, username, password)
-
+        logging.info('Username: {0}  |  IPG Deployment sent to celery for processing..'.format(user))
         # Return task id back to client for ajax use.
         return HttpResponse(json.dumps({'task_id': task.id}), content_type='application/json')
 
