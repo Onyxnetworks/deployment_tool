@@ -1,5 +1,5 @@
 #  Base Functions
-import openpyxl, json, yaml
+import openpyxl, json, yaml, logging
 from operator import itemgetter
 
 # Custom Functions
@@ -210,20 +210,23 @@ def ipg_deployment_validation(ipg_list, location, url_dict, username, password):
     base_url = url_dict[location]
     error = False
     vpc_presant = False
-
+    logging.info('Validating Formatting in workbook')
     output_log.append({'Headers': "Validating Formatting in Workbook."})
     for ipg in ipg_list:
 
         if ipg['vmm'] and ipg['epg_list']:
             error = True
+            logging.error('Line: {0} - cannot have VMM integrated IPG with static EPG mappings.'.format(str(ipg['line'])))
             output_log.append({'Errors': 'Line: {0} - cannot have VMM integrated IPG with static EPG mappings.'.format(str(ipg['line']))})
 
         if ipg['environment'] is None:
             error = True
+            logging.error('Line: {0} - No environment defined.'.format(str(ipg['line'])))
             output_log.append({'Errors': 'Line: {0} - No environment defined.'.format(str(ipg['line']))})
 
         if ipg['vpc'] is None:
             error = True
+            logging.error('Line: {0} - VPC Field not defined'.format(str(ipg['line'])))
             output_log.append({'Errors': 'Line: {0} - VPC Field not defined'.format(str(ipg['line']))})
             continue
 
@@ -233,41 +236,50 @@ def ipg_deployment_validation(ipg_list, location, url_dict, username, password):
             # If VPC = Yes check to make sure both nodes are defined.
             if ipg['node_2'] is None:
                 error = True
+                logging.error('Line: {0} - Type VPC selected but Node 2 not defined.'.format(str(ipg['line'])))
                 output_log.append({'Errors': 'Line: {0} - Type VPC selected but Node 2 not defined.'.format(str(ipg['line']))})
                 continue
 
             # If VPC = Yes check to make sure switches are a VPC pair
             if int(ipg['node_2']) - int(ipg['node_1']) != 1:
                 error = True
+                logging.error('Line: {0} - Type VPC selected but switches are not a VPC Pair.'.format(str(ipg['line'])))
                 output_log.append({'Errors': 'Line: {0} - Type VPC selected but switches are not a VPC Pair.'.format(str(ipg['line']))})
 
             # If VPC = Yes check that a port-channel policy is defined.
             if ipg['port_channel_policy'] is None:
                 error = True
+                logging.error('Line: {0} - Type VPC selected but no port-channel policy defined.'.format(str(ipg['line'])))
                 output_log.append({'Errors': 'Line: {0} - Type VPC selected but no port-channel policy defined.'.format(str(ipg['line']))})
         if ipg['vpc'] == 'NO':
             # If VPC = No check to make sure node_2 has no value
             if not ipg['node_2'] is None:
                 error = True
+                logging.error('Line: {0} - Non VPC selected but two switches defined.'.format(str(ipg['line'])))
                 output_log.append({'Errors': 'Line: {0} - Non VPC selected but two switches defined.'.format(str(ipg['line']))})
             # If VPC = No check to make sure port-channel policy has no value
             if not ipg['port_channel_policy'] is None:
                 error = True
+                logging.error('Line: {0} - Non VPC selected but port-channel policy defined.'.format(str(ipg['line'])))
                 output_log.append({'Errors': 'Line: {0} - Non VPC selected but port-channel policy defined.'.format(str(ipg['line']))})
         # Check to make sure speed is defined.
         if ipg['speed'] is None:
             error = True
+            logging.error('Line: {0} - Interface speed not defined.'.format(str(ipg['line'])))
             output_log.append({'Errors': 'Line: {0} - Interface speed not defined.'.format(str(ipg['line']))})
 
         # Check to make sure description is defined.
         if ipg['description'] is None:
             error = True
+            logging.error('Line: {0} - Description not defined.'.format(str(ipg['line'])))
             output_log.append({'Errors': 'Line: {0} - Description not defined.'.format(str(ipg['line']))})
 
     if not error:
+        logging.info('Workbook validated successfully')
         output_log.append({'NotificationsSuccess': 'Workbook validated successfully'})
 
         # Go and check if switches exist on fabric.
+        logging.info('Checking if switches exist')
         switch_list = []
         for switches in ipg_list:
             switch_list.append(switches['node_1'])
@@ -277,9 +289,11 @@ def ipg_deployment_validation(ipg_list, location, url_dict, username, password):
         excel_switch_list = list(set(switch_list))
         fabric_switch_list = []
         # Login to fabric
+        logging.info('Connecting to APIC: {0}'.format(base_url))
         output_log.append({'Headers': 'Connecting to APIC'})
         apic_cookie = APIC_LOGIN(base_url, username, password)
         if apic_cookie:
+            logging.info('Successfully generated authentication cookie')
             output_log.append({'Notifications': 'Successfully generated authentication cookie'})
             output_log.append({'Headers': 'Checking if nodes presant in fabric.'})
             get_fabric_nodes_response = get_fabric_nodes(base_url, apic_cookie, headers, output_log)
@@ -294,13 +308,16 @@ def ipg_deployment_validation(ipg_list, location, url_dict, username, password):
                 for switch in excel_switch_list:
                     if switch not in fabric_switch_list:
                         error = True
+                        logging.error('Node {0} not found in fabric.'.format(switch))
                         output_log.append({'Errors': 'Node {0} not found in fabric.'.format(switch)})
 
             if not error:
+                logging.info('Fabric switches validated successfully')
                 output_log.append({'NotificationsSuccess': 'Fabric switches validated successfully'})
 
             # Check if IPG's already exist.
             if not error:
+                logging.info("Checking if IPG's presant in fabric.")
                 output_log.append({'Headers': "Checking if IPG's presant in fabric."})
                 get_fabric_vpc_ipgs_response = get_fabric_vpc_ipgs(base_url, apic_cookie, headers, output_log)
                 if get_fabric_vpc_ipgs_response[0]:
@@ -395,8 +412,10 @@ def ipg_deployment_validation(ipg_list, location, url_dict, username, password):
 
                             if ipg_name in fabric_ipg_list:
                                 ipg['presant'] = True
+                                logging.warning("Line: {0} {1} already exists on the fabric and won't be created".format(str(ipg['line']), ipg_name))
                                 output_log.append({'NotificationsWarning': "Line: {0} {1} already exists on the fabric and won't be created".format(str(ipg['line']), ipg_name)})
                             else:
+                                logging.info("Line: {0} {1} will be created".format(str(ipg['line']), ipg_name))
                                 output_log.append({'Notifications': "Line: {0} {1} will be created".format(str(ipg['line']), ipg_name)})
                         if ipg['vpc'] == 'NO':
 
@@ -423,10 +442,12 @@ def ipg_deployment_validation(ipg_list, location, url_dict, username, password):
                                 error = True
                                 accessIpg = False
                     if not accessIpg:
+                        logging.error('Unable to locate Access IPG on fabric. IPG Name: {0}'.format(ipg_name))
                         output_log.append({'Errors': 'Unable to locate Access IPG on fabric. IPG Name: {0}'.format(ipg_name)})
 
             # Checking if VPC domain are correct.
             if not error:
+                logging.info('Checking VPC Pairs.')
                 output_log.append({'Headers': 'Checking VPC Pairs.'})
                 get_vpc_domain_response = get_vpc_domain(base_url, apic_cookie, headers, output_log)
 
@@ -462,10 +483,13 @@ def ipg_deployment_validation(ipg_list, location, url_dict, username, password):
                             form_vpc = [int(ipg['node_1']), int(ipg['node_2'])]
                             if sorted(form_vpc) not in vpc_list:
                                 error = True
+                                logging.error('Line: {0} Node: {1} & {2} not configured for VPC.'.format(str(ipg['line']), ipg['node_1'], ipg['node_2']))
                                 output_log.append({'Errors': 'Line: {0} Node: {1} & {2} not configured for VPC.'.format(str(ipg['line']), ipg['node_1'], ipg['node_2'])})
             # Check if ports are already in use.
             if not error:
+                logging.info("VPC's validated successfully")
                 output_log.append({'NotificationsSuccess': "VPC's validated successfully"})
+                logging.info('Checking interface availability.')
                 output_log.append({'Headers': 'Checking interface availability.'})
 
                 for ipg in ipg_list:
@@ -542,17 +566,15 @@ def ipg_deployment_validation(ipg_list, location, url_dict, username, password):
                                                 if ipg_name != fabric_ipg_name:
                                                     if start_card == fromCard and start_port == fromPort and end_card == toCard and end_port == toPort:
                                                         error = True
-                                                        output_log.append({'Errors': 'Line: ' + str(
-                                                            ipg[
-                                                                'line']) + ' IPG Name missmatch between the Workbook and Fabric. ' + ipg_name + ' & ' + fabric_ipg_name})
+                                                        logging.error('Line: {0} IPG Name missmatch between the Workbook and Fabric. {1} & {2} '.format(str(ipg['line']), ipg_name, fabric_ipg_name))
+                                                        output_log.append({'Errors': 'Line: {0} IPG Name missmatch between the Workbook and Fabric. {1} & {2} '.format(str(ipg['line']), ipg_name, fabric_ipg_name)})
 
                                                 if ipg_name == fabric_ipg_name:
                                                     if start_card == fromCard and start_port == fromPort and end_card == toCard and end_port == toPort:
                                                         ipg['presant'] = True
                                                         ipg['lsp_mapped'] = True
-                                                        output_log.append({'NotificationsWarning': 'Line: ' + str(
-                                                            ipg[
-                                                                'line']) + ' ports already provisioned, no IPG will be configured but any additional EPGs will be pusshed'})
+                                                        logging.warning('Line: {0} ports already provisioned, no IPG will be configured but any additional EPGs will be pusshed'.format(str(ipg['line'])))
+                                                        output_log.append({'NotificationsWarning': 'Line: {0} ports already provisioned, no IPG will be configured but any additional EPGs will be pusshed'.format(str(ipg['line']))})
 
                         # Get port details from node_1 LSP
                         vpc = False
@@ -588,8 +610,8 @@ def ipg_deployment_validation(ipg_list, location, url_dict, username, password):
 
                                                 if start_card == fromCard and start_port == fromPort and end_card == toCard and end_port == toPort:
                                                     error = True
-                                                    output_log.append({'Errors': 'Line: ' + str(ipg[
-                                                                                                    'line']) + ' ports already provisioned as non VPC port on LFS' + nonvpc_node_1})
+                                                    logging.error('Line: {0} ports already provisioned as non VPC port on LFS  {1}'.format(str(ipg['line']), nonvpc_node_1))
+                                                    output_log.append({'Errors': 'Line: {0} ports already provisioned as non VPC port on LFS  {1}'.format(str(ipg['line']), nonvpc_node_1)})
 
                         nonvpc_node_1 = ipg['node_2']
                         get_lsp_detail_response_node2 = get_lsp_detail(base_url, apic_cookie, headers, output_log, vpc,
@@ -622,9 +644,8 @@ def ipg_deployment_validation(ipg_list, location, url_dict, username, password):
 
                                                 if start_card == fromCard and start_port == fromPort and end_card == toCard and end_port == toPort:
                                                     error = True
-                                                    output_log.append({'Errors': 'Line: ' + str(
-                                                        ipg[
-                                                            'line']) + ' ports already provisioned as non VPC port on LFS' + nonvpc_node_1})
+                                                    logging.error('Line: {0} ports already provisioned as non VPC port on LFS  {1}'.format(str(ipg['line']), nonvpc_node_1))
+                                                    output_log.append({'Errors': 'Line: {0} ports already provisioned as non VPC port on LFS  {1}'.format(str(ipg['line']), nonvpc_node_1)})
 
                     if ipg['vpc'] == 'NO':
                         # Format the port
@@ -678,10 +699,12 @@ def ipg_deployment_validation(ipg_list, location, url_dict, username, password):
                                                 if start_card == fromCard and start_port == fromPort and end_card == toCard and end_port == toPort:
                                                     ipg['presant'] = True
                                                     ipg['lsp_mapped'] = True
+                                                    logging.warning('Line: {0} ports already provisioned, no IPG will be configured but any additional EPGs will be pusshed'.format(str(ipg['line'])))
                                                     output_log.append({'NotificationsWarning': 'Line: {0} ports already provisioned, no IPG will be configured but any additional EPGs will be pusshed'.format(str(ipg['line']))})
 
             # Check if EPGs are created.
             if not error:
+                logging.info("Checking if EPG's exist.")
                 output_log.append({'Headers': "Checking if EPG's exist."})
                 get_all_epg_response = get_all_epgs(base_url, apic_cookie, headers, output_log)
                 if get_all_epg_response[0]:
@@ -698,14 +721,17 @@ def ipg_deployment_validation(ipg_list, location, url_dict, username, password):
                             else:
                                 if key.upper() not in (s['fvAEPg']['attributes']['name'].upper() for s in epg_list):
                                     error = True
+                                    logging.error('{0} EPG not presant in fabric.'.format(key))
                                     output_log.append({'Errors': '{0} EPG not presant in fabric.'.format(key)})
 
 
 
             if not error:
+                logging.info("EPG's validated successfully")
                 output_log.append({'NotificationsSuccess': "EPG's validated successfully"})
 
         else:
+            logging.error('Failed to connect to apic.')
             output_log.append({'Errors': 'Failed to connect to apic.'})
 
     return output_log, ipg_list
@@ -721,16 +747,21 @@ def ipg_deployment_post(ipg_list, location, url_dict, username, password):
     # --------------------------------------------------------------------------#
     # Begin Configuration
     # --------------------------------------------------------------------------#
+    logging.info('Starting IPG provisioning.')
     output_log.append({'Headers': 'Starting IPG provisioning.'})
+    logging.info('Connecting to APIC')
     output_log.append({'Headers': 'Connecting to APIC'})
     apic_cookie = APIC_LOGIN(base_url, username, password)
     if apic_cookie:
+        logging.info('Successfully generated authentication cookie')
         output_log.append({'Notifications': 'Successfully generated authentication cookie'})
+        logging.info("Creating IPG's")
         output_log.append({'Headers': "Creating IPG's"})
         for ipg in ipg_list:
 
             # Create new VPC IPGs
             if ipg['vpc'] == 'YES' and not ipg['presant']:
+                logging.info("Creating IPG's for line: {0}".format(ipg['line']))
                 output_log.append({'Headers2': "Creating IPG's for line: {0}".format(ipg['line'])})
                 # Post call to create IPG's
                 post_create_ipg_response = post_create_ipg(base_url, apic_cookie, headers, output_log, ipg['ipgSettings'])
@@ -739,9 +770,11 @@ def ipg_deployment_post(ipg_list, location, url_dict, username, password):
 
         if not error:
             # Map IPG to LSP
+            logging.info("Mapping IPG's to Interface profiles")
             output_log.append({'Headers': "Mapping IPG's to Interface profiles"})
             for ipg in ipg_list:
                 if not ipg['lsp_mapped']:
+                    logging.info("Mapping LSP's for line: {0}".format(ipg['line']))
                     output_log.append({'Headers2': "Mapping LSP's for line: {0}".format(ipg['line'])})
 
                     if ipg['vpc'] == 'YES':
@@ -761,9 +794,11 @@ def ipg_deployment_post(ipg_list, location, url_dict, username, password):
                         output_log = post_create_lsp_port_response[1]
 
         if not error:
+            logging.info("Pushing EPG static bindings")
             output_log.append({'Headers': "Pushing EPG static bindings"})
             for ipg in ipg_list:
                 if ipg['epg_list']:
+                    logging.info('Pushing Bindings for line: {0}'.format(ipg['line']))
                     output_log.append({'Headers2': 'Pushing Bindings for line: {0}'.format(ipg['line'])})
 
                 if ipg['vpc'] == 'YES':
@@ -833,6 +868,7 @@ def ipg_deployment_post(ipg_list, location, url_dict, username, password):
 
 
     else:
+        logging.error('Failed to connect to apic.')
         output_log.append({'Errors': 'Failed to connect to apic.'})
 
     return output_log

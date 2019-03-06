@@ -6,7 +6,7 @@ from .tasks import *
 from index.scripts.baseline import get_base_url
 from index.scripts.external_links import *
 
-logging.basicConfig(filename='{0}aci_deployment.log'.format(settings.LOG_URL), format='%(asctime)s - aci - %(levelname)s - %(messages)s', level=settings.LOG_LEVEL)
+logging.basicConfig(filename='{0}aci_deployment.log'.format(settings.LOG_URL), format='%(asctime)s - aci - %(levelname)s - %(message)s', level=settings.LOG_LEVEL)
 
 def endpoint_search(request):
     user = request.session.get('user')
@@ -156,7 +156,7 @@ def external_epg_deployment_push(request):
         rule_list = data['rule_list']
         environment = request.session.get('environment')
         logging.info('Action: EPG Deployment Push | Location: {0}  | Environment: {1}  | Username: {2}'.format(location, environment, user))
-        logging.debug('Config Data: {0}'.format(rule_list))
+        logging.info('Config Data: {0}'.format(rule_list))
 
         if environment == 'Production':
             username = request.session.get('prod_username')
@@ -247,7 +247,7 @@ def contract_deployment_push(request):
         rule_list = data['rule_list']
         environment = request.session.get('environment')
         logging.info('Action: Contract Deployment Push | Location: {0}  | Environment: {1}  | Username: {2}'.format(location, environment, user))
-        logging.debug('Config Data: {0}'.format(rule_list))
+        logging.info('Config Data: {0}'.format(rule_list))
         if environment == 'Production':
             username = request.session.get('prod_username')
             password = request.session.get('prod_password')
@@ -341,7 +341,7 @@ def ipg_deployment_push(request):
         ipg_list = data['ipg_list']
         environment = request.session.get('environment')
         logging.info('Action: Contract Deployment Push | Location: {0}  | Environment: {1}  | Username: {2}'.format(location, environment, user))
-        logging.debug('Config Data: {0}'.format(ipg_list))
+        logging.info('Config Data: {0}'.format(ipg_list))
         if environment == 'Production':
             username = request.session.get('prod_username')
             password = request.session.get('prod_password')
