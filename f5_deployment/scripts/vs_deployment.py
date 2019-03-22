@@ -562,8 +562,8 @@ def create_pool_monitor(vs_dict, partition, bigip_url_base, bigip, output_log):
 
         if vs_dict['vs']['S2']:
             pool_mon_cst_str = vs_dict['vs']['S2']
-            pool_mon_cst_str_send = pool_mon_cst_str.split('"')[1]
-            pool_mon_cst_str_receive = pool_mon_cst_str.split('"')[3]
+            pool_mon_cst_str_send = vs_dict['vs']['S2']
+            pool_mon_cst_str_receive = vs_dict['vs']['T2']
             pool_mon_info['send'] = pool_mon_cst_str_send
             pool_mon_info['recv'] = pool_mon_cst_str_receive
 
