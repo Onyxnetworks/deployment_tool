@@ -41,7 +41,7 @@ def vs_deployment_validation(vs_dict, location, url_dict, username, password):
     output_log = []
     error = False
     form_version = vs_dict['version']
-    script_version = '1.4'
+    script_version = '1.5'
     output_log.append({'Headers': 'Checking Script compatibility.'})
     if form_version != script_version:
         error = True
