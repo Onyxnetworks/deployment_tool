@@ -109,6 +109,7 @@ def vs_deployment_validation(vs_dict, location, url_dict, username, password):
         
         output_log = check_httpprofile_result[0]
         error = check_httpprofile_result[1]
+        vs_dict['httpProfile'] = check_httpprofile_result[2]
        
     if not error:
         output_log.append({'NotificationsSuccess': 'HTTP Profiles validated successfully.'})
@@ -118,6 +119,9 @@ def vs_deployment_validation(vs_dict, location, url_dict, username, password):
                 check_ssl_profile_result = check_ssl_profile(vs_dict, partition, bigip_url_base, bigip, output_log)
                 output_log = check_ssl_profile_result[0]
                 error = check_ssl_profile_result[1]
+                vs_dict['sslClient'] = check_ssl_profile_result[2]
+                vs_dict['sslServer'] = check_ssl_profile_result[3]
+
                 if not error:
                     output_log.append({'Headers': 'Checking certificates.'})
                     check_cert_result = check_cert(vs_dict, partition, bigip_url_base, bigip, output_log)
@@ -129,6 +133,7 @@ def vs_deployment_validation(vs_dict, location, url_dict, username, password):
         check_http_mon_result = check_http_mon(vs_dict, partition, bigip_url_base, bigip, output_log)
         output_log = check_http_mon_result[0]
         error = check_http_mon_result[1]
+        vs_dict['httpMonitor'] = check_http_mon_result[2]
     
     if not error:
         output_log.append({'NotificationsSuccess': 'Monitor configuration validated successfully.'})
@@ -158,6 +163,7 @@ def vs_deployment_validation(vs_dict, location, url_dict, username, password):
         compare_pool_results = compare_pool(vs_dict, partition, bigip_url_base, bigip, output_log)
         output_log = compare_pool_results[0]
         error = compare_pool_results[1]
+        vs_dict['pool'] = compare_pool_results[2]
 
     if not error:
         output_log.append({'NotificationsSuccess': 'Pool configuration validated successfully.'})

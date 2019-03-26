@@ -85,7 +85,7 @@ def check_httpprofile(vs_dict, partition, bigip_url_base, bigip, output_log):
         for key, value in httpprofile_dict.items():
             if http_default_profile == value:
                 counter = counter + 1
-                output_log.append({'Notifications': 'Default HTTP(S) Profile {} present on LTM.'
+                output_log.append({'Notifications': 'Default HTTP Profile {} present on LTM.'
                                   .format(http_default_profile)})
 
                 for httpprofile_dict in httpptofiles_on_ltm:
@@ -94,23 +94,23 @@ def check_httpprofile(vs_dict, partition, bigip_url_base, bigip, output_log):
                         if http_profile == value:
                             #error = True
                             profileExists = True
-                            output_log.append({'NotificationsWarning': 'HTTP(S) profile name {} already present on LTM, please check values before deploying.'
+                            output_log.append({'NotificationsWarning': 'HTTP profile name {} already present on LTM, please check values before deploying.'
                                               .format(http_profile)})
 
     if counter == 0:
         error = True
-        output_log.append({'Errors': 'Default HTTP(S) Profile {}, not present, please create default profile.'
+        output_log.append({'Errors': 'Default HTTP Profile {}, not present, please create default profile.'
                           .format(http_default_profile)})
         
     if error:
-        return output_log, error
+        return output_log, error, profileExists
     
     if not error:
         if not profileExists:
-            output_log.append({'Notifications': 'HTTP(S) Profile {} will be created.'.format(http_profile)})
-            return output_log, error
+            output_log.append({'Notifications': 'HTTP Profile {} will be created.'.format(http_profile)})
+            return output_log, error, profileExists
         if profileExists:
-            return output_log, error
+            return output_log, error, profileExists
 
 
 def check_ssl_profile(vs_dict, partition, bigip_url_base, bigip, output_log):
@@ -166,7 +166,7 @@ def check_ssl_profile(vs_dict, partition, bigip_url_base, bigip, output_log):
     else:
         output_log.append({'Notifications': 'No SSL Server profile.'})
 
-    return output_log, error
+    return output_log, error, sllClientExists, sslServerExists
     
     
 def check_cert(vs_dict, partition, bigip_url_base, bigip, output_log):
@@ -233,6 +233,7 @@ def check_cert(vs_dict, partition, bigip_url_base, bigip, output_log):
 def check_http_mon(vs_dict, partition, bigip_url_base, bigip, output_log):
     
     error = False
+    httpMonExists = False
     marker = 0
     http_mon_name = vs_dict['vs']['Q2']
     http_mon_on_ltm = bigip.get('%s/ltm/monitor/http' % bigip_url_base, )
@@ -249,6 +250,7 @@ def check_http_mon(vs_dict, partition, bigip_url_base, bigip, output_log):
                 output_log.append({'NotificationsWarning': 'HTTP monitor : {} present on LTM, please check values before deploying.'.format(http_mon_name)})
                 marker = 1
                 #error = True
+                httpMonExists = True
 
     for https_mon_dict in https_mon_on_ltm:
         for key, value in https_mon_dict.items():
@@ -256,11 +258,12 @@ def check_http_mon(vs_dict, partition, bigip_url_base, bigip, output_log):
                 output_log.append({'NotificationsWarning': 'HTTPS monitor : {} present on LTM, please check values before deploying.'.format(http_mon_name)})
                 marker = 1
                 #error = True
+                httpMonExists = True
 
     if marker == 0:
         output_log.append({'Notifications': 'HTTP(S) monitor {} will be created'.format(http_mon_name)})
         
-    return output_log, error
+    return output_log, error, httpMonExists
 
     
 def compare_snat_on_ltm_excel(vs_dict, partition, bigip_url_base, bigip, output_log):
@@ -431,6 +434,7 @@ def compare_ltm_nodes(vs_dict, partition, bigip_url_base, bigip, output_log):
 
 def compare_pool(vs_dict, partition, bigip_url_base, bigip, output_log):
     error = False
+    poolExists = False
     pool_name = str(vs_dict['vs']['P2'])
     pool_full_name = '/{0}/{1}'.format(partition, pool_name)
 
@@ -454,19 +458,20 @@ def compare_pool(vs_dict, partition, bigip_url_base, bigip, output_log):
         if pool_full_name == pool_path_value_ltm:
             output_log.append({'NotificationsWarning': '{} - Pool name present on LTM.{}, please check values before deploying.'.format(pool_name, pool_description)})
             #error = True
-            return output_log, error
+            poolExists = True
+            return output_log, error, poolExists
 
         if pool_name.split('_')[0] == pool_name_value_ltm.split('_')[0]:
             if partition != pool_partition:
                 output_log.append({'Errors': 'LTM Pool and Excel Pool in different partitions. '
                                              'LTM: {0} EXCEL: {1}'.format(pool_partition, partition)})
                 error = True
-                return output_log, error
+                return output_log, error, poolExists
 
     if not error:
         output_log.append({'Notifications': 'Pool: {} not present on LTM, POOL will be created.'.format(pool_name)})
 
-    return output_log, error
+    return output_log, error, poolExists
 
 
 def compare_vs(vs_dict, partition, bigip_url_base, bigip, output_log):
@@ -503,53 +508,59 @@ def compare_vs(vs_dict, partition, bigip_url_base, bigip, output_log):
 def create_vs_ssl_profiles(vs_dict, partition, bigip_url_base, bigip, output_log):
     error = False
     output_log.append({'Headers': 'Creating SSL Client Profile.'})
-    ssl_client_profile = {}
-    vs_hostname_crt = vs_dict['vs']['Y2'] + '.crt'
-    vs_hostname_key = vs_dict['vs']['Y2'] + '.key'
-    vs_hostname_chain = vs_dict['vs']['Z2'] + '.crt'
-    ssl_default_profile = (vs_dict['vs']['N2'])
+    if not vs_dict['sslClient']:
+        ssl_client_profile = {}
+        vs_hostname_crt = vs_dict['vs']['Y2'] + '.crt'
+        vs_hostname_key = vs_dict['vs']['Y2'] + '.key'
+        vs_hostname_chain = vs_dict['vs']['Z2'] + '.crt'
+        ssl_default_profile = (vs_dict['vs']['N2'])
 
-    ssl_client_profile['kind'] = 'tm:ltm:profile:client-ssl:client-sslstate'
-    ssl_client_profile['name'] = vs_dict['vs']['L2']
-    ssl_client_profile['defaultsFrom'] = ssl_default_profile
+        ssl_client_profile['kind'] = 'tm:ltm:profile:client-ssl:client-sslstate'
+        ssl_client_profile['name'] = vs_dict['vs']['L2']
+        ssl_client_profile['defaultsFrom'] = ssl_default_profile
 
-    ssl_client_profile['cert'] = vs_hostname_crt
-    ssl_client_profile['key'] = vs_hostname_key
-    ssl_client_profile['chain'] = vs_hostname_chain
-    ssl_client_profile['partition'] = partition
+        ssl_client_profile['cert'] = vs_hostname_crt
+        ssl_client_profile['key'] = vs_hostname_key
+        ssl_client_profile['chain'] = vs_hostname_chain
+        ssl_client_profile['partition'] = partition
 
-    ssl_client_profile_sent = str(bigip.post('%s/ltm/profile/client-ssl' % bigip_url_base,
-                                             data=json.dumps(ssl_client_profile)))
+        ssl_client_profile_sent = str(bigip.post('%s/ltm/profile/client-ssl' % bigip_url_base,
+                                                 data=json.dumps(ssl_client_profile)))
 
-    if ssl_client_profile_sent.__contains__('200'):
-        output_log.append({'NotificationsInfo': '{} : SSL Client Profile Created'.format(vs_dict['vs']['L2'])})
+        if ssl_client_profile_sent.__contains__('200'):
+            output_log.append({'NotificationsInfo': '{} : SSL Client Profile Created'.format(vs_dict['vs']['L2'])})
 
-    elif ssl_client_profile_sent.__contains__('409'):
-        output_log.append({'NotificationsInfo': '{} : *SSL Client Profile Modified*'.format(vs_dict['vs']['L2'])})
+        elif ssl_client_profile_sent.__contains__('409'):
+            output_log.append({'NotificationsInfo': '{} : *SSL Client Profile Modified*'.format(vs_dict['vs']['L2'])})
 
-    elif ssl_client_profile_sent.__contains__('400'):
-        output_log.append({'Errors': '{} - Bad Request, unable to create SSL Client Profile*'
-                          .format(vs_dict['vs']['L2'])})
-        error = True
-        return output_log, error
+        elif ssl_client_profile_sent.__contains__('400'):
+            output_log.append({'Errors': '{} - Bad Request, unable to create SSL Client Profile*'
+                              .format(vs_dict['vs']['L2'])})
+            error = True
+            return output_log, error
+    else:
+        output_log.append({'Notifications': '{} : SSL Client Profile already exists and no configuration was pushed.'.format(vs_dict['vs']['L2'])})
 
-     # Create SSL Server Profile
+    # Create SSL Server Profile
     if vs_dict['vs']['M2']:
+        if not vs_dict['sslServer']:
+            ssl_server_profile = {}
+            output_log.append({'Headers': 'Creating SSL Server Profile.'})
+            ssl_server_profile['kind'] = 'tm:ltm:profile:server-ssl:server-sslstate'
+            ssl_server_profile['name'] = vs_dict['vs']['M2']
+            ssl_server_profile['defaultsFrom'] = 'serverssl'
+            ssl_server_profile['partition'] = partition
+            ssl_server_profile_sent = str(bigip.post('%s/ltm/profile/server-ssl' % bigip_url_base,
+                                                     data=json.dumps(ssl_server_profile)))
 
-        ssl_server_profile = {}
-        output_log.append({'Headers': 'Creating SSL Server Profile.'})
-        ssl_server_profile['kind'] = 'tm:ltm:profile:server-ssl:server-sslstate'
-        ssl_server_profile['name'] = vs_dict['vs']['M2']
-        ssl_server_profile['defaultsFrom'] = 'serverssl'
-        ssl_server_profile['partition'] = partition
-        ssl_server_profile_sent = str(bigip.post('%s/ltm/profile/server-ssl' % bigip_url_base,
-                                                 data=json.dumps(ssl_server_profile)))
+            if ssl_server_profile_sent.__contains__('200'):
+                output_log.append({'NotificationsInfo': '{} - SSL Server Profile Created'.format(vs_dict['vs']['K2'])})
 
-        if ssl_server_profile_sent.__contains__('200'):
-            output_log.append({'NotificationsInfo': '{} - SSL Server Profile Created'.format(vs_dict['vs']['K2'])})
+            elif ssl_server_profile_sent.__contains__('409'):
+                output_log.append({'NotificationsInfo': '{} - SSL Server Profile Modified*'.format(vs_dict['vs']['K2'])})
 
-        elif ssl_server_profile_sent.__contains__('409'):
-            output_log.append({'NotificationsInfo': '{} - SSL Server Profile Modified*'.format(vs_dict['vs']['K2'])})
+        else:
+            output_log.append({'Notifications': '{} : SSL Server Profile already exists and no configuration was pushed.'.format(vs_dict['vs']['M2'])})
 
     return output_log, error
 
@@ -568,27 +579,30 @@ def create_pool_monitor(vs_dict, partition, bigip_url_base, bigip, output_log):
 
     if traffic_type in ['http', 'HTTP', 'https', 'HTTPS']:
         output_log.append({'Headers': 'Creating HTTP(S) monitor.'})
+        if not vs_dict['httpMonitor']:
+            if vs_dict['vs']['S2']:
+                pool_mon_cst_str = vs_dict['vs']['S2']
+                pool_mon_cst_str_send = vs_dict['vs']['S2']
+                pool_mon_cst_str_receive = vs_dict['vs']['T2']
+                pool_mon_info['send'] = pool_mon_cst_str_send
+                pool_mon_info['recv'] = pool_mon_cst_str_receive
 
-        if vs_dict['vs']['S2']:
-            pool_mon_cst_str = vs_dict['vs']['S2']
-            pool_mon_cst_str_send = vs_dict['vs']['S2']
-            pool_mon_cst_str_receive = vs_dict['vs']['T2']
-            pool_mon_info['send'] = pool_mon_cst_str_send
-            pool_mon_info['recv'] = pool_mon_cst_str_receive
+            pool_mon_info['kind'] = 'tm:ltm:monitor:{}:{}state'.format(traffic_type, traffic_type)
+            pool_mon_info['name'] = vs_dict['vs']['Q2']
+            pool_mon_info['defaultsFrom'] = traffic_type
+            pool_mon_info['destination'] = '*:' + str(vs_dict['vs']['V2'])
+            pool_mon_info['partition'] = partition
 
-        pool_mon_info['kind'] = 'tm:ltm:monitor:{}:{}state'.format(traffic_type, traffic_type)
-        pool_mon_info['name'] = vs_dict['vs']['Q2']
-        pool_mon_info['defaultsFrom'] = traffic_type
-        pool_mon_info['destination'] = '*:' + str(vs_dict['vs']['V2'])
-        pool_mon_info['partition'] = partition
+            https_mon_sent = str(bigip.post('%s/ltm/monitor/%s' % (bigip_url_base, traffic_type), data=json.dumps(pool_mon_info)))
 
-        https_mon_sent = str(bigip.post('%s/ltm/monitor/%s' % (bigip_url_base, traffic_type), data=json.dumps(pool_mon_info)))
+            if https_mon_sent.__contains__('200'):
+                output_log.append({'NotificationsInfo': '{} - Monitor Created'.format(vs_dict['vs']['Q2'])})
 
-        if https_mon_sent.__contains__('200'):
-            output_log.append({'NotificationsInfo': '{} - Monitor Created'.format(vs_dict['vs']['Q2'])})
+            elif https_mon_sent.__contains__('409'):
+                output_log.append({'NotificationsInfo': '{} - Monitor Modified'.format(vs_dict['vs']['Q2'])})
 
-        elif https_mon_sent.__contains__('409'):
-            output_log.append({'NotificationsInfo': '{} - Monitor Modified'.format(vs_dict['vs']['Q2'])})
+        else:
+            output_log.append({'Notifications': '{} : Monitor already exists and no configuration was pushed.'.format(vs_dict['vs']['Q2'])})
 
     return output_log, error
 
@@ -596,40 +610,42 @@ def create_pool_monitor(vs_dict, partition, bigip_url_base, bigip, output_log):
 def create_vs_profiles_http(vs_dict, partition, bigip_url_base, bigip, output_log):
     
     error = False
-    http_profile = {}
-    traffic_type = vs_dict['vs']['D2']
-    traffic_type = (traffic_type.lower())
-    http_default_profile = vs_dict['vs']['O2']
+    output_log.append({'Headers': 'Creating HTTP Profile.'})
+    if not vs_dict['httpProfile']:
+        http_profile = {}
+        traffic_type = vs_dict['vs']['D2']
+        traffic_type = (traffic_type.lower())
+        http_default_profile = vs_dict['vs']['O2']
 
-    if traffic_type == 'HTTP' or 'HTTPS':
+        if traffic_type == 'HTTP' or 'HTTPS':
 
-        if vs_dict['vs']['O2']:
-            output_log.append({'Headers': 'Creating HTTP Profile.'})
+            if vs_dict['vs']['O2']:
+                http_profile['kind'] = 'tm:ltm:profile:http:httpstate'
+                http_profile['name'] = vs_dict['vs']['K2']
+                http_profile['insertXforwardedFor'] = "enabled"
+                http_profile['defaultsFrom'] = http_default_profile
+                http_profile['partition'] = partition
 
-            http_profile['kind'] = 'tm:ltm:profile:http:httpstate'
-            http_profile['name'] = vs_dict['vs']['K2']
-            http_profile['insertXforwardedFor'] = "enabled"
-            http_profile['defaultsFrom'] = http_default_profile
-            http_profile['partition'] = partition
+                http_profile_sent = str(bigip.post('%s/ltm/profile/http' % bigip_url_base, data=json.dumps(http_profile)))
 
-            http_profile_sent = str(bigip.post('%s/ltm/profile/http' % bigip_url_base, data=json.dumps(http_profile)))
+                if http_profile_sent.__contains__('200'):
+                    output_log.append({'NotificationsInfo': '{} - HTTP Profile Created'.format(vs_dict['vs']['K2'])})
 
-            if http_profile_sent.__contains__('200'):
-                output_log.append({'NotificationsInfo': '{} - HTTP Profile Created'.format(vs_dict['vs']['K2'])})
+                elif http_profile_sent.__contains__('409'):
+                    output_log.append({'NotificationsInfo': '{} : *HTTP Profile Modified*'.format(vs_dict['vs']['K2'])})
 
-            elif http_profile_sent.__contains__('409'):
-                output_log.append({'NotificationsInfo': '{} : *HTTP Profile Modified*'.format(vs_dict['vs']['K2'])})
+                elif http_profile_sent.__contains__('400'):
+                    error = True
+                    output_log.append({'Errors': '{} - HTTP Profile not created, no profile configuration deployed.'
+                                      .format(vs_dict['vs']['K2'])})
 
-            elif http_profile_sent.__contains__('400'):
+            else:
                 error = True
                 output_log.append({'Errors': '{} - HTTP Profile not created, no profile configuration deployed.'
                                   .format(vs_dict['vs']['K2'])})
 
-        else:
-            error = True
-            output_log.append({'Errors': '{} - HTTP Profile not created, no profile configuration deployed.'
-                              .format(vs_dict['vs']['K2'])})
-
+    else:
+        output_log.append({'Notifications': 'Profile already exists and no configuration was pushed.'})
 
     return output_log, error
 
@@ -714,27 +730,30 @@ def create_pool(vs_dict, partition, bigip_url_base, bigip, output_log):
     pool_info = {}
     output_log.append({'Headers': 'Creating Pool.'})
 
-    pool_info['kind'] = 'tm:ltm:pool:poolstate'
-    pool_info['name'] = vs_dict['vs']['P2']
-    pool_info['description'] = vs_dict['vs']['AA2']
-    pool_info['loadBalancingMode'] = vs_dict['vs']['U2']
-    pool_info['monitor'] = vs_dict['vs']['Q2']
-    pool_info['members'] = node_list_pool
-    pool_info['minActiveMembers'] = str(vs_dict['vs']['AV2'])
-    pool_info['partition'] = partition
+    if not vs_dict['pool']:
+        pool_info['kind'] = 'tm:ltm:pool:poolstate'
+        pool_info['name'] = vs_dict['vs']['P2']
+        pool_info['description'] = vs_dict['vs']['AA2']
+        pool_info['loadBalancingMode'] = vs_dict['vs']['U2']
+        pool_info['monitor'] = vs_dict['vs']['Q2']
+        pool_info['members'] = node_list_pool
+        pool_info['minActiveMembers'] = str(vs_dict['vs']['AV2'])
+        pool_info['partition'] = partition
 
-    pool_sent = str(bigip.post('%s/ltm/pool' % bigip_url_base, data=json.dumps(pool_info)))
+        pool_sent = str(bigip.post('%s/ltm/pool' % bigip_url_base, data=json.dumps(pool_info)))
 
-    if pool_sent.__contains__('200'):
-        output_log.append({'NotificationsInfo': '{} - Pool Created.'.format(vs_dict['vs']['P2'])})
+        if pool_sent.__contains__('200'):
+            output_log.append({'NotificationsInfo': '{} - Pool Created.'.format(vs_dict['vs']['P2'])})
 
-    elif pool_sent.__contains__('409'):
-        output_log.append({'NotificationsInfo': '{} - Pool Modified.'.format(vs_dict['vs']['P2'])})
+        elif pool_sent.__contains__('409'):
+            output_log.append({'NotificationsInfo': '{} - Pool Modified.'.format(vs_dict['vs']['P2'])})
+        else:
+            error = True
+            output_log.append({'Errors': 'Failed to create Pool'})
+            output_log.append({'Errors': pool_sent})
+
     else:
-        error = True
-        output_log.append({'Errors': 'Failed to create Pool'})
-        output_log.append({'Errors': pool_sent})
-
+        output_log.append({'Notifications': '{} : Pool already exists and no configuration was pushed.'.format(vs_dict['vs']['P2'])})
 
     return output_log, error
 
