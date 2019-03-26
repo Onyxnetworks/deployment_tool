@@ -452,8 +452,8 @@ def compare_pool(vs_dict, partition, bigip_url_base, bigip, output_log):
         pool_name_value_ltm = str((dict_pool.get('name')))
 
         if pool_full_name == pool_path_value_ltm:
-            output_log.append({'Errors': '{} - Pool name present on LTM.{}'.format(pool_name, pool_description)})
-            error = True
+            output_log.append({'NotificationsWarning': '{} - Pool name present on LTM.{}, please check values before deploying.'.format(pool_name, pool_description)})
+            #error = True
             return output_log, error
 
         if pool_name.split('_')[0] == pool_name_value_ltm.split('_')[0]:
