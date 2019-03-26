@@ -71,6 +71,7 @@ def check_sync(bigip_url_base, bigip, output_log):
 
 def check_httpprofile(vs_dict, partition, bigip_url_base, bigip, output_log):
     error = False
+    profileExists = False
     counter = 0
     httpptofiles_on_ltm = bigip.get('%s/ltm/profile/http' % bigip_url_base)
     http_default_profile = vs_dict['vs']['O2']
@@ -91,8 +92,9 @@ def check_httpprofile(vs_dict, partition, bigip_url_base, bigip, output_log):
                     for key, value in httpprofile_dict.items():
                         # check if http profile name is preset on ltm
                         if http_profile == value:
-                            error = True
-                            output_log.append({'Errors': 'HTTP(S) profile name {} already present on LTM'
+                            #error = True
+                            profileExists = True
+                            output_log.append({'NotificationsWarning': 'HTTP(S) profile name {} already present on LTM, please check values before deploying.'
                                               .format(http_profile)})
 
     if counter == 0:
@@ -104,15 +106,20 @@ def check_httpprofile(vs_dict, partition, bigip_url_base, bigip, output_log):
         return output_log, error
     
     if not error:
-        output_log.append({'Notifications': 'HTTP(S) Profile {} will be created.'.format(http_profile)})
-        return output_log, error
+        if not profileExists:
+            output_log.append({'Notifications': 'HTTP(S) Profile {} will be created.'.format(http_profile)})
+            return output_log, error
+        if profileExists:
+            return output_log, error
 
 
 def check_ssl_profile(vs_dict, partition, bigip_url_base, bigip, output_log):
     error = False
     counter = 0
     marker_c = 0
-    marker_s = 0    
+    marker_s = 0
+    sllClientExists = False
+    sslServerExists = False
     ssl_default_profile = vs_dict['vs']['N2']
     ssl_profile_client = vs_dict['vs']['L2']
     ssl_profile_server = vs_dict['vs']['M2']
@@ -132,16 +139,18 @@ def check_ssl_profile(vs_dict, partition, bigip_url_base, bigip, output_log):
                     for key, value in sslprofile_dict.items():
                         # Check if ssl client profile name is preset on ltm
                         if sslprofiles_on_ltm == value:
-                            output_log.append({'Errors': 'SSL Client Profile name {} already present on LTM.'.format(
+                            output_log.append({'NotificationsWarning': 'SSL Client Profile name {} already present on LTM, please check values before deploying.'.format(
                                 sslprofiles_on_ltm)})
                             marker_c = 1
-                            error = True
+                            sllClientExists = True
+                            #error = True
 
                         if ssl_profile_server == value:
-                            output_log.append({'Errors': 'SSL Server Profile name {} already present on LTM.'.format(
+                            output_log.append({'NotificationsWarning': 'SSL Server Profile name {} already present on LTM, please check values before deploying.'.format(
                                 ssl_profile_server)})
                             marker_s = 1
-                            error = True
+                            sslServerExists = True
+                            #error = True
 
     if counter == 0:
         output_log.append({'Errors': 'Default SSL Profile {}, not present, please create default profile.'
@@ -237,16 +246,16 @@ def check_http_mon(vs_dict, partition, bigip_url_base, bigip, output_log):
     for http_mon_dict in http_mon_on_ltm:
         for key, value in http_mon_dict.items():
             if http_mon_name == value:
-                output_log.append({'Errors': 'HTTP monitor : {} present on LTM'.format(http_mon_name)})         
+                output_log.append({'NotificationsWarning': 'HTTP monitor : {} present on LTM, please check values before deploying.'.format(http_mon_name)})
                 marker = 1
-                error = True
+                #error = True
 
     for https_mon_dict in https_mon_on_ltm:
         for key, value in https_mon_dict.items():
             if http_mon_name == value:
-                output_log.append({'Errors': 'HTTPS monitor : {} present on LTM'.format(http_mon_name)})    
+                output_log.append({'NotificationsWarning': 'HTTPS monitor : {} present on LTM, please check values before deploying.'.format(http_mon_name)})
                 marker = 1
-                error = True
+                #error = True
 
     if marker == 0:
         output_log.append({'Notifications': 'HTTP(S) monitor {} will be created'.format(http_mon_name)})
