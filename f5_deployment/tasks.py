@@ -98,10 +98,12 @@ def vs_deployment_validation(vs_dict, location, url_dict, username, password):
             return output_log, vs_dict
 
     if not error:
-        output_log.append({'Headers': 'Checking Sync status of F5.'})   
-        #check_sync_result  = check_sync(bigip_url_base, bigip, output_log)
-        #output_log = check_sync_result[0]
-        #error = check_sync_result[1]
+        # Skip Sync check if in Lab
+        if location != 'LAB':
+            output_log.append({'Headers': 'Checking Sync status of F5.'})
+            check_sync_result  = check_sync(bigip_url_base, bigip, output_log)
+            output_log = check_sync_result[0]
+            error = check_sync_result[1]
      
     if not error:
         output_log.append({'Headers': 'Checking for HTTP Profiles.'})   

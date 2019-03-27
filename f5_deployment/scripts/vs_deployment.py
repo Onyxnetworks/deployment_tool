@@ -92,7 +92,6 @@ def check_httpprofile(vs_dict, partition, bigip_url_base, bigip, output_log):
                     for key, value in httpprofile_dict.items():
                         # check if http profile name is preset on ltm
                         if http_profile == value:
-                            #error = True
                             profileExists = True
                             output_log.append({'NotificationsWarning': 'HTTP profile name {} already present on LTM, please check values before deploying.'
                                               .format(http_profile)})
@@ -143,14 +142,12 @@ def check_ssl_profile(vs_dict, partition, bigip_url_base, bigip, output_log):
                                 sslprofiles_on_ltm)})
                             marker_c = 1
                             sllClientExists = True
-                            #error = True
 
                         if ssl_profile_server == value:
                             output_log.append({'NotificationsWarning': 'SSL Server Profile name {} already present on LTM, please check values before deploying.'.format(
                                 ssl_profile_server)})
                             marker_s = 1
                             sslServerExists = True
-                            #error = True
 
     if counter == 0:
         output_log.append({'Errors': 'Default SSL Profile {}, not present, please create default profile.'
@@ -249,7 +246,6 @@ def check_http_mon(vs_dict, partition, bigip_url_base, bigip, output_log):
             if http_mon_name == value:
                 output_log.append({'NotificationsWarning': 'HTTP monitor : {} present on LTM, please check values before deploying.'.format(http_mon_name)})
                 marker = 1
-                #error = True
                 httpMonExists = True
 
     for https_mon_dict in https_mon_on_ltm:
@@ -257,7 +253,6 @@ def check_http_mon(vs_dict, partition, bigip_url_base, bigip, output_log):
             if http_mon_name == value:
                 output_log.append({'NotificationsWarning': 'HTTPS monitor : {} present on LTM, please check values before deploying.'.format(http_mon_name)})
                 marker = 1
-                #error = True
                 httpMonExists = True
 
     if marker == 0:
@@ -457,7 +452,6 @@ def compare_pool(vs_dict, partition, bigip_url_base, bigip, output_log):
 
         if pool_full_name == pool_path_value_ltm:
             output_log.append({'NotificationsWarning': '{} - Pool name present on LTM.{}, please check values before deploying.'.format(pool_name, pool_description)})
-            #error = True
             poolExists = True
             return output_log, error, poolExists
 
