@@ -19,4 +19,4 @@ requests==2.21.0
 tornado==5.1.1
 urllib3==1.24.1
 vine==1.1.4
-PyYAML==3.13
+PyYAML==5.4
