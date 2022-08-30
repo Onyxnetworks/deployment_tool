@@ -10,7 +10,7 @@ flower==0.9.2
 idna==2.8
 jdcal==1.4
 kombu==4.2.2.post1
-mod-wsgi==4.6.5
+mod-wsgi==4.9.3
 netaddr==0.7.19
 openpyxl==2.5.12
 pytz==2018.7
